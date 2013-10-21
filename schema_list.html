@@ -1,0 +1,16 @@
+<table class="table table-bordered table-condensed table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Owner</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="schema in schemas">
+            <td><a href="#/show/{{schema.name}}">{{schema.name}}</a></td>
+            <td>{{schema.owner}}</td>
+            <td><a class="btn btn-xs btn-primary" href="#/edit/{{schema.name}}">edit</a> | <a class="btn btn-xs btn-danger" href="#/remove/{{schema.name}}">remove</a></td>
+         </tr>
+    </tbody>
+</table>

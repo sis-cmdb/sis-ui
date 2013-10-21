@@ -1,0 +1,21 @@
+<div>
+    <div class="row">
+        <div class="col-md-8 text-left"><strong>{{schema}} data</strong></div>
+        <div class="col-md-4 text-right">{{record_count}} records</div>
+    </div>
+    <table class="table table-bordered table-condensed table-striped">
+        <thead>
+            <tr>
+                <th ng-repeat="key in defkeys">{{key}}</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="doc in docs">
+                <td ng-repeat="key in defkeys">{{doc[key]}}</td>
+
+                <td><a class="btn btn-xs btn-primary" href="#/edit/{{schema}}/{{doc._id}}">edit</a> | <a class="btn btn-xs btn-danger" href="#/remove/{{schema}}/{{doc._id}}">remove</a></td>
+             </tr>
+        </tbody>
+    </table>
+</div>
