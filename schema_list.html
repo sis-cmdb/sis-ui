@@ -8,7 +8,7 @@
     </thead>
     <tbody>
         <tr ng-repeat="schema in schemas">
-            <td><a href="#/show/{{schema.name}}">{{schema.name}}</a></td>
+            <td><a href="#/list/{{schema.name}}">{{schema.name}}</a></td>
             <td>{{schema.owner}}</td>
             <td><a class="btn btn-xs btn-primary" href="#/edit/{{schema.name}}">edit</a> | <a class="btn btn-xs btn-danger" href="#/remove/{{schema.name}}">remove</a></td>
          </tr>
