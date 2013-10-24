@@ -11,10 +11,10 @@ angular.module('sis',[]).config(function($routeProvider) {
         when('/list_hooks', {controller:HookListCtrl,templateUrl:'hook_list.html'}).
         when('/create_hooks',{controller:HookCreateCtrl,templateUrl:'hook_create.html'}).
         when('/remove_hooks/:hook',{controller:HookRemoveCtrl,templateUrl:'hook_remove.html'}).
-        whem('/edit_hooks/:hook',{controller:HookEditCtrl,templateUrl:'hook_edit.html'}).
+        when('/edit_hooks/:hook',{controller:HookEditCtrl,templateUrl:'hook_edit.html'}).
         otherwise({redirectTo:'/'});
 });
-var SISClient = SIS({'url' : 'http://sis-node1.dev-bo.iad1.vrsn.com'});
+var SISClient = SIS.client({'url' : 'http://sis-node1.dev-bo.iad1.vrsn.com'});
 
 function notify(msg) {
     var not = $('<div class="alert alert-success">'+msg+'</div>');
@@ -218,6 +218,7 @@ function EntityCreateCtrl($scope,$http,$routeParams,$location) {
 
             notify('This entity has been successfully created.');
             $location.path('/list/'+$scope.schema);
+        });
     }
     $scope.back = function() {
         window.history.back();
