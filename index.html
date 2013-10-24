@@ -14,6 +14,9 @@
             <div id="notification_area"></div>
         </div>
         <div class="container" ng-view></div>
+        <div class="container">
+            <a href="#/">Schemas</a> | <a href="#/list_hooks">Hooks</a>
+        </div>
         <script>
             var client = SIS.client({'url' : 'http://sis-node1.dev-bo.iad1.vrsn.com/'});
             client.hooks.list(function(err, res) {

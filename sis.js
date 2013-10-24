@@ -8,8 +8,13 @@ angular.module('sis',[]).config(function($routeProvider) {
         when('/edit/:schema/:id',{controller:EntityEditCtrl, templateUrl:'entity_edit.html'}).
         when('/remove/:schema/:id',{controller:EntityRemoveCtrl, templateUrl: 'entity_remove.html'}).
         when('/create/:schema',{controller:EntityCreateCtrl, templateUrl:'entity_create.html'}).
+        when('/list_hooks', {controller:HookListCtrl,templateUrl:'hook_list.html'}).
+        when('/create_hooks',{controller:HookCreateCtrl,templateUrl:'hook_create.html'}).
+        when('/remove_hooks/:hook',{controller:HookRemoveCtrl,templateUrl:'hook_remove.html'}).
+        whem('/edit_hooks/:hook',{controller:HookEditCtrl,templateUrl:'hook_edit.html'}).
         otherwise({redirectTo:'/'});
 });
+var SISClient = SIS({'url' : 'http://sis-node1.dev-bo.iad1.vrsn.com'});
 
 function notify(msg) {
     var not = $('<div class="alert alert-success">'+msg+'</div>');
@@ -22,14 +27,13 @@ function notify(msg) {
 function SchemaListCtrl($scope,$http) {
     $scope.record_count = 0;
     $scope.refresh = function() {
-        $http.get("http://sis-node1.dev-bo.iad1.vrsn.com/api/v1/schemas")
-        .success(function(data) {
+        SISClient.schemas.list(function(err,data) {
+            if(err) {
+                alert(err);
+                return;
+            }
             $scope.schemas = data;
             $scope.record_count = data.length;
-
-        })
-        .error(function(data,status) {
-            alert("Unable to fetch data from SIS: "+data+":"+status);
         });
     };
     $scope.refresh();
@@ -38,33 +42,26 @@ function SchemaListCtrl($scope,$http) {
 function SchemaEditCtrl($scope,$http,$routeParams) {
     $scope.schema = $routeParams.schema;
     $scope.onload = function() {
-        $http.get("http://sis-node1.dev-bo.iad1.vrsn.com/api/v1/schemas/"+$scope.schema)
-        .success(function(data) {
+        SISClient.schemas.get($scope.schema,function(err,data) {
+            if(err) {
+                alert(err);
+                return;
+            }
             $scope.doc = data;
             $scope.doc.definition = JSON.stringify(data.definition);
-        })
-        .error(function(data,status) {
-            alert("Unable to fetch data from SIS: "+data+":"+status);
         });
     }
     $scope.save = function() {
         delete $scope.doc._id;
         delete $scope.doc.__v;
         $scope.definition = JSON.parse($scope.definition);
-        $http({
-            "method": "PUT",
-            "url": "http://sis-node1.dev-bo.iad1.vrsn.com/api/v1/schemas/"+$scope.schema,
-            "data": JSON.stringify($scope.doc),
-            "headers": {
-                "Content-type": "application/json"
-            },
-        })
-        .success(function(data) {
+        SISClient.schemas.update($scope.doc,function(err,data) {
+            if(err) {
+                alert(err);
+                return;
+            }
             notify('This schema has been successfully updated.');
             $location.path('/');
-        })
-        .error(function(data,status) {
-            alert("Failed to update data in SIS: "+JSON.stringify($scope.doc)+": "+status);
         });
     }
     $scope.back = function() {
@@ -86,20 +83,13 @@ function SchemaCreateCtrl($scope,$http,$location) {
     };
     $scope.create = function() {
         $scope.definition = JSON.parse($scope.definition);
-        $http({
-            "method": "POST",
-            "url": "http://sis-node1.dev-bo.iad1.vrsn.com/api/v1/schemas/",
-            "data": JSON.stringify($scope.doc),
-            "headers": {
-                "Content-type": "application/json"
-            },
-        })
-        .success(function(data) {
+        SISClient.schemas.create($scope.doc,function(err,data) {
+            if(err) {
+                alert(err);
+                return;
+            }
             notify('This schema has been successfully created.');
             $location.path('/');
-        })
-        .error(function(data,status) {
-            alert("Failed to update data in SIS: "+JSON.stringify($scope.doc)+": "+status);
         });
     }
     $scope.back = function() {
@@ -111,13 +101,13 @@ function SchemaRemoveCtrl($scope,$http,$routeParams,$location) {
     $scope.schema = $routeParams.schema;
 
     $scope.remove_schema = function() {
-        $http.delete("http://sis-node1.dev-bo.iad1.vrsn.com/api/v1/schemas/"+$scope.schema)
-        .success(function(data) {
+        SISClient.schemas.delete({'name' : $scope.schema },function(err,data) {
+            if(err) {
+                alert(err);
+                return;
+            }
             notify('This schema has been successfully removed.');
             $location.path('/');
-        })
-        .error(function(data,status) {
-            alert("Unable to fetch data from SIS: "+data+":"+status);
         });
     }
     $scope.back = function() {
@@ -130,25 +120,24 @@ function EntityListCtrl($scope,$http,$routeParams) {
     $scope.refresh = function() {
         // First get schema definition so we can display column names
         // ----------------------------------------------------------
-        $http.get("http://sis-node1.dev-bo.iad1.vrsn.com/api/v1/schemas/"+$scope.schema)
-        .success(function(data) {
+        SISClient.schemas.get($scope.schema, function(err,data) {
+            if(err) {
+                alert(err);
+                return;
+            }
             $scope.defkeys = [];
             for(var k in data.definition) {
               $scope.defkeys.push(k);
             }
-            $http.get("http://sis-node1.dev-bo.iad1.vrsn.com/api/v1/entities/"+$scope.schema)
-            .success(function(data) {
+            SISClient.entities($scope.schema).list(function(err,data) {
+                if(err) {
+                    alert(err);
+                    return;
+                }
                 $scope.docs = data;
                 $scope.record_count = data.length;
-            })
-            .error(function(data,status) {
-                alert("Unable to fetch data from SIS: "+data+":"+status);
             });
-        })
-        .error(function(data,status) {
-            alert("Unable to fetch data from SIS: "+data+":"+status);
         });
-
     };
     $scope.back = function() {
         window.history.back();
@@ -164,42 +153,34 @@ function EntityEditCtrl($scope,$http,$routeParams,$location) {
     $scope.onload = function() {
         // First get schema definition so we can display column names
         // ----------------------------------------------------------
-        $http.get("http://sis-node1.dev-bo.iad1.vrsn.com/api/v1/schemas/"+$scope.schema)
-        .success(function(data) {
+        SISClient.schemas.get($scope.schema, function(err,data) {
+            if(err) {
+                alert(err);
+                return;
+            }
             $scope.defkeys = [];
             for(var k in data.definition) {
               $scope.defkeys.push(k);
             }
-            $http.get("http://sis-node1.dev-bo.iad1.vrsn.com/api/v1/entities/"+$scope.schema+'/'+$scope.id)
-            .success(function(data) {
-                $scope.doc = data;
-            })
-            .error(function(data,status) {
-                alert("Unable to fetch data from SIS: "+data+":"+status);
-            });
-        })
-        .error(function(data,status) {
-            alert("Unable to fetch data from SIS: "+data+":"+status);
-        });
 
+            SISClient.entities($scope.schema).get($scope.id,function(err,data) {
+                if(err) {
+                    alert(err);
+                    return;
+                }
+                $scope.doc = data;
+            });
+        });
     };
     $scope.save = function() {
-        delete $scope.doc._id;
         delete $scope.doc.__v;
-        $http({
-            "method": "PUT",
-            "url": "http://sis-node1.dev-bo.iad1.vrsn.com/api/v1/entities/"+$scope.schema+'/'+$scope.id,
-            "data": JSON.stringify($scope.doc),
-            "headers": {
-                "Content-type": "application/json"
-            },
-        })
-        .success(function(data) {
+        SISClient.entities($scope.schema).update($scope.doc,function(err,data) {
+            if(err) {
+                alert(err);
+                return;
+            }
             notify('This entity has been successfully updated.');
             $location.path('/list/'+$scope.schema);
-        })
-        .error(function(data,status) {
-            alert("Failed to update data in SIS: "+JSON.stringify($scope.doc)+": "+status);
         });
     }
     $scope.back = function() {
@@ -215,36 +196,28 @@ function EntityCreateCtrl($scope,$http,$routeParams,$location) {
     $scope.onload = function() {
         // First get schema definition so we can display column names
         // ----------------------------------------------------------
-        $http.get("http://sis-node1.dev-bo.iad1.vrsn.com/api/v1/schemas/"+$scope.schema)
-        .success(function(data) {
+        SISClient.schemas.get($scope.schema,function(err,data) {
+            if(err) {
+                alert(err);
+                return;
+            }
             $scope.defkeys = [];
             $scope.doc = {};
             for(var k in data.definition) {
               $scope.defkeys.push(k);
               $scope.doc[k] = '';
             }
-        })
-        .error(function(data,status) {
-            alert("Unable to fetch data from SIS: "+data+":"+status);
         });
-
     };
     $scope.create = function() {
-        $http({
-            "method": "POST",
-            "url": "http://sis-node1.dev-bo.iad1.vrsn.com/api/v1/entities/"+$scope.schema,
-            "data": JSON.stringify($scope.doc),
-            "headers": {
-                "Content-type": "application/json"
-            },
-        })
-        .success(function(data) {
+        SISClient.entities($scope.schema).create($scope.doc,function(err,data) {
+            if(err) {
+                alert(err);
+                return;
+            }
+
             notify('This entity has been successfully created.');
             $location.path('/list/'+$scope.schema);
-        })
-        .error(function(data,status) {
-            alert("Failed to update data in SIS: "+JSON.stringify($scope.doc)+": "+status);
-        });
     }
     $scope.back = function() {
         window.history.back();
@@ -257,13 +230,13 @@ function EntityRemoveCtrl($scope,$http,$routeParams,$location) {
     $scope.schema = $routeParams.schema;
 
     $scope.remove_entity = function() {
-        $http.delete("http://sis-node1.dev-bo.iad1.vrsn.com/api/v1/entities/"+$scope.schema+'/'+$scope.id)
-        .success(function(data) {
+        SISClient.entities($scope.schema).delete({'_id':$scope.id},function(err,data) {
+            if(err) {
+                alert(err);
+                return;
+            }
             notify('Entity has been successfully removed.');
             $location.path('/list/'+$scope.schema);
-        })
-        .error(function(data,status) {
-            alert("Unable to fetch data from SIS: "+data+":"+status);
         });
     }
     $scope.back = function() {
@@ -271,3 +244,111 @@ function EntityRemoveCtrl($scope,$http,$routeParams,$location) {
     }
 }
 
+function HookListCtrl($scope,$http) {
+    $scope.record_count = 0;
+    $scope.refresh = function() {
+        SISClient.hooks.list(function(err,data) {
+            if(err) {
+                alert(err);
+                return;
+            }
+            $scope.hooks = data;
+            $scope.record_count = data.length;
+        });
+    };
+    $scope.refresh();
+}
+
+function HookEditCtrl($scope,$http,$routeParams) {
+    $scope.hook = $routeParams.hook;
+    $scope.onload = function() {
+        SISClient.hook.get($scope.hook,function(err,data) {
+            if(err) {
+                alert(err);
+                return;
+            }
+            $scope.doc = data;
+            $scope.events.insert = false;
+            $scope.events.update = false;
+            $scope.events.delete = false;
+            for (var i = 0; i < $scope.doc.events.length; i++) {
+                $scope.events[$scope.doc.events[i]] = true;
+            }
+        });
+    }
+    $scope.save = function() {
+        delete $scope.doc._id;
+        delete $scope.doc.__v;
+        $scope.doc.events = [];
+        if($scope.events.insert) $scope.doc.events.push('insert');
+        if($scope.events.update) $scope.doc.events.push('update');
+        if($scope.events.delete) $scope.doc.events.push('delete');
+        SISClient.hooks.update($scope.doc,function(err,data) {
+            if(err) {
+                alert(err);
+                return;
+            }
+            notify('This hook has been successfully updated.');
+            $location.path('/');
+        });
+    }
+    $scope.back = function() {
+        window.history.back();
+    }
+    $scope.onload();
+    
+}
+function HookCreateCtrl($scope,$http,$location) {
+
+    // Grab existing data, and pop open a modal with a form
+    // ----------------------------------------------------
+    $scope.onload = function() {
+        $scope.events.insert = false;
+        $scope.events.update = false;
+        $scope.events.delete = false;
+        $scope.doc = {
+            "name" : '',
+            "owner" : '',
+            "entity_type" : '',
+            "target" : {
+                "action" : '',
+                "url" : ''
+            },
+            "events" : [],
+        };
+    };
+    $scope.create = function() {
+        if($scope.events.insert) $scope.doc.events.push('insert');
+        if($scope.events.update) $scope.doc.events.push('update');
+        if($scope.events.delete) $scope.doc.events.push('delete');
+        SISClient.hook.create($scope.doc,function(err,data) {
+            if(err) {
+                alert(err);
+                return;
+            }
+            notify('This hook has been successfully created.');
+            $location.path('/');
+        });
+    }
+    $scope.back = function() {
+        window.history.back();
+    }
+    $scope.onload();
+}
+function HookRemoveCtrl($scope,$http,$routeParams,$location) {
+    $scope.hook = $routeParams.hook;
+
+    $scope.remove_hook = function() {
+        SISClient.hooks.delete({'name' : $scope.hook },function(err,data) {
+            if(err) {
+                alert(err);
+                return;
+            }
+            notify('This hook has been successfully removed.');
+            $location.path('/');
+        });
+    }
+    $scope.back = function() {
+        window.history.back();
+    }
+}
