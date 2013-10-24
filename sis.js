@@ -28,16 +28,20 @@ function alert_out(e) {
     alert(JSON.stringify(e));
 }
 
-function SchemaListCtrl($scope,$http) {
+function SchemaListCtrl($scope) {
     $scope.record_count = 0;
+    $scope.schemas = [];
     $scope.refresh = function() {
         SISClient.schemas.list(function(err,data) {
             if(err) {
+                alert("Getting here");
                 alert_out(err);
                 return;
             }
-            $scope.schemas = data;
-            $scope.record_count = data.length;
+            $scope.$apply(function() {
+                $scope.schemas = data;
+                $scope.record_count = data.length;
+            });
         });
     };
     $scope.refresh();
@@ -51,8 +55,10 @@ function SchemaEditCtrl($scope,$http,$routeParams) {
                 alert_out(err);
                 return;
             }
-            $scope.doc = data;
-            $scope.doc.definition = JSON.stringify(data.definition);
+            $scope.$apply(function() {
+                $scope.doc = data;
+                $scope.doc.definition = JSON.stringify(data.definition);
+            });
         });
     }
     $scope.save = function() {
@@ -129,17 +135,21 @@ function EntityListCtrl($scope,$http,$routeParams) {
                 alert_out(err);
                 return;
             }
-            $scope.defkeys = [];
-            for(var k in data.definition) {
-              $scope.defkeys.push(k);
-            }
+            $scope.$apply(function() {
+                $scope.defkeys = [];
+                for(var k in data.definition) {
+                  $scope.defkeys.push(k);
+                }
+            });
             SISClient.entities($scope.schema).list(function(err,data) {
                 if(err) {
                     alert_out(err);
                     return;
                 }
-                $scope.docs = data;
-                $scope.record_count = data.length;
+                $scope.$apply(function() {
+                    $scope.docs = data;
+                    $scope.record_count = data.length;
+                });
             });
         });
     };
@@ -162,17 +172,21 @@ function EntityEditCtrl($scope,$http,$routeParams,$location) {
                 alert_out(err);
                 return;
             }
-            $scope.defkeys = [];
-            for(var k in data.definition) {
-              $scope.defkeys.push(k);
-            }
+            $scope.$apply(function() {
+                $scope.defkeys = [];
+                for(var k in data.definition) {
+                  $scope.defkeys.push(k);
+                }
+            });
 
             SISClient.entities($scope.schema).get($scope.id,function(err,data) {
                 if(err) {
                     alert_out(err);
                     return;
                 }
-                $scope.doc = data;
+                $scope.$apply(function() {
+                    $scope.doc = data;
+                });
             });
         });
     };
@@ -205,12 +219,14 @@ function EntityCreateCtrl($scope,$http,$routeParams,$location) {
                 alert_out(err);
                 return;
             }
-            $scope.defkeys = [];
-            $scope.doc = {};
-            for(var k in data.definition) {
-              $scope.defkeys.push(k);
-              $scope.doc[k] = '';
-            }
+            $scope.$apply(function() {
+                $scope.defkeys = [];
+                $scope.doc = {};
+                for(var k in data.definition) {
+                  $scope.defkeys.push(k);
+                  $scope.doc[k] = '';
+                }
+            });
         });
     };
     $scope.create = function() {
@@ -257,8 +273,10 @@ function HookListCtrl($scope,$http) {
                 alert_out(err);
                 return;
             }
-            $scope.hooks = data;
-            $scope.record_count = data.length;
+            $scope.$apply(function() {
+                $scope.hooks = data;
+                $scope.record_count = data.length;
+            });
         });
     };
     $scope.refresh();
@@ -266,19 +284,22 @@ function HookListCtrl($scope,$http) {
 
 function HookEditCtrl($scope,$http,$routeParams) {
     $scope.hook = $routeParams.hook;
+    $scope.events = {};
     $scope.onload = function() {
-        SISClient.hook.get($scope.hook,function(err,data) {
+        SISClient.hooks.get($scope.hook,function(err,data) {
             if(err) {
                 alert_out(err);
                 return;
             }
-            $scope.doc = data;
-            $scope.events.insert = false;
-            $scope.events.update = false;
-            $scope.events.delete = false;
-            for (var i = 0; i < $scope.doc.events.length; i++) {
-                $scope.events[$scope.doc.events[i]] = true;
-            }
+            $scope.$apply(function() {
+                $scope.doc = data;
+                $scope.events.insert = false;
+                $scope.events.update = false;
+                $scope.events.delete = false;
+                for (var i = 0; i < $scope.doc.events.length; i++) {
+                    $scope.events[$scope.doc.events[i]] = true;
+                }
+            });
         });
     }
     $scope.save = function() {
@@ -326,7 +347,7 @@ function HookCreateCtrl($scope,$http,$location) {
         if($scope.events.insert) $scope.doc.events.push('insert');
         if($scope.events.update) $scope.doc.events.push('update');
         if($scope.events.delete) $scope.doc.events.push('delete');
-        SISClient.hook.create($scope.doc,function(err,data) {
+        SISClient.hooks.create($scope.doc,function(err,data) {
             if(err) {
                 alert_out(err);
                 return;
