@@ -24,12 +24,16 @@ function notify(msg) {
     });
 }
 
+function alert_out(e) {
+    alert(JSON.stringify(e));
+}
+
 function SchemaListCtrl($scope,$http) {
     $scope.record_count = 0;
     $scope.refresh = function() {
         SISClient.schemas.list(function(err,data) {
             if(err) {
-                alert(err);
+                alert_out(err);
                 return;
             }
             $scope.schemas = data;
@@ -44,7 +48,7 @@ function SchemaEditCtrl($scope,$http,$routeParams) {
     $scope.onload = function() {
         SISClient.schemas.get($scope.schema,function(err,data) {
             if(err) {
-                alert(err);
+                alert_out(err);
                 return;
             }
             $scope.doc = data;
@@ -57,7 +61,7 @@ function SchemaEditCtrl($scope,$http,$routeParams) {
         $scope.definition = JSON.parse($scope.definition);
         SISClient.schemas.update($scope.doc,function(err,data) {
             if(err) {
-                alert(err);
+                alert_out(err);
                 return;
             }
             notify('This schema has been successfully updated.');
@@ -85,7 +89,7 @@ function SchemaCreateCtrl($scope,$http,$location) {
         $scope.definition = JSON.parse($scope.definition);
         SISClient.schemas.create($scope.doc,function(err,data) {
             if(err) {
-                alert(err);
+                alert_out(err);
                 return;
             }
             notify('This schema has been successfully created.');
@@ -103,7 +107,7 @@ function SchemaRemoveCtrl($scope,$http,$routeParams,$location) {
     $scope.remove_schema = function() {
         SISClient.schemas.delete({'name' : $scope.schema },function(err,data) {
             if(err) {
-                alert(err);
+                alert_out(err);
                 return;
             }
             notify('This schema has been successfully removed.');
@@ -122,7 +126,7 @@ function EntityListCtrl($scope,$http,$routeParams) {
         // ----------------------------------------------------------
         SISClient.schemas.get($scope.schema, function(err,data) {
             if(err) {
-                alert(err);
+                alert_out(err);
                 return;
             }
             $scope.defkeys = [];
@@ -131,7 +135,7 @@ function EntityListCtrl($scope,$http,$routeParams) {
             }
             SISClient.entities($scope.schema).list(function(err,data) {
                 if(err) {
-                    alert(err);
+                    alert_out(err);
                     return;
                 }
                 $scope.docs = data;
@@ -155,7 +159,7 @@ function EntityEditCtrl($scope,$http,$routeParams,$location) {
         // ----------------------------------------------------------
         SISClient.schemas.get($scope.schema, function(err,data) {
             if(err) {
-                alert(err);
+                alert_out(err);
                 return;
             }
             $scope.defkeys = [];
@@ -165,7 +169,7 @@ function EntityEditCtrl($scope,$http,$routeParams,$location) {
 
             SISClient.entities($scope.schema).get($scope.id,function(err,data) {
                 if(err) {
-                    alert(err);
+                    alert_out(err);
                     return;
                 }
                 $scope.doc = data;
@@ -176,7 +180,7 @@ function EntityEditCtrl($scope,$http,$routeParams,$location) {
         delete $scope.doc.__v;
         SISClient.entities($scope.schema).update($scope.doc,function(err,data) {
             if(err) {
-                alert(err);
+                alert_out(err);
                 return;
             }
             notify('This entity has been successfully updated.');
@@ -198,7 +202,7 @@ function EntityCreateCtrl($scope,$http,$routeParams,$location) {
         // ----------------------------------------------------------
         SISClient.schemas.get($scope.schema,function(err,data) {
             if(err) {
-                alert(err);
+                alert_out(err);
                 return;
             }
             $scope.defkeys = [];
@@ -212,7 +216,7 @@ function EntityCreateCtrl($scope,$http,$routeParams,$location) {
     $scope.create = function() {
         SISClient.entities($scope.schema).create($scope.doc,function(err,data) {
             if(err) {
-                alert(err);
+                alert_out(err);
                 return;
             }
 
@@ -233,7 +237,7 @@ function EntityRemoveCtrl($scope,$http,$routeParams,$location) {
     $scope.remove_entity = function() {
         SISClient.entities($scope.schema).delete({'_id':$scope.id},function(err,data) {
             if(err) {
-                alert(err);
+                alert_out(err);
                 return;
             }
             notify('Entity has been successfully removed.');
@@ -250,7 +254,7 @@ function HookListCtrl($scope,$http) {
     $scope.refresh = function() {
         SISClient.hooks.list(function(err,data) {
             if(err) {
-                alert(err);
+                alert_out(err);
                 return;
             }
             $scope.hooks = data;
@@ -265,7 +269,7 @@ function HookEditCtrl($scope,$http,$routeParams) {
     $scope.onload = function() {
         SISClient.hook.get($scope.hook,function(err,data) {
             if(err) {
-                alert(err);
+                alert_out(err);
                 return;
             }
             $scope.doc = data;
@@ -286,7 +290,7 @@ function HookEditCtrl($scope,$http,$routeParams) {
         if($scope.events.delete) $scope.doc.events.push('delete');
         SISClient.hooks.update($scope.doc,function(err,data) {
             if(err) {
-                alert(err);
+                alert_out(err);
                 return;
             }
             notify('This hook has been successfully updated.');
@@ -324,7 +328,7 @@ function HookCreateCtrl($scope,$http,$location) {
         if($scope.events.delete) $scope.doc.events.push('delete');
         SISClient.hook.create($scope.doc,function(err,data) {
             if(err) {
-                alert(err);
+                alert_out(err);
                 return;
             }
             notify('This hook has been successfully created.');
@@ -342,7 +346,7 @@ function HookRemoveCtrl($scope,$http,$routeParams,$location) {
     $scope.remove_hook = function() {
         SISClient.hooks.delete({'name' : $scope.hook },function(err,data) {
             if(err) {
-                alert(err);
+                alert_out(err);
                 return;
             }
             notify('This hook has been successfully removed.');
