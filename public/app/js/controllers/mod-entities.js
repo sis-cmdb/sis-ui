@@ -1,8 +1,6 @@
-'use strict';
-
-sisapp
+angular.module('sisui')
 .controller("EntityDescriptorController", function($scope, SisUtil, $log) {
-
+    "use strict";
     // the container object we are managing a field of
     // $scope.container
 
@@ -42,7 +40,7 @@ sisapp
             $scope.fieldName = arrIdx;
         } else {
             // the container is a document
-            var fieldName = fieldDescriptor['name'];
+            var fieldName = fieldDescriptor.name;
             if (fieldName in container) {
                 $scope.fieldValue = container[fieldName];
             } else {
@@ -51,7 +49,7 @@ sisapp
             }
             $scope.fieldName = fieldName;
         }
-    }
+    };
 
     // set up the controller after init has been called
     var setupScope = function() {
@@ -66,12 +64,12 @@ sisapp
             // fieldValue is an array
             // children is a single element descriptor
             // array
-            $scope.children = fieldDescriptor['children'];
+            $scope.children = fieldDescriptor.children;
         } else if (fieldDescriptor.type == "Document") {
             // fieldValue is a document
-            $scope.children = fieldDescriptor['children'];
+            $scope.children = fieldDescriptor.children;
         } // else we are a non container field
-    }
+    };
 
     $scope.inputType = function() {
         switch ($scope.fieldDescriptor.type) {
@@ -82,7 +80,7 @@ sisapp
             default:
                 return "text";
         }
-    }
+    };
 
     $scope.toggleChoice = function(choice) {
         var idx = $scope.fieldValue.indexOf(choice);
@@ -91,14 +89,14 @@ sisapp
         } else {
             $scope.fieldValue.splice(idx, 1);
         }
-    }
+    };
 
     $scope.addItem = function() {
         var fieldDescriptor = $scope.fieldDescriptor;
-        var itemDesc = fieldDescriptor['children'][0];
+        var itemDesc = fieldDescriptor.children[0];
         var item = SisUtil.getNewItemForDesc(itemDesc);
         $scope.fieldValue.push(item);
-    }
+    };
 
     $scope.delItem = function(idx) {
         if (!$scope.isItem()) {
@@ -108,27 +106,27 @@ sisapp
         if (idx >= 0 && idx < container.length) {
             container.splice(idx, 1);
         }
-    }
+    };
 
     $scope.isItem = function() {
         var container = $scope.container;
         var arrIdx = $scope.arrIdx;
         return !isNaN(arrIdx) && container instanceof Array;
-    }
+    };
 
     $scope.canDelete = function() {
         if ($scope.action == "view") {
             return false;
         }
         return $scope.isItem();
-    }
+    };
 
     $scope.canAdd = function() {
         if ($scope.action == "view") {
             return false;
         }
         return ($scope.fieldValue instanceof Array);
-    }
+    };
 
     // initialize a controller where value is a
     // container object (document or array),
@@ -142,7 +140,7 @@ sisapp
         $scope.isCollapsed = false;
         initializeFieldValue();
         setupScope();
-    }
+    };
 
     // Dirty hack.  Better way would be to make binding fieldValue
     // and propagating that up without ngChange
@@ -160,13 +158,13 @@ sisapp
 
     $scope.isReadOnly = function() {
         return $scope.action == 'view';
-    }
+    };
 
     $scope.fieldValue = "<NOT_SET>";
 
 });
 
-sisapp
+angular.module('sisui')
 .controller("ShowEntityController", function($scope, $modalInstance,
                                              SisUtil, SisClient) {
     var orig = $scope.entity;
@@ -177,10 +175,10 @@ sisapp
     var foundLocked = false;
     for (var i = 0; i < $scope.descriptors.length; ++i) {
         var desc = $scope.descriptors[i];
-        if (desc['name'] == 'owner') {
+        if (desc.name == 'owner') {
             // convert owner into an enum
-            desc['enum'] = SisUtil.getOwnerSubset($scope.schema);
-        } else if (desc['name'] == 'sis_locked') {
+            desc.enum = SisUtil.getOwnerSubset($scope.schema);
+        } else if (desc.name == 'sis_locked') {
             foundLocked = true;
         }
     }
@@ -192,10 +190,10 @@ sisapp
     $scope.hasChanged = function() {
         console.log(JSON.stringify($scope.entity));
         return !angular.equals(orig, $scope.entity);
-    }
+    };
 
     $scope.save = function() {
-        var schemaName = $scope.schema['name'];
+        var schemaName = $scope.schema.name;
         var endpoint = SisClient.entities(schemaName);
         if ($scope.action == 'add') {
             // create
@@ -212,6 +210,6 @@ sisapp
                 }
             });
         }
-    }
+    };
 
-})
+});

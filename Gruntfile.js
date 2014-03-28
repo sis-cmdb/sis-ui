@@ -1,0 +1,250 @@
+module.exports = function(grunt) {
+
+  grunt.file.defaultEncoding = 'utf8';
+
+  var marked = require('marked');
+  marked.setOptions({
+    breaks : true
+  });
+  var hljs = require('highlight.js');
+  var fs = require('fs');
+
+  marked.setOptions({
+    highlight: function(code, lang) {
+      var result =  hljs.highlight(lang, code).value;
+      return result;
+    }
+  });
+
+  var getDocData = function(dest, src) {
+    var replaceMents = [
+        ['./docs/rbac.md', './rbac'],
+        ['./docs/sharing.md', './sharing'],
+        ['./rbac.md', './rbac']
+    ];
+    console.log(dest + " -> " + src);
+    var srcMd = "../SIS-web/README.md";
+    var srcTitle = "SIS Documentation";
+    var baseFile = dest.split('/');
+    var filename = baseFile[baseFile.length - 1];
+    if (filename != 'index.html') {
+        srcMd = "../SIS-web/docs/" + filename + ".md";
+        switch (baseFile) {
+            case 'rbac':
+                srcTitle = "SIS RBAC";
+                break;
+            case 'sharing':
+                srcTitle = "SIS Data Sharing";
+                break;
+            default:
+                break;
+        }
+    }
+
+
+    var mdData = grunt.file.read(srcMd);
+    for (var i = 0; i < replaceMents.length; ++i) {
+        var r = replaceMents[i];
+        mdData = mdData.replace(r[0], r[1]);
+    }
+    var html = marked(mdData);
+    return {
+        'docHtml' : html,
+        'title' : srcTitle
+    };
+  };
+
+  grunt.initConfig({
+    pkg: grunt.file.readJSON('package.json'),
+    // concat: {
+    //   options: {
+    //     separator: ';'
+    //   },
+    //   dist: {
+    //     src: ['app/**/*.js'],
+    //     dest: 'dist/<%= pkg.name %>.js'
+    //   }
+    // },
+    // uglify: {
+    //   options: {
+    //     banner: '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\n'
+    //   },
+    //   dist: {
+    //     files: {
+    //       'dist/<%= pkg.name %>.min.js': ['<%= concat.dist.dest %>']
+    //     }
+    //   }
+    // },
+    // The actual grunt server settings
+    connect: {
+      options: {
+        port: 9000,
+        // Change this to '0.0.0.0' to access the server from outside.
+        hostname: 'localhost',
+        livereload: 35729
+      },
+      livereload: {
+        options: {
+          open: true,
+          base: [
+            '.tmp',
+            'public'
+          ]
+        }
+      },
+      // test: {
+      //   options: {
+      //     port: 9001,
+      //     base: [
+      //       '.tmp',
+      //       'test',
+      //       'public'
+      //     ]
+      //   }
+      // },
+      dist: {
+        options: {
+          base: 'dist',
+          middleware : function(connect, options, middlewares) {
+            var func = function(req, res, next) {
+              if (req.url.indexOf('/docs/rbac') != -1 ||
+                req.url.indexOf('/docs/sharing') != -1) {
+                res.setHeader('Content-Type', 'text/html');
+              }
+              return next();
+            };
+            middlewares.unshift(func);
+            return middlewares;
+          }
+        }
+      }
+    },
+    // TODO: add minification if needed
+    copy: {
+      dist: {
+        files : [
+          {
+            src: ['public/**/*', '!**/sis-js.js'],
+            dest: 'dist/',
+          },
+          {
+            src: 'index.html',
+            dest: 'dist/'
+          },
+          {
+            src: ['docs/**/*', '!**/*.jade'],
+            dest: 'dist/',
+          },
+          {
+            src: "../SIS-js/lib/sis-js.js",
+            dest: 'dist/public/app/lib/sis-js.js'
+          }
+        ]
+      }
+    },
+    qunit: {
+      files: ['test/**/*.html']
+    },
+    jshint: {
+      files: ['Gruntfile.js', 'public/app/lib/sis-js.js', 'public/app/js/**/*.js', 'docs/js/*.js', 'test/**/*.js'],
+      options: {
+        // options here to override JSHint defaults
+        globals: {
+          console: true,
+          module: true,
+          document: true,
+          angular: true,
+          SIS: true,
+          localStorage: true
+        }
+      }
+    },
+    // create documents
+    jade: {
+        docs: {
+            options: {
+                data: getDocData
+            },
+            files : {
+                "dist/docs/index.html" : "docs/docs.jade",
+                "dist/docs/rbac" : "docs/docs.jade",
+                "dist/docs/sharing" : "docs/docs.jade",
+            }
+        }
+    },
+    // Empties folders to start fresh
+    clean: {
+      dist: {
+        files: [{
+          dot: true,
+          src: [
+            'dist/*'
+          ]
+        }]
+      },
+      server: '.tmp'
+    },
+    watch: {
+      js: {
+        files: ['public/app/{,*/}*.js'],
+        tasks: ['newer:jshint:all'],
+        options: {
+          livereload: true
+        }
+      },
+      // jsTest: {
+      //   files: ['test/spec/{,*/}*.js'],
+      //   tasks: ['newer:jshint:test', 'karma']
+      // },
+      // styles: {
+      //   files: ['<%= yeoman.app %>/styles/{,*/}*.css'],
+      //   tasks: ['newer:copy:styles', 'autoprefixer']
+      // },
+      gruntfile: {
+        files: ['Gruntfile.js']
+      },
+      livereload: {
+        options: {
+          livereload: '<%= connect.options.livereload %>'
+        },
+        files: [
+          'public/{,*/}*.html',
+        ]
+      }
+    },
+  });
+
+  // grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-jshint');
+  // grunt.loadNpmTasks('grunt-contrib-qunit');
+  grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-contrib-connect');
+  grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-contrib-jade');
+  grunt.loadNpmTasks('grunt-newer');
+
+  // grunt.registerTask('test', ['jshint', 'qunit']);
+  // grunt.registerTask('default', ['jshint', 'qunit', 'concat', 'uglify']);
+
+  grunt.registerTask('serve', function (target) {
+    if (target === 'dist') {
+      return grunt.task.run(['build', 'connect:dist:keepalive']);
+    }
+
+    grunt.task.run([
+      'clean:server',
+      'connect:livereload',
+      'watch'
+    ]);
+  });
+  grunt.registerTask('build', [
+    'clean:dist',
+    'copy:dist',
+    'jade:docs'
+  ]);
+
+  grunt.registerTask('default', ['newer:jshint','build']);
+
+
+};

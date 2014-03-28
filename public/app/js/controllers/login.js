@@ -1,6 +1,7 @@
-'use strict';
+angular.module('sisui')
+.controller("LoginController", function($scope, $location, currentUserService) {
+    "use strict";
 
-sisapp.controller("LoginController", function($scope, $location, currentUserService) {
     if (currentUserService.isLoggedIn()) {
         $location.path("/schemas");
         return;
@@ -11,5 +12,5 @@ sisapp.controller("LoginController", function($scope, $location, currentUserServ
         currentUserService.login(username, pw).then(function() {
             $location.path("/schemas");
         });
-    }
+    };
 });

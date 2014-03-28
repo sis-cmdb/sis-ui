@@ -1,7 +1,7 @@
-'use strict';
-
-sisapp.controller("EntitiesController", function($scope, $location, $route,
+angular.module('sisui')
+.controller("EntitiesController", function($scope, $location, $route,
                                                  $modal, SisUtil, SisClient) {
+    "use strict";
     if (!($route.current && $route.current.params && $route.current.params.schema)) {
         $location.path("/#schemas");
         return;
@@ -13,15 +13,15 @@ sisapp.controller("EntitiesController", function($scope, $location, $route,
             if (!err) {
                 $scope.$apply(function() {
                     for (var i = 0; i < $scope.entities.length; ++i) {
-                        if ($scope.entities[i]['_id'] == entity['_id']) {
-                            $scope.entities.splice(i, 1)
+                        if ($scope.entities[i]._id == entity._id) {
+                            $scope.entities.splice(i, 1);
                             break;
                         }
                     }
                 });
             }
         });
-    }
+    };
 
     var schemaName = $route.current.params.schema;
 
@@ -37,8 +37,8 @@ sisapp.controller("EntitiesController", function($scope, $location, $route,
             controller : "ShowEntityController"
         }).result.then(function(entity) {
             $scope.entities.push(entity);
-        });;
-    }
+        });
+    };
 
     var editEntity = function(entity) {
         var modalScope = $scope.$new(true);
@@ -51,13 +51,13 @@ sisapp.controller("EntitiesController", function($scope, $location, $route,
             controller : "ShowEntityController"
         }).result.then(function(entity) {
             for (var i = 0; i < $scope.entities.length; ++i) {
-                if ($scope.entities[i]['_id'] == entity['_id']) {
+                if ($scope.entities[i]._id == entity._id) {
                     $scope.entities[i] = entity;
                     break;
                 }
             }
         });
-    }
+    };
 
     var viewEntity = function(entity) {
         var modalScope = $scope.$new(true);
@@ -69,15 +69,15 @@ sisapp.controller("EntitiesController", function($scope, $location, $route,
             scope : modalScope,
             controller : "ShowEntityController"
         });
-    }
+    };
 
     $scope.canManage = function(entity) {
         return SisUtil.canManageEntity(entity, $scope.schema);
-    }
+    };
 
     $scope.canRemove = function(entity) {
         return $scope.canManage(entity) && SisUtil.canDelete(entity);
-    }
+    };
 
     SisClient.schemas.get(schemaName, function(err, schema) {
         if (schema) {
@@ -94,12 +94,12 @@ sisapp.controller("EntitiesController", function($scope, $location, $route,
                         $scope.idField = SisUtil.getIdField(schema);
                         $scope.entities = entities.results.map(function(ent) {
                             return ent;
-                        })
+                        });
                     });
                 }
             });
         } else {
-            $location.path("/#schemas")
+            $location.path("/#schemas");
         }
     });
 });
