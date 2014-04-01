@@ -237,7 +237,7 @@ angular.module('sisui')
         if (parent.type === "Document") {
             var i = 0;
             for (i = 0; i < parent.children.length; ++i) {
-                if (parent.children[i].name == descriptor.name) {
+                if (parent.children[i] == descriptor) {
                     break;
                 }
             }
@@ -302,11 +302,38 @@ angular.module('sisui')
         schemaDefinitionDescriptor
     ];
 
-    $scope.$watch("schema", function() {
-        //console.log(JSON.stringify($scope.schema));
-    }, true);
-
+    var orig = angular.copy($scope.schema);
     $scope.descriptors = descriptors;
+
+    $scope.hasChanged = function() {
+        return !angular.equals(orig, $scope.schema);
+    };
+
+    $scope.save = function() {
+        var name = $scope.schema.name;
+        var endpoint = SisClient.schemas;
+        var func = endpoint.create;
+        if ($scope.action === 'edit') {
+            func = endpoint.update;
+        }
+        func($scope.schema, function(err, res) {
+            if (!err) {
+                $modalInstance.close(res);
+            }
+        });
+    };
+
+    switch ($scope.action) {
+        case 'add':
+            $scope.modalTitle = "Add a new schema";
+            break;
+        case 'edit':
+            $scope.modalTitle = "Modify Schema - " + $scope.schema.name;
+            break;
+        default:
+            $scope.modalTitle = "<error>";
+            break;
+    }
 });
 
 

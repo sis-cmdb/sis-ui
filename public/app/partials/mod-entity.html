@@ -1,6 +1,6 @@
 <div>
     <div class="modal-header">
-        <h3>Add an entity of type {{ schema.name }}</h3>
+        <h3>{{ modalTitle }}</h3>
     </div>
     <div class="modal-body no-item-display">
         <li ng-controller="EntityDescriptorController" ng-repeat="descriptor in descriptors" ng-init="init(entity, descriptor);">

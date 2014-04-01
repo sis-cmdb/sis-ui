@@ -186,28 +186,33 @@ angular.module('sisui')
 
 
     $scope.hasChanged = function() {
-        console.log(JSON.stringify($scope.entity));
         return !angular.equals(orig, $scope.entity);
     };
 
     $scope.save = function() {
         var schemaName = $scope.schema.name;
         var endpoint = SisClient.entities(schemaName);
-        if ($scope.action == 'add') {
-            // create
-            endpoint.create($scope.entity, function(err, res) {
-                if (!err) {
-                    $modalInstance.close(res);
-                }
-            });
-        } else {
-            // update
-            endpoint.update($scope.entity, function(err, res) {
-                if (!err) {
-                    $modalInstance.close(res);
-                }
-            });
+        var func = endpoint.create;
+        if ($scope.action == 'edit') {
+            func = endpoint.update;
         }
+        func($scope.entity, function(err, res) {
+            if (!err) {
+                $modalInstance.close(res);
+            }
+        });
     };
+
+    switch ($scope.action) {
+        case 'add':
+            $scope.modalTitle = "Add a new entity of type " + $scope.schema.name;
+            break;
+        case 'edit':
+            $scope.modalTitle = "Modify entity of type " + $scope.schema.name;
+            break;
+        default:
+            $scope.modalTitle = "Entity information " + $scope.schema.name;
+            break;
+    }
 
 });

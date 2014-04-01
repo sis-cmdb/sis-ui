@@ -33,7 +33,7 @@
             var res = {
                 type : "Array"
             };
-            if (arr.length) {
+            if (arr.length && arr[0]) {
                 res.children = [normalizeDescriptor(arr[0], null)];
             } else {
                 res.children = [{ "type" : "Mixed" }];

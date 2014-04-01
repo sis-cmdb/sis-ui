@@ -7,6 +7,28 @@ angular.module('sisui')
         return;
     }
 
+
+    $scope.canManageSchema = function(schema) {
+        if (!schema) {
+            return false;
+        }
+        return SisUtil.canManageSchema(schema);
+    };
+
+    $scope.editSchema = function(schema) {
+        var modalScope = $scope.$new(true);
+        modalScope.schema = schema;
+        modalScope.action = 'edit';
+        var modal = $modal.open({
+            templateUrl : "public/app/partials/mod-schema.html",
+            scope : modalScope,
+            controller : "ModSchemaController"
+        }).result.then(function(schema) {
+            $scope.schema = schema;
+            $scope.$broadcast('schema', schema);
+        });
+    };
+
     $scope.remove = function(entity) {
         var schemaName = $scope.schema.name;
         SisClient.entities(schemaName).delete(entity, function(err, res) {
