@@ -34,7 +34,7 @@
                 type : "Array"
             };
             if (arr.length) {
-                res.children = [normalizeDescriptor(arr[0])];
+                res.children = [normalizeDescriptor(arr[0], null)];
             } else {
                 res.children = [{ "type" : "Mixed" }];
             }
@@ -119,6 +119,7 @@
 
 
         function getDescriptors(defn) {
+            if (!defn) { return []; }
             var result = [];
             for (var k in defn) {
                 var desc = defn[k];
@@ -142,6 +143,24 @@
                 }
             }
             return false;
+        };
+
+        var _getAdminRoles = function() {
+            var user = currentUserService.getCurrentUser();
+            if (!user) {
+                return null;
+            }
+            if (user.super_user) {
+                return true;
+            }
+            var roles = user.roles || { };
+            var result = [];
+            for (var k in roles) {
+                if (roles[k] == 'admin') {
+                    result.push(k);
+                }
+            }
+            return result;
         };
 
         var _getOwnerSubset = function(schema) {
@@ -229,6 +248,17 @@
             }
         };
 
+        var _getInputType = function(type) {
+            switch (type) {
+                case "Boolean":
+                    return "checkbox";
+                case "Number":
+                    return "number";
+                default:
+                    return "text";
+            }
+        };
+
         return {
             getDescriptorArray : function(schema) {
                 return getDescriptors(schema.definition);
@@ -240,7 +270,9 @@
             getDescriptorPath : _getPathForDesc,
             getNewItemForDesc : _getNewItemForDesc,
             canDelete : _canDelete,
-            getOwnerSubset : _getOwnerSubset
+            getOwnerSubset : _getOwnerSubset,
+            getAdminRoles : _getAdminRoles,
+            getInputType : _getInputType
         };
     });
 
@@ -262,16 +294,21 @@
 
     sisapp.factory("currentUserService", function(SisClient, $q, $rootScope) {
         var USER_KEY = "t";
+
+        var isExpired = function(currentUser) {
+            return !(currentUser &&
+                     currentUser.expirationTime &&
+                     currentUser.expirationTime > Date.now());
+        };
+
         return {
             isLoggedIn : function() {
                 if (!(USER_KEY in localStorage)) {
                     return false;
                 }
                 var currentUser = angular.fromJson(localStorage[USER_KEY]);
-                var result = currentUser &&
-                             currentUser.expirationTime &&
-                             currentUser.expirationTime > Date.now();
-                if (!result) {
+                var expired = isExpired(currentUser);
+                if (expired) {
                     // cleanup
                     SisClient.authToken = null;
                     delete localStorage[USER_KEY];
@@ -279,12 +316,20 @@
                     // ensure sis client token is set
                     SisClient.authToken = currentUser.token;
                 }
-                return result;
+                return !expired;
             },
             getCurrentUser : function() {
                 var data = localStorage[USER_KEY];
                 if (data) {
-                    return angular.fromJson(data);
+                    // ensure not expired
+                    var user = angular.fromJson(data);
+                    if (isExpired(user)) {
+                        // cleanup
+                        SisClient.authToken = null;
+                        delete localStorage[USER_KEY];
+                        user = null;
+                    }
+                    return user;
                 }
                 return null;
             },

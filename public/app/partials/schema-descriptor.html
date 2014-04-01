@@ -1,10 +1,44 @@
-<label class="label label-default">{{descriptor.name}}</label>
-<a ng-if="descriptor.url" href="{{ descriptor.url }}">
-    <label class="label label-warning add-pointer">{{descriptor.type}}</label>
-</a>
-<label ng-if="!descriptor.url" class="label label-success">{{descriptor.type}}</label>
-<label class="label label-primary" ng-show="descriptor.required">required</label>
-<label class="label label-info" ng-show="descriptor.unique">unique</label>
-<ul ng-hide="!descriptor.children">
-    <li ng-repeat="descriptor in descriptor.children" ng-include="'public/app/partials/schema-descriptor.html'"></li>
-</ul>
+<ng-form class="form-inline" role="form">
+    <label ng-if="path === 'definition'" for="{{ path }}">{{ descriptor.name }}</label>
+    <div ng-if="canModifyDescriptor()">
+        <a ng-disabled="!canDelete();" class="btn btn-xs btn-primary" ng-click="deleteDescriptor();">
+            <span class="glyphicon glyphicon-minus"></span>
+        </a>
+        <input ng-if="canModifyDescriptorName()" type="text" ng-model="descriptor.name" placeholder="Field Name" ng-change="nameChanged(descriptor);">
+        <select ng-model="descriptor.type" ng-options="type for type in validDescriptorTypes" ng-change="typeChanged(descriptor);"></select>
+        <div ng-repeat="f in checkboxFields" class="checkbox">
+            <label>
+                <input ng-change="attrChanged(descriptor);" type="checkbox" ng-model="descriptor[f]"> {{ f }}
+            </label>
+        </div>
+    </div>
+    <div ng-if="isSchemaValue()">
+        <label for="{{ path }}">{{ descriptor.name }}</label>
+        <div ng-if="descriptor.enum" id="{{ path }}">
+            <ul>
+                <li>
+                    <fieldset>
+                    <label ng-repeat="choice in descriptor.enum">
+                        <input type="checkbox"
+                           ng-checked="schema[descriptor.name].indexOf(choice) >= 0"
+                           ng-click="toggleChoice(choice)"> {{ choice }}
+                    </label>
+                    </fieldset>
+                </li>
+            </ul>
+        </div>
+        <input ng-if="!descriptor.enum" type="{{ inputType() }}" placeholder="{{descriptor.type}}" ng-model="value" ng-disabled="descriptor.readonly" ng-change="schemaValueChanged(value)" id="{{ path }}"/>
+    </div>
+</ng-form>
+<div ng-if="canModifyChildren();">
+    <ul>
+        <li ng-repeat="descriptor in descriptor.children" ng-controller="SchemaDescriptorController">
+            <div ng-include="'public/app/partials/schema-descriptor.html'"></div>
+        </li>
+        <li ng-if="canAddChildren();">
+            <a class="btn btn-xs btn-primary" ng-click="addChildDescriptor();">
+                <span class="glyphicon glyphicon-plus">Add</span>
+            </a>
+        </li>
+    </ul>
+</div>

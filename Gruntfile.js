@@ -2,6 +2,8 @@ module.exports = function(grunt) {
 
   grunt.file.defaultEncoding = 'utf8';
 
+  require('load-grunt-tasks')(grunt);
+
   var marked = require('marked');
   marked.setOptions({
     breaks : true
@@ -54,27 +56,10 @@ module.exports = function(grunt) {
     };
   };
 
+  // TODO: minfiy / concat if needed?
+
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-    // concat: {
-    //   options: {
-    //     separator: ';'
-    //   },
-    //   dist: {
-    //     src: ['app/**/*.js'],
-    //     dest: 'dist/<%= pkg.name %>.js'
-    //   }
-    // },
-    // uglify: {
-    //   options: {
-    //     banner: '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\n'
-    //   },
-    //   dist: {
-    //     files: {
-    //       'dist/<%= pkg.name %>.min.js': ['<%= concat.dist.dest %>']
-    //     }
-    //   }
-    // },
     // The actual grunt server settings
     connect: {
       options: {
@@ -85,23 +70,9 @@ module.exports = function(grunt) {
       },
       livereload: {
         options: {
-          open: true,
-          base: [
-            '.tmp',
-            'public'
-          ]
+          open: true
         }
       },
-      // test: {
-      //   options: {
-      //     port: 9001,
-      //     base: [
-      //       '.tmp',
-      //       'test',
-      //       'public'
-      //     ]
-      //   }
-      // },
       dist: {
         options: {
           base: 'dist',
@@ -146,7 +117,7 @@ module.exports = function(grunt) {
       files: ['test/**/*.html']
     },
     jshint: {
-      files: ['Gruntfile.js', 'public/app/lib/sis-js.js', 'public/app/js/**/*.js', 'docs/js/*.js', 'test/**/*.js'],
+      files: ['Gruntfile.js', 'public/app/**/*.js', 'public/app/js/**/*.js', 'docs/js/*.js', 'test/**/*.js', '!public/app/lib/ui.bootstrap/*.js'],
       options: {
         // options here to override JSHint defaults
         globals: {
@@ -186,20 +157,12 @@ module.exports = function(grunt) {
     },
     watch: {
       js: {
-        files: ['public/app/{,*/}*.js'],
-        tasks: ['newer:jshint:all'],
+        files: ['public/app/**/*.js'],
+        tasks: ['newer:jshint'],
         options: {
           livereload: true
         }
       },
-      // jsTest: {
-      //   files: ['test/spec/{,*/}*.js'],
-      //   tasks: ['newer:jshint:test', 'karma']
-      // },
-      // styles: {
-      //   files: ['<%= yeoman.app %>/styles/{,*/}*.css'],
-      //   tasks: ['newer:copy:styles', 'autoprefixer']
-      // },
       gruntfile: {
         files: ['Gruntfile.js']
       },
@@ -208,24 +171,12 @@ module.exports = function(grunt) {
           livereload: '<%= connect.options.livereload %>'
         },
         files: [
-          'public/{,*/}*.html',
+          'public/**/*.html',
+          'public/app/**/*.js'
         ]
       }
     },
   });
-
-  // grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-contrib-jshint');
-  // grunt.loadNpmTasks('grunt-contrib-qunit');
-  grunt.loadNpmTasks('grunt-contrib-clean');
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-contrib-connect');
-  grunt.loadNpmTasks('grunt-contrib-copy');
-  grunt.loadNpmTasks('grunt-contrib-jade');
-  grunt.loadNpmTasks('grunt-newer');
-
-  // grunt.registerTask('test', ['jshint', 'qunit']);
-  // grunt.registerTask('default', ['jshint', 'qunit', 'concat', 'uglify']);
 
   grunt.registerTask('serve', function (target) {
     if (target === 'dist') {

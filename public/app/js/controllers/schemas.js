@@ -1,6 +1,6 @@
 angular.module('sisui')
 .controller("SchemasController", function($scope, $location,
-                                                SisUtil, SisClient) {
+                                          $modal, SisUtil, SisClient) {
     "use strict";
 
     var query = {
@@ -24,6 +24,36 @@ angular.module('sisui')
         });
     };
 
+    $scope.edit = function(schema) {
+        var modalScope = $scope.$new(true);
+        modalScope.schema = schema;
+        modalScope.action = 'edit';
+        var modal = $modal.open({
+            templateUrl : "public/app/partials/mod-schema.html",
+            scope : modalScope,
+            controller : "ModSchemaController"
+        }).result.then(function(schema) {
+
+        });
+    };
+
+    $scope.addNew = function() {
+        var modalScope = $scope.$new(true);
+        modalScope.schema = { };
+        modalScope.action = 'add';
+        var modal = $modal.open({
+            templateUrl : "public/app/partials/mod-schema.html",
+            scope : modalScope,
+            controller : "ModSchemaController"
+        }).result.then(function(schema) {
+            $scope.schemas.push(schema);
+        });
+    };
+
+    $scope.canAdd = function() {
+        return !!(SisUtil.getAdminRoles());
+    };
+
     $scope.canManage = function(schema) {
         return SisUtil.canManageSchema(schema);
     };
@@ -34,9 +64,6 @@ angular.module('sisui')
 
     SisClient.schemas.listAll({ sort : "name" }, function(err, schemas) {
         if (schemas) {
-            schemas = schemas.map(function(s) {
-                return s;
-            });
             $scope.$apply(function() {
                 $scope.schemas = schemas;
             });

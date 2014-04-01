@@ -72,14 +72,7 @@ angular.module('sisui')
     };
 
     $scope.inputType = function() {
-        switch ($scope.fieldDescriptor.type) {
-            case "Boolean":
-                return "checkbox";
-            case "Number":
-                return "number";
-            default:
-                return "text";
-        }
+        return SisUtil.getInputType($scope.fieldDescriptor.type);
     };
 
     $scope.toggleChoice = function(choice) {
@@ -165,11 +158,10 @@ angular.module('sisui')
 });
 
 angular.module('sisui')
-.controller("ShowEntityController", function($scope, $modalInstance,
+.controller("ModEntityController", function($scope, $modalInstance,
                                              SisUtil, SisClient) {
     var orig = $scope.entity;
     $scope.entity = angular.copy(orig);
-    console.log("orig: " + JSON.stringify(orig));
     $scope.descriptors = SisUtil.getDescriptorArray($scope.schema);
     // need to tweak this so owner and sis_locked show up..
     var foundLocked = false;
@@ -181,6 +173,12 @@ angular.module('sisui')
         } else if (desc.name == 'sis_locked') {
             foundLocked = true;
         }
+    }
+    if (!foundLocked) {
+        $scope.descriptors.push({
+            name : "sis_locked",
+            type : "Boolean"
+        });
     }
 
     // for the valueChanged recursion

@@ -1,6 +1,6 @@
 angular.module('sisui')
 .controller("EntitiesController", function($scope, $location, $route,
-                                                 $modal, SisUtil, SisClient) {
+                                           $modal, SisUtil, SisClient) {
     "use strict";
     if (!($route.current && $route.current.params && $route.current.params.schema)) {
         $location.path("/#schemas");
@@ -34,7 +34,7 @@ angular.module('sisui')
         var modal = $modal.open({
             templateUrl : "public/app/partials/mod-entity.html",
             scope : modalScope,
-            controller : "ShowEntityController"
+            controller : "ModEntityController"
         }).result.then(function(entity) {
             $scope.entities.push(entity);
         });
@@ -48,7 +48,7 @@ angular.module('sisui')
         var modal = $modal.open({
             templateUrl : "public/app/partials/mod-entity.html",
             scope : modalScope,
-            controller : "ShowEntityController"
+            controller : "ModEntityController"
         }).result.then(function(entity) {
             for (var i = 0; i < $scope.entities.length; ++i) {
                 if ($scope.entities[i]._id == entity._id) {
@@ -67,7 +67,7 @@ angular.module('sisui')
         $modal.open({
             templateUrl : "public/app/partials/mod-entity.html",
             scope : modalScope,
-            controller : "ShowEntityController"
+            controller : "ModEntityController"
         });
     };
 
