@@ -1,5 +1,5 @@
 angular.module('sisui')
-.controller("EntityDescriptorController", function($scope, SisUtil, $log) {
+.controller("EntityDescriptorController", function($scope, SisUtil, SisClient, $log) {
     "use strict";
     // the container object we are managing a field of
     // $scope.container
@@ -68,7 +68,35 @@ angular.module('sisui')
         } else if (fieldDescriptor.type == "Document") {
             // fieldValue is a document
             $scope.children = fieldDescriptor.children;
-        } // else we are a non container field
+        } else if (fieldDescriptor.type == "ObjectId") {
+            if (fieldDescriptor.ref) {
+                // get the schema and list of entities to show
+                SisClient.schemas.get(fieldDescriptor.ref, function(err, schema) {
+                    if (schema) {
+                        var idField = SisUtil.getIdField(schema);
+                        if (idField != '_id') {
+                            idField += ",_id";
+                        }
+                        SisClient.entities(schema.name).listAll({"fields" : idField}, function(err, results) {
+                            $scope.$apply(function() {
+                                $scope.idField = idField;
+                                $scope.entities = results;
+                                if ($scope.fieldValue) {
+                                    $scope.fieldValue = $scope.fieldValue._id || $scope.fieldValue;
+                                    $scope.entities.some(function(e) {
+                                        if (e._id == $scope.fieldValue) {
+                                            $scope.fieldValue = e;
+                                            return true;
+                                        }
+                                        return false;
+                                    });
+                                }
+                            });
+                        });
+                    }
+                });
+            }
+        }
     };
 
     $scope.inputType = function() {
@@ -139,6 +167,10 @@ angular.module('sisui')
     // and propagating that up without ngChange
     // TODO: debug why binding w/ ng-model only didn't work.
     $scope.valueChanged = function(value) {
+        if ($scope.fieldDescriptor.type == "ObjectId" &&
+            $scope.fieldDescriptor.ref) {
+            value = value._id;
+        }
         if ($scope.isItem()) {
             $scope.$parent.fieldValue[$scope.arrIdx] = value;
         } else {

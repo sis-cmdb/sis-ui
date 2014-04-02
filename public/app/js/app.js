@@ -26,6 +26,22 @@
             });
     });
 
+    // SIS Client factory
+    sisapp.factory('SisClient', function($location, API_URL) {
+        if (!API_URL) {
+            var absUrl = $location.absUrl();
+            // strip off the #
+            var idx = absUrl.indexOf('#');
+            if (idx != -1)
+                absUrl = absUrl.substring(0, absUrl.indexOf('#'));
+
+            API_URL = absUrl;
+        }
+        var client = SIS.client({'url' : API_URL });
+
+        return client;
+    });
+
     // add factories here
     sisapp.factory('SisUtil', function(currentUserService) {
         // add some utilities to the client
@@ -62,7 +78,8 @@
                         result[k] = desc[k];
                     }
                     if (desc.type == "ObjectId" && desc.ref) {
-                        result.type = desc.ref;
+                        result.type = desc.type;
+                        result.ref = desc.ref;
                         result.url = "#/entities/" + result.type;
                     }
                     return result;
@@ -259,6 +276,34 @@
             }
         };
 
+        var _descriptorTypes = ["Boolean", "String", "Number", "Mixed",
+                                "Document", "Array", "ObjectId"];
+
+        var _getAttributesForType = function(type) {
+            var result = [
+                {name : 'required', type : 'checkbox'},
+                {name : 'unique', type : 'checkbox'}
+            ];
+            switch (type) {
+                case "Number":
+                    result.push({ name : "min", type : "number" });
+                    result.push({ name : "max", type : "number" });
+                    break;
+                case "String":
+                    result.push({ name : "lowercase", type : "checkbox" });
+                    result.push({ name : "trim", type : "checkbox" });
+                    result.push({ name : "uppercase", type : "checkbox" });
+                    result.push({ name : "enum", type : "textArray" });
+                    break;
+                case "ObjectId":
+                    result.push({ name : "ref", type : "select", values : "schemaList" });
+                    break;
+                default:
+                    break;
+            }
+            return result;
+        };
+
         return {
             getDescriptorArray : function(schema) {
                 return getDescriptors(schema.definition);
@@ -272,24 +317,10 @@
             canDelete : _canDelete,
             getOwnerSubset : _getOwnerSubset,
             getAdminRoles : _getAdminRoles,
-            getInputType : _getInputType
+            getInputType : _getInputType,
+            descriptorTypes : _descriptorTypes,
+            attributesForType : _getAttributesForType
         };
-    });
-
-    // SIS Client factory
-    sisapp.factory('SisClient', function($location, API_URL) {
-        if (!API_URL) {
-            var absUrl = $location.absUrl();
-            // strip off the #
-            var idx = absUrl.indexOf('#');
-            if (idx != -1)
-                absUrl = absUrl.substring(0, absUrl.indexOf('#'));
-
-            API_URL = absUrl;
-        }
-        var client = SIS.client({'url' : API_URL });
-
-        return client;
     });
 
     sisapp.factory("currentUserService", function(SisClient, $q, $rootScope) {

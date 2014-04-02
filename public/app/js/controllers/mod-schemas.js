@@ -62,6 +62,12 @@ angular.module('sisui')
         descriptor.children.push(newDesc);
     };
 
+    var textToArray = function(text) {
+        return text.split(",").map(function(s) {
+            return s.trim();
+        });
+    };
+
     var convertToSchemaField = function(descriptor) {
         var result = {
             type : descriptor.type
@@ -83,12 +89,21 @@ angular.module('sisui')
                 }
             }
         }
-        for (i = 0; i < $scope.checkboxFields.length; ++i) {
-            var field = $scope.checkboxFields[i];
-            if (!descriptor[field]) {
-                delete result[field];
+        for (i = 0; i < $scope.additionalFields.length; ++i) {
+            var field = $scope.additionalFields[i];
+            var fieldName = field.name;
+            if (!descriptor[fieldName] &&
+                descriptor[fieldName] !== 0) {
+                delete result[fieldName];
             } else {
-                result[field] = true;
+                if (field.type == 'textArray') {
+                    var values = textToArray(descriptor[fieldName]);
+                    result[fieldName] = values;
+                } else if (field.type == 'select' && fieldName == "ref") {
+                    result[fieldName] = descriptor[fieldName].name;
+                } else {
+                    result[fieldName] = descriptor[fieldName];
+                }
             }
         }
         if (Object.keys(result).length == 1) {
@@ -193,11 +208,15 @@ angular.module('sisui')
         } else {
             delete descriptor.children;
         }
+        $scope.additionalFields.forEach(function(f) {
+            delete descriptor[f.name];
+        });
+        $scope.additionalFields = SisUtil.attributesForType($scope.descriptor.type);
         // update the schema descriptor object
         setSchemaField(descriptor, convertToSchemaField(descriptor));
     };
 
-    $scope.attrChanged = function(descriptor) {
+    $scope.attrChanged = function(descriptor, f) {
         setSchemaField(descriptor, convertToSchemaField(descriptor));
     };
 
@@ -249,24 +268,23 @@ angular.module('sisui')
         delete descriptor._parent_;
     };
 
-    $scope.validDescriptorTypes = ["Boolean", "String", "Number", "Mixed",
-                                   "Document", "Array"];
+    $scope.validDescriptorTypes = SisUtil.descriptorTypes;
 
-    $scope.checkboxFields = ["required", "unique"];
+    $scope.additionalFields = SisUtil.attributesForType($scope.descriptor.type);
 
     $scope.value = "<not set>";
     if ($scope.isSchemaValue()) {
         $scope.value = $scope.schema[$scope.descriptor.name];
     }
 
-    $scope.isCollapsed = false;
+    $scope.isCollapsed = true;
 
 });
 
 // controller for editing/creating schemas
 angular.module('sisui')
 .controller("ModSchemaController", function($scope, $modalInstance,
-                                            SisUtil, SisClient) {
+                                            SisUtil, SisClient, $q) {
     "use strict";
 
     var ownerDescriptor = {
@@ -309,9 +327,10 @@ angular.module('sisui')
         return !angular.equals(orig, $scope.schema);
     };
 
+    var endpoint = SisClient.schemas;
+
     $scope.save = function() {
         var name = $scope.schema.name;
-        var endpoint = SisClient.schemas;
         var func = endpoint.create;
         if ($scope.action === 'edit') {
             func = endpoint.update;
@@ -322,6 +341,16 @@ angular.module('sisui')
             }
         });
     };
+
+    if (!$scope.schemaList) {
+        endpoint.listAll({sort : "name"}, function(err, res) {
+            if (!err) {
+                $scope.$apply(function() {
+                    $scope.schemaList = res;
+                });
+            }
+        });
+    }
 
     switch ($scope.action) {
         case 'add':

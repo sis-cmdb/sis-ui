@@ -28,6 +28,7 @@ angular.module('sisui')
         var modalScope = $scope.$new(true);
         modalScope.schema = schema;
         modalScope.action = 'edit';
+        modalScope.schemaList = $scope.schemas;
         var modal = $modal.open({
             templateUrl : "public/app/partials/mod-schema.html",
             scope : modalScope,
@@ -51,6 +52,7 @@ angular.module('sisui')
             sis_locked : false,
             locked_fields : []
         };
+        modalScope.schemaList = $scope.schemas;
         modalScope.action = 'add';
         var modal = $modal.open({
             templateUrl : "public/app/partials/mod-schema.html",
