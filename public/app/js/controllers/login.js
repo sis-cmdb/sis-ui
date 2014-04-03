@@ -1,15 +1,15 @@
 angular.module('sisui')
-.controller("LoginController", function($scope, $location, currentUserService) {
+.controller("LoginController", function($scope, $location, SisUser) {
     "use strict";
 
-    if (currentUserService.isLoggedIn()) {
+    if (SisUser.isLoggedIn()) {
         $location.path("/schemas");
         return;
     }
     $scope.login = function() {
         var username = $scope.username;
         var pw = $scope.password;
-        currentUserService.login(username, pw).then(function() {
+        SisUser.login(username, pw).then(function() {
             $location.path("/schemas");
         });
     };

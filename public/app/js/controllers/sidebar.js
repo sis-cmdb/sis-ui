@@ -1,13 +1,13 @@
 angular.module('sisui')
-.controller("SidebarController", function($scope, $location, currentUserService,
+.controller("SidebarController", function($scope, $location, SisUser,
                                           $rootScope) {
-    $scope.loggedIn = currentUserService.isLoggedIn();
+    $scope.loggedIn = SisUser.isLoggedIn();
     $scope.$on("loggedIn", function() {
-        $scope.loggedIn = currentUserService.isLoggedIn();
+        $scope.loggedIn = SisUser.isLoggedIn();
     });
 
     $scope.logout = function() {
-        currentUserService.logout().then(function() {
+        SisUser.logout().then(function() {
             $location.path("/");
         });
     };

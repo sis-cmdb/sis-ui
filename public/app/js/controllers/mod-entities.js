@@ -1,5 +1,5 @@
 angular.module('sisui')
-.controller("EntityDescriptorController", function($scope, SisUtil, SisClient, $log) {
+.controller("EntityDescriptorController", function($scope, SisUtil, SisApi, $log) {
     "use strict";
     // the container object we are managing a field of
     // $scope.container
@@ -71,27 +71,25 @@ angular.module('sisui')
         } else if (fieldDescriptor.type == "ObjectId") {
             if (fieldDescriptor.ref) {
                 // get the schema and list of entities to show
-                SisClient.schemas.get(fieldDescriptor.ref, function(err, schema) {
+                SisApi.schemas.get(fieldDescriptor.ref).then(function(schema) {
                     if (schema) {
                         var idField = SisUtil.getIdField(schema);
                         if (idField != '_id') {
                             idField += ",_id";
                         }
-                        SisClient.entities(schema.name).listAll({"fields" : idField}, function(err, results) {
-                            $scope.$apply(function() {
-                                $scope.idField = idField;
-                                $scope.entities = results;
-                                if ($scope.fieldValue) {
-                                    $scope.fieldValue = $scope.fieldValue._id || $scope.fieldValue;
-                                    $scope.entities.some(function(e) {
-                                        if (e._id == $scope.fieldValue) {
-                                            $scope.fieldValue = e;
-                                            return true;
-                                        }
-                                        return false;
-                                    });
-                                }
-                            });
+                        SisApi.entities(schema.name).listAll({"fields" : idField}).then(function(results) {
+                            $scope.idField = idField;
+                            $scope.entities = results;
+                            if ($scope.fieldValue) {
+                                $scope.fieldValue = $scope.fieldValue._id || $scope.fieldValue;
+                                $scope.entities.some(function(e) {
+                                    if (e._id == $scope.fieldValue) {
+                                        $scope.fieldValue = e;
+                                        return true;
+                                    }
+                                    return false;
+                                });
+                            }
                         });
                     }
                 });
@@ -191,7 +189,7 @@ angular.module('sisui')
 
 angular.module('sisui')
 .controller("ModEntityController", function($scope, $modalInstance,
-                                             SisUtil, SisClient) {
+                                             SisUtil, SisApi) {
     var orig = $scope.entity;
     $scope.entity = angular.copy(orig);
     $scope.descriptors = SisUtil.getDescriptorArray($scope.schema);
@@ -223,15 +221,13 @@ angular.module('sisui')
 
     $scope.save = function() {
         var schemaName = $scope.schema.name;
-        var endpoint = SisClient.entities(schemaName);
+        var endpoint = SisApi.entities(schemaName);
         var func = endpoint.create;
         if ($scope.action == 'edit') {
             func = endpoint.update;
         }
-        func($scope.entity, function(err, res) {
-            if (!err) {
-                $modalInstance.close(res);
-            }
+        func($scope.entity).then(function(res) {
+            $modalInstance.close(res);
         });
     };
 

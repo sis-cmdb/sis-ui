@@ -69,7 +69,7 @@
                 <label for="{{ path }}">{{ fieldName }}</label>
                 <select ng-if="fieldDescriptor.enum" ng-options="choice for choice in fieldDescriptor.enum" ng-model="fieldValue" ng-change="valueChanged(fieldValue)" required="{{ !!fieldDescriptor.required }}"></select>
 
-                <input ng-if"!fieldDescriptor.enum" type="{{ inputType() }}" class="form-control input-sm" id="{{ path }}" placeholder="{{ fieldDescriptor.type }}" ng-change="valueChanged(fieldValue);" ng-model="fieldValue" required="{{ !!fieldDescriptor.required }}">
+                <input ng-if="!fieldDescriptor.enum" type="{{ inputType() }}" class="form-control input-sm" id="{{ path }}" placeholder="{{ fieldDescriptor.type }}" ng-change="valueChanged(fieldValue);" ng-model="fieldValue" required="{{ !!fieldDescriptor.required }}">
 
             </fieldset>
         </div>

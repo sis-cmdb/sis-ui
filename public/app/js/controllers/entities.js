@@ -1,6 +1,6 @@
 angular.module('sisui')
 .controller("EntitiesController", function($scope, $location, $route,
-                                           $modal, SisUtil, SisClient) {
+                                           $modal, SisUtil, SisApi) {
     "use strict";
     if (!($route.current && $route.current.params && $route.current.params.schema)) {
         $location.path("/#schemas");
@@ -31,7 +31,7 @@ angular.module('sisui')
 
     $scope.remove = function(entity) {
         var schemaName = $scope.schema.name;
-        SisClient.entities(schemaName).delete(entity, function(err, res) {
+        SisApi.entities(schemaName).delete(entity).then(function(res) {
             if (!err) {
                 $scope.$apply(function() {
                     for (var i = 0; i < $scope.entities.length; ++i) {
@@ -101,7 +101,7 @@ angular.module('sisui')
         return $scope.canManage(entity) && SisUtil.canDelete(entity);
     };
 
-    SisClient.schemas.get(schemaName, function(err, schema) {
+    SisApi.schemas.get(schemaName).then(function(schema) {
         if (schema) {
             $scope.canAdd = SisUtil.canAddEntity(schema);
             $scope.$broadcast('schema', schema);
@@ -109,14 +109,12 @@ angular.module('sisui')
             $scope.editEntity = editEntity;
             $scope.viewEntity = viewEntity;
             // grab the entities (TODO: paginate)
-            SisClient.entities(schemaName).list(function(err, entities) {
+            SisApi.entities(schemaName).list().then(function(entities) {
                 if (entities) {
-                    $scope.$apply(function() {
-                        $scope.schema = schema;
-                        $scope.idField = SisUtil.getIdField(schema);
-                        $scope.entities = entities.results.map(function(ent) {
-                            return ent;
-                        });
+                    $scope.schema = schema;
+                    $scope.idField = SisUtil.getIdField(schema);
+                    $scope.entities = entities.results.map(function(ent) {
+                        return ent;
                     });
                 }
             });

@@ -1,5 +1,5 @@
 angular.module('sisui')
-.controller("SchemaDefinitionController", function($scope, SisClient, SisUtil) {
+.controller("SchemaDefinitionController", function($scope, SisUtil) {
     "use strict";
 
     $scope.$on('schema', function(event, schema) {

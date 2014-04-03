@@ -284,7 +284,7 @@ angular.module('sisui')
 // controller for editing/creating schemas
 angular.module('sisui')
 .controller("ModSchemaController", function($scope, $modalInstance,
-                                            SisUtil, SisClient, $q) {
+                                            SisUtil, SisApi) {
     "use strict";
 
     var ownerDescriptor = {
@@ -327,7 +327,7 @@ angular.module('sisui')
         return !angular.equals(orig, $scope.schema);
     };
 
-    var endpoint = SisClient.schemas;
+    var endpoint = SisApi.schemas;
 
     $scope.save = function() {
         var name = $scope.schema.name;
@@ -335,20 +335,14 @@ angular.module('sisui')
         if ($scope.action === 'edit') {
             func = endpoint.update;
         }
-        func($scope.schema, function(err, res) {
-            if (!err) {
-                $modalInstance.close(res);
-            }
+        func($scope.schema).then(function(res) {
+            $modalInstance.close(res);
         });
     };
 
     if (!$scope.schemaList) {
-        endpoint.listAll({sort : "name"}, function(err, res) {
-            if (!err) {
-                $scope.$apply(function() {
-                    $scope.schemaList = res;
-                });
-            }
+        endpoint.listAll({sort : "name"}).then(function(res) {
+            $scope.schemaList = res;
         });
     }
 

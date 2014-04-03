@@ -1,6 +1,6 @@
 angular.module('sisui')
 .controller("SchemasController", function($scope, $location,
-                                          $modal, SisUtil, SisClient) {
+                                          $modal, SisUtil, SisApi) {
     "use strict";
 
     var query = {
@@ -10,7 +10,7 @@ angular.module('sisui')
 
     $scope.remove = function(schema) {
         var name = schema.name;
-        SisClient.schemas.delete(schema, function(err, res) {
+        SisApi.schemas.delete(schema).then(function(res) {
             if (!err) {
                 $scope.$apply(function() {
                     for (var i = 0; i < $scope.schemas.length; ++i) {
@@ -84,11 +84,9 @@ angular.module('sisui')
         return $scope.canManage(schema) && SisUtil.canDelete(schema);
     };
 
-    SisClient.schemas.listAll({ sort : "name" }, function(err, schemas) {
+    SisApi.schemas.listAll({ sort : "name" }).then(function(schemas) {
         if (schemas) {
-            $scope.$apply(function() {
-                $scope.schemas = schemas;
-            });
+            $scope.schemas = schemas;
         }
     });
 });
