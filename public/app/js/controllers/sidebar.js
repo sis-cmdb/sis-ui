@@ -15,17 +15,11 @@ angular.module('sisui')
     $scope.isActive = function(name) {
         var path = $location.path();
         switch(name) {
-            case 'login':
-                return path == "/";
             case 'schemas':
                 return path.indexOf("/schemas") === 0 ||
                        path.indexOf("/entities") === 0;
-            case 'hooks':
-                return path.indexOf("/hooks") != -1;
-            case 'hiera':
-                return path.indexOf("/hiera") != -1;
             default:
-                return false;
+                return path.indexOf("/" + name) != -1;
         }
     };
 

@@ -3,7 +3,7 @@
         <h3>{{ modalTitle }}</h3>
     </div>
     <div class="modal-body no-item-display">
-        <li ng-controller="EntityDescriptorController" ng-repeat="descriptor in descriptors" ng-init="init(entity, descriptor);">
+        <li ng-controller="EntityDescriptorController" ng-repeat="descriptor in descriptors" ng-init="init(obj, descriptor);">
             <div ng-include="'public/app/partials/entity-descriptor.html'"></div>
         </li>
     </div>

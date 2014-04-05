@@ -16,3 +16,7 @@ ul {
 .no-item-display li {
     list-style-type: none;
 }
+
+.wide-modal-window .modal-dialog {
+    width : 800px;
+}

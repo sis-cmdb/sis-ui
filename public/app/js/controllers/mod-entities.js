@@ -49,6 +49,10 @@ angular.module('sisui')
             }
             $scope.fieldName = fieldName;
         }
+        if (fieldDescriptor.type === "Mixed" &&
+            typeof $scope.fieldValue === "object") {
+            $scope.fieldValue = angular.toJson($scope.fieldValue);
+        }
     };
 
     // set up the controller after init has been called
@@ -168,6 +172,9 @@ angular.module('sisui')
         if ($scope.fieldDescriptor.type == "ObjectId" &&
             $scope.fieldDescriptor.ref) {
             value = value._id;
+        } else if ($scope.fieldDescriptor.type == "Mixed" &&
+            typeof value === "object") {
+            value = angular.toJson(value);
         }
         if ($scope.isItem()) {
             $scope.$parent.fieldValue[$scope.arrIdx] = value;
@@ -190,8 +197,8 @@ angular.module('sisui')
 angular.module('sisui')
 .controller("ModEntityController", function($scope, $modalInstance,
                                              SisUtil, SisApi) {
-    var orig = $scope.entity;
-    $scope.entity = angular.copy(orig);
+    var orig = $scope.obj;
+    $scope.obj = angular.copy(orig);
     $scope.descriptors = SisUtil.getDescriptorArray($scope.schema);
     // need to tweak this so owner and sis_locked show up..
     var foundLocked = false;
@@ -212,11 +219,11 @@ angular.module('sisui')
     }
 
     // for the valueChanged recursion
-    $scope.fieldValue = $scope.entity;
+    $scope.fieldValue = $scope.obj;
 
 
     $scope.hasChanged = function() {
-        return !angular.equals(orig, $scope.entity);
+        return !angular.equals(orig, $scope.obj);
     };
 
     $scope.save = function() {
@@ -226,21 +233,21 @@ angular.module('sisui')
         if ($scope.action == 'edit') {
             func = endpoint.update;
         }
-        func($scope.entity).then(function(res) {
+        func($scope.obj).then(function(res) {
             $modalInstance.close(res);
         });
     };
 
-    switch ($scope.action) {
-        case 'add':
-            $scope.modalTitle = "Add a new entity of type " + $scope.schema.name;
-            break;
-        case 'edit':
-            $scope.modalTitle = "Modify entity of type " + $scope.schema.name;
-            break;
-        default:
-            $scope.modalTitle = "Entity information " + $scope.schema.name;
-            break;
-    }
+    // switch ($scope.action) {
+    //     case 'add':
+    //         $scope.modalTitle = "Add a new entity of type " + $scope.schema.name;
+    //         break;
+    //     case 'edit':
+    //         $scope.modalTitle = "Modify entity of type " + $scope.schema.name;
+    //         break;
+    //     default:
+    //         $scope.modalTitle = "Entity information " + $scope.schema.name;
+    //         break;
+    // }
 
 });

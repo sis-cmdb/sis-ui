@@ -1,6 +1,6 @@
 angular.module('sisui')
 .controller("SchemasController", function($scope, $location,
-                                          $modal, SisUtil, SisApi) {
+                                          SisDialogs, SisUtil, SisApi) {
     "use strict";
 
     var query = {
@@ -11,29 +11,18 @@ angular.module('sisui')
     $scope.remove = function(schema) {
         var name = schema.name;
         SisApi.schemas.delete(schema).then(function(res) {
-            if (!err) {
-                $scope.$apply(function() {
-                    for (var i = 0; i < $scope.schemas.length; ++i) {
-                        if ($scope.schemas[i].name == name) {
-                            $scope.schemas.splice(i, 1);
-                            break;
-                        }
-                    }
-                });
+            for (var i = 0; i < $scope.schemas.length; ++i) {
+                if ($scope.schemas[i].name == name) {
+                    $scope.schemas.splice(i, 1);
+                    break;
+                }
             }
         });
     };
 
     $scope.edit = function(schema) {
-        var modalScope = $scope.$new(true);
-        modalScope.schema = schema;
-        modalScope.action = 'edit';
-        modalScope.schemaList = $scope.schemas;
-        var modal = $modal.open({
-            templateUrl : "public/app/partials/mod-schema.html",
-            scope : modalScope,
-            controller : "ModSchemaController"
-        }).result.then(function(schema) {
+        var dlg = SisDialogs.showSchemaDialog(schema, $scope.schemaList, 'edit');
+        dlg.result.then(function(schema) {
             for (var i = 0; i < $scope.schemas.length; ++i) {
                 if (schema.name == $scope.schemas[i].name) {
                     $scope.schemas[i] = schema;
@@ -44,21 +33,8 @@ angular.module('sisui')
     };
 
     $scope.addNew = function() {
-        var modalScope = $scope.$new(true);
-        modalScope.schema = {
-            name : "",
-            owner : [],
-            definition : { },
-            sis_locked : false,
-            locked_fields : []
-        };
-        modalScope.schemaList = $scope.schemas;
-        modalScope.action = 'add';
-        var modal = $modal.open({
-            templateUrl : "public/app/partials/mod-schema.html",
-            scope : modalScope,
-            controller : "ModSchemaController"
-        }).result.then(function(schema) {
+        var dlg = SisDialogs.showSchemaDialog(null, $scope.schemaList, 'add');
+        dlg.result.then(function(schema) {
             $scope.schemas.push(schema);
             $scope.schemas.sort(function(s1, s2) {
                 if (s1.name < s2.name) {

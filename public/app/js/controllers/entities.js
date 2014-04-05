@@ -1,6 +1,6 @@
 angular.module('sisui')
 .controller("EntitiesController", function($scope, $location, $route,
-                                           $modal, SisUtil, SisApi) {
+                                           SisDialogs, SisUtil, SisApi) {
     "use strict";
     if (!($route.current && $route.current.params && $route.current.params.schema)) {
         $location.path("/#schemas");
@@ -16,14 +16,8 @@ angular.module('sisui')
     };
 
     $scope.editSchema = function(schema) {
-        var modalScope = $scope.$new(true);
-        modalScope.schema = schema;
-        modalScope.action = 'edit';
-        var modal = $modal.open({
-            templateUrl : "public/app/partials/mod-schema.html",
-            scope : modalScope,
-            controller : "ModSchemaController"
-        }).result.then(function(schema) {
+        var dlg = SisDialogs.showSchemaDialog(schema, null, 'edit');
+        dlg.result.then(function(schema) {
             $scope.schema = schema;
             $scope.$broadcast('schema', schema);
         });
@@ -47,31 +41,25 @@ angular.module('sisui')
 
     var schemaName = $route.current.params.schema;
 
-    var addNew = function() {
-        // bring up a dialog..
-        var modalScope = $scope.$new(true);
-        modalScope.schema = $scope.schema;
-        modalScope.entity = { };
-        modalScope.action = 'add';
-        var modal = $modal.open({
-            templateUrl : "public/app/partials/mod-entity.html",
-            scope : modalScope,
-            controller : "ModEntityController"
-        }).result.then(function(entity) {
+    $scope.addNew = function() {
+        var title = "Add a new entity of type " + schemaName;
+        var dlg = SisDialogs.showObjectDialog(null, $scope.schema,
+                                              'add', title);
+        dlg.result.then(function(entity) {
             $scope.entities.push(entity);
         });
     };
 
-    var editEntity = function(entity) {
-        var modalScope = $scope.$new(true);
-        modalScope.schema = $scope.schema;
-        modalScope.entity = entity;
-        modalScope.action = 'edit';
-        var modal = $modal.open({
-            templateUrl : "public/app/partials/mod-entity.html",
-            scope : modalScope,
-            controller : "ModEntityController"
-        }).result.then(function(entity) {
+    $scope.canAdd = function() {
+        return $scope.schema &&
+               SisUtil.canAddEntity($scope.schema);
+    };
+
+    $scope.editEntity = function(entity) {
+        var title = "Modify entity of type " + schemaName;
+        var dlg = SisDialogs.showObjectDialog(entity, $scope.schema,
+                                              'edit', title);
+        dlg.result.then(function(entity) {
             for (var i = 0; i < $scope.entities.length; ++i) {
                 if ($scope.entities[i]._id == entity._id) {
                     $scope.entities[i] = entity;
@@ -81,16 +69,10 @@ angular.module('sisui')
         });
     };
 
-    var viewEntity = function(entity) {
-        var modalScope = $scope.$new(true);
-        modalScope.schema = $scope.schema;
-        modalScope.entity = entity;
-        modalScope.action = 'view';
-        $modal.open({
-            templateUrl : "public/app/partials/mod-entity.html",
-            scope : modalScope,
-            controller : "ModEntityController"
-        });
+    $scope.viewEntity = function(entity) {
+        var title = "Entity information " + schemaName;
+        SisDialogs.showObjectDialog(entity, $scope.schema,
+                                    'view', title);
     };
 
     $scope.canManage = function(entity) {
@@ -103,11 +85,7 @@ angular.module('sisui')
 
     SisApi.schemas.get(schemaName).then(function(schema) {
         if (schema) {
-            $scope.canAdd = SisUtil.canAddEntity(schema);
             $scope.$broadcast('schema', schema);
-            $scope.addNew = addNew;
-            $scope.editEntity = editEntity;
-            $scope.viewEntity = viewEntity;
             // grab the entities (TODO: paginate)
             SisApi.entities(schemaName).list().then(function(entities) {
                 if (entities) {
