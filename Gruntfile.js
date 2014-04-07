@@ -128,7 +128,8 @@ module.exports = function(grunt) {
           SIS: true,
           localStorage: true
         }
-      }
+      },
+      dist: ['dist/**/*.js', '!dist/public/app/lib/ui.bootstrap/*.js']
     },
     // create documents
     jade: {
@@ -163,6 +164,12 @@ module.exports = function(grunt) {
           livereload: true
         }
       },
+      css: {
+        files : ['public/app/**/*.css'],
+        options: {
+          livereload: true
+        }
+      },
       gruntfile: {
         files: ['Gruntfile.js']
       },
@@ -192,6 +199,7 @@ module.exports = function(grunt) {
   grunt.registerTask('build', [
     'clean:dist',
     'copy:dist',
+    'jshint:dist',
     'jade:docs'
   ]);
 
