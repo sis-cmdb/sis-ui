@@ -3,7 +3,7 @@
         <a ng-show="canDelete();" class="btn btn-xs btn-primary" ng-click="delItem(arrIdx);">
             <span class="glyphicon glyphicon-minus"></span>
         </a>
-        <a class="btn btn-xs btn-default" ng-click="isCollapsed = !isCollapsed">
+        <a class="btn btn-xs btn-default collapse-btn" ng-click="isCollapsed = !isCollapsed">
             <span ng-show="isCollapsed" class="glyphicon glyphicon-chevron-right"> {{ fieldName }}</span>
             <span ng-show="!isCollapsed" class="glyphicon glyphicon-chevron-down"> {{ fieldName }}</span>
         </a>
@@ -17,7 +17,7 @@
         <a ng-show="canDelete();" class="btn btn-xs btn-primary" ng-click="delItem(arrIdx);">
             <span class="glyphicon glyphicon-minus"></span>
         </a>
-        <a class="btn btn-xs btn-default" ng-click="isCollapsed = !isCollapsed">
+        <a class="btn btn-xs btn-default collapse-btn" ng-click="isCollapsed = !isCollapsed">
             <span ng-show="isCollapsed" class="glyphicon glyphicon-chevron-right"> {{ fieldName }}</span>
             <span ng-show="!isCollapsed" class="glyphicon glyphicon-chevron-down"> {{ fieldName }}</span>
         </a>
@@ -53,7 +53,7 @@
                 <span class="glyphicon glyphicon-minus"></span>
             </a>
             <fieldset ng-disabled="isReadOnly();">
-                <label for="{{ path }}">{{ fieldName }}</label>
+                <label class="entity-label" for="{{ path }}">{{ fieldName }}</label>
                 <select ng-if="fieldDescriptor.ref" ng-options="e[idField] for e in entities" ng-model="fieldValue" ng-change="valueChanged(fieldValue)" required="{{ !!fieldDescriptor.required }}"></select>
 
                 <input ng-if="!fieldDescriptor.ref" type="text" class="form-control input-sm" id="{{ path }}" placeholder="{{ fieldDescriptor.type }}" ng-change="valueChanged(fieldValue);" ng-model="fieldValue" required="{{ !!fieldDescriptor.required }}">
@@ -62,11 +62,11 @@
     </ng-form>
     <ng-form ng-switch-default class="form-inline css-form" role="form" novalidate>
         <div class="form-group">
-            <a ng-show="canDelete();" class="btn btn-xs btn-primary" ng-click="delItem(arrIdx);">
-                <span class="glyphicon glyphicon-minus"></span>
-            </a>
             <fieldset ng-disabled="isReadOnly();">
-                <label for="{{ path }}">{{ fieldName }}</label>
+                <a ng-show="canDelete();" class="btn btn-xs btn-primary" ng-click="delItem(arrIdx);">
+                    <span class="glyphicon glyphicon-minus"></span>
+                </a>
+                <label ng-class="{ 'entity-label' : !isItem() }" for="{{ path }}">{{ fieldName }}</label>
                 <select ng-if="fieldDescriptor.enum" ng-options="choice for choice in fieldDescriptor.enum" ng-model="fieldValue" ng-change="valueChanged(fieldValue)" required="{{ !!fieldDescriptor.required }}"></select>
 
                 <input ng-if="!fieldDescriptor.enum" type="{{ inputType() }}" class="form-control input-sm" id="{{ path }}" placeholder="{{ fieldDescriptor.type }}" ng-change="valueChanged(fieldValue);" ng-model="fieldValue" required="{{ !!fieldDescriptor.required }}">

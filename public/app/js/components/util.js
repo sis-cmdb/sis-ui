@@ -26,6 +26,17 @@ angular.module('sisui')
         return res;
     }
 
+    function fixChildren(desc) {
+        desc.children.map(function(c) {
+            c._parent_ = desc;
+        });
+        desc.children.sort(function(c1, c2) {
+            if (c1.name < c2.name) { return -1 ;}
+            else if (c1.name > c2.name) { return 1 ;}
+            return 0;
+        });
+    }
+
     function normalizeDescriptor(desc, name) {
         var k, inner = null;
         if (desc instanceof Array) {
@@ -67,9 +78,7 @@ angular.module('sisui')
                             type : "Document",
                             children : getDescriptors(desc)
                         };
-                        inner.children.map(function(c) {
-                            c._parent_ = inner;
-                        });
+                        fixChildren(inner);
                         return inner;
                     } else {
                         // desc.type is the embedded schema
@@ -79,9 +88,7 @@ angular.module('sisui')
                             type : "Document",
                             children : getDescriptors(desc.type)
                         };
-                        inner.children.map(function(c) {
-                            c._parent_ = inner;
-                        });
+                        fixChildren(inner);
                         for (k in desc) {
                             if (k != 'type') {
                                 inner[k] = desc[k];
@@ -128,6 +135,11 @@ angular.module('sisui')
             var normalized = normalizeDescriptor(desc, k);
             result.push(normalized);
         }
+        result.sort(function(c1, c2) {
+            if (c1.name < c2.name) { return -1 ;}
+            else if (c1.name > c2.name) { return 1 ;}
+            return 0;
+        });
         return result;
     }
 

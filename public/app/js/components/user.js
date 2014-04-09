@@ -37,6 +37,7 @@ angular.module('sisui')
                     SisApi.setAuthToken(null);
                     delete localStorage[USER_KEY];
                     user = null;
+                    $rootScope.$broadcast("loggedIn", true);
                 }
                 return user;
             }

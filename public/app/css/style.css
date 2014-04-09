@@ -20,3 +20,12 @@ ul {
 .wide-modal-window .modal-dialog {
     width : 800px;
 }
+
+.entity-label {
+    width: 80px;
+    text-align: right;
+}
+
+.collapseBtn {
+    margin-bottom: 2px;
+}

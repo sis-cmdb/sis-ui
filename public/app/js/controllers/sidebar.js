@@ -23,7 +23,4 @@ angular.module('sisui')
         }
     };
 
-    $scope.$on("$locationChangeSuccess", function(evt) {
-
-    });
 });
