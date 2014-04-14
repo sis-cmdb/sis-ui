@@ -1,0 +1,48 @@
+
+// controller for editing a user
+angular.module('sisui')
+.controller("ModUserController", function($scope, $modalInstance,
+                                          SisUtil, SisApi) {
+    "use strict";
+
+    var adminGroups = SisUtil.getAdminRoles();
+
+    if (adminGroups !== true) {
+        $scope.currGroups = adminGroups || [];
+    }
+
+    $scope.user = angular.copy($scope.user);
+    $scope.user.roles = $scope.user.roles || { };
+
+    var orig = angular.copy($scope.user);
+
+    $scope.isSuperUser = function() {
+        return adminGroups === true;
+    };
+
+    $scope.canManageRole = function(role) {
+        return adminGroups === true ||
+               adminGroups.indexOf(role) >= 0;
+    };
+
+    $scope.deleteGroup = function(group) {
+        delete $scope.user.roles[group];
+    };
+
+    $scope.hasChanged = function() {
+        return !angular.equals(orig, $scope.user);
+    };
+
+    $scope.save = function() {
+        var user = $scope.user;
+        if (user.super_user) {
+            user.roles = { };
+        }
+        SisApi.users.update(user).then(function(res) {
+            $modalInstance.close(res);
+        });
+    };
+
+});
+
+

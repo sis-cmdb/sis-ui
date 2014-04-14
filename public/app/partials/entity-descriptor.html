@@ -1,0 +1,77 @@
+<div ng-switch on="fieldDescriptor.type">
+    <div ng-switch-when="Document">
+        <a ng-show="canDelete();" class="btn btn-xs btn-primary" ng-click="delItem(arrIdx);">
+            <span class="glyphicon glyphicon-minus"></span>
+        </a>
+        <a class="btn btn-xs btn-default collapse-btn" ng-click="isCollapsed = !isCollapsed">
+            <span ng-show="isCollapsed" class="glyphicon glyphicon-chevron-right"> {{ fieldName }}</span>
+            <span ng-show="!isCollapsed" class="glyphicon glyphicon-chevron-down"> {{ fieldName }}</span>
+        </a>
+        <ul collapse="isCollapsed">
+            <li ng-controller="EntityDescriptorController" ng-repeat="descriptor in children" ng-init="init($parent.fieldValue, descriptor);">
+                <div ng-include="'public/app/partials/entity-descriptor.html'"></div>
+            </li>
+        </ul>
+    </div>
+    <div ng-switch-when="Array">
+        <a ng-show="canDelete();" class="btn btn-xs btn-primary" ng-click="delItem(arrIdx);">
+            <span class="glyphicon glyphicon-minus"></span>
+        </a>
+        <a class="btn btn-xs btn-default collapse-btn" ng-click="isCollapsed = !isCollapsed">
+            <span ng-show="isCollapsed" class="glyphicon glyphicon-chevron-right"> {{ fieldName }}</span>
+            <span ng-show="!isCollapsed" class="glyphicon glyphicon-chevron-down"> {{ fieldName }}</span>
+        </a>
+        <div ng-if="fieldDescriptor.enum">
+            <ul collapse="isCollapsed">
+                <li>
+                    <fieldset ng-disabled="isReadOnly();">
+                    <label ng-repeat="choice in fieldDescriptor.enum">
+                        <input type="checkbox"
+                           ng-checked="fieldValue.indexOf(choice) >= 0"
+                           ng-click="toggleChoice(choice)"> {{ choice }}
+                    </label>
+                    </fieldset>
+                </li>
+            </ul>
+        </div>
+        <div ng-if="!fieldDescriptor.enum">
+            <ul collapse="isCollapsed">
+                <li ng-controller="EntityDescriptorController" ng-init="init($parent.fieldValue, $parent.children[0], $index);" ng-repeat="value in fieldValue track by $index">
+                    <div ng-include="'public/app/partials/entity-descriptor.html'"></div>
+                </li>
+                <li>
+                    <a ng-show="canAdd();" class="btn btn-xs btn-primary" ng-click="addItem();">
+                        <span class="glyphicon glyphicon-plus">Add</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <ng-form ng-switch-when="ObjectId" class="form-inline css-form" role="form" novalidate>
+        <div class="form-group">
+            <a ng-show="canDelete();" class="btn btn-xs btn-primary" ng-click="delItem(arrIdx);">
+                <span class="glyphicon glyphicon-minus"></span>
+            </a>
+            <fieldset ng-disabled="isReadOnly();">
+                <label class="entity-label" for="{{ path }}">{{ fieldName }}</label>
+                <select ng-if="fieldDescriptor.ref" ng-options="e[idField] for e in entities" ng-model="fieldValue" ng-change="valueChanged(fieldValue)" required="{{ !!fieldDescriptor.required }}"></select>
+
+                <input ng-if="!fieldDescriptor.ref" type="text" class="form-control input-sm" id="{{ path }}" placeholder="{{ fieldDescriptor.type }}" ng-change="valueChanged(fieldValue);" ng-model="fieldValue" required="{{ !!fieldDescriptor.required }}">
+            </fieldset>
+        </div>
+    </ng-form>
+    <ng-form ng-switch-default class="form-inline css-form" role="form" novalidate>
+        <div class="form-group">
+            <fieldset ng-disabled="isReadOnly();">
+                <a ng-show="canDelete();" class="btn btn-xs btn-primary" ng-click="delItem(arrIdx);">
+                    <span class="glyphicon glyphicon-minus"></span>
+                </a>
+                <label ng-class="{ 'entity-label' : !isItem() }" for="{{ path }}">{{ fieldName }}</label>
+                <select ng-if="fieldDescriptor.enum" ng-options="choice for choice in fieldDescriptor.enum" ng-model="fieldValue" ng-change="valueChanged(fieldValue)" required="{{ !!fieldDescriptor.required }}"></select>
+
+                <input ng-if="!fieldDescriptor.enum" type="{{ inputType() }}" class="form-control input-sm" id="{{ path }}" placeholder="{{ fieldDescriptor.type }}" ng-change="valueChanged(fieldValue);" ng-model="fieldValue" required="{{ !!fieldDescriptor.required }}">
+
+            </fieldset>
+        </div>
+    </form>
+</div>

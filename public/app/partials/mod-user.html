@@ -1,0 +1,52 @@
+<div>
+    <div class="modal-header">
+        <h3>Edit permissions for {{ user.name }}</h3>
+    </div>
+    <div class="modal-body no-item-display">
+        <ng-form role="form">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" ng-model="user.super_user" ng-disabled="!isSuperUser();"> Super User
+                </label>
+            </div>
+            <label>Groups</label>
+            <ul ng-if="!user.super_user">
+                <li ng-repeat="(group,role) in user.roles">
+                    <div class="form-group">
+                        <a class="btn btn-xs btn-primary" ng-click="deleteGroup(group);" ng-disabled="!canManageRole(group)">
+                            <span class="glyphicon glyphicon-minus"></span>
+                        </a>
+                        <label for="{{ group }}">{{ group }}</label>
+                        <select ng-disabled="!canManageRole(group)" ng-model="user.roles[group]" ng-options="r for r in ['user','admin']">
+                        </select>
+                    </div>
+                </li>
+                <li ng-repeat="group in currGroups" ng-if="!user.roles[group]">
+                    <div class="form-group" ng-disabled="!canManageRole(group)">
+                        <a class="btn btn-xs btn-primary" ng-click="deleteGroup(group);">
+                            <span class="glyphicon glyphicon-minus"></span>
+                        </a>
+                        <label for="{{group}}">{{ group }}</label>
+                        <select ng-model="user.roles[group]" ng-options="r for r in ['user','admin']"></select>
+                    </div>
+                </li>
+                <li ng-if="isSuperUser()">
+                    <div class="form-group">
+                        <input ng-model="newGroup" placeholder="group">
+                        <select ng-model="newRole" ng-options="r for r in ['user', 'admin']"></select>
+                        <a class="btn btn-xs btn-primary" ng-click="addRole();">
+                            <span class="glyphicon glyphicon-plus">Add</span>
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </ng-form>
+    </div>
+    <div class="modal-footer" ng-if="action != 'view'">
+        <button ng-disabled="!hasChanged()" class="btn btn-primary" ng-click="save();">Save</button>
+        <button class="btn btn-warning" ng-click="$dismiss('Cancel');">Cancel</button>
+    </div>
+    <div class="modal-footer" ng-if="action == 'view'">
+        <button class="btn btn-warning" ng-click="$dismiss('Close');">Close</button>
+    </div>
+</div>
