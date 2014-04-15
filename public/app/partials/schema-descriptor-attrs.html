@@ -1,0 +1,22 @@
+
+<div>
+    <div class="modal-header">
+        <h3><b>{{ descriptor.name }}</b> Attributes</h3>
+    </div>
+    <div class="modal-body no-item-display">
+        <div class="row">
+            <div ng-repeat="f in additionalFields" ng-class="{ checkbox : f.type == 'checkbox', 'form-group' : f.type != 'checkbox' }">
+                <label ng-if="f.type == 'checkbox'" >
+                        <input type="checkbox" ng-model="descriptor[f.name]" ng-change="attrChanged(descriptor, f)"> {{ f.name }}
+                </label>
+                <input ng-if="f.type == 'textArray'" type="text" ng-model="descriptor[f.name]" ng-change="attrChanged(descriptor, f)" class="input-sm" placeholder="{{ f.name }}">
+                <input ng-if="f.type == 'number'" type="number" ng-model="descriptor[f.name]" ng-change="attrChanged(descriptor, f)" class="input-sm" placeholder="{{ f.name }}">
+                <label ng-if="f.type == 'select'"> {{ f.name }}</label>
+                <select ng-if="f.type == 'select'" ng-model="descriptor[f.name]" ng-options="s.name for s in schemaList" ng-change="attrChanged(descriptor, f)"></select>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-warning" ng-click="$dismiss('Close');">Close</button>
+    </div>
+</div>

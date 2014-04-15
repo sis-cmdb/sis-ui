@@ -28,8 +28,11 @@ angular.module('sisui')
     var adminRoles = SisUtil.getAdminRoles();
 
     $scope.canManage = function(user) {
-        return (!user.super_user && (adminRoles === true ||
-                                     adminRoles.length > 0)) &&
+        if (!userName || adminRoles === null) {
+            return false;
+        }
+        return (!user.super_user &&
+                (adminRoles === true || adminRoles.length)) &&
                 userName != user.name;
     };
 

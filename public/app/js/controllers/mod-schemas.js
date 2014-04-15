@@ -1,6 +1,7 @@
 
 angular.module('sisui')
-.controller("SchemaDescriptorController", function($scope, SisUtil, $log) {
+.controller("SchemaDescriptorController", function($scope, SisUtil,
+                                                   $modal, $log) {
     "use strict";
 
     $scope.paths = SisUtil.getDescriptorPath($scope.descriptor);
@@ -28,11 +29,14 @@ angular.module('sisui')
         return SisUtil.getInputType($scope.descriptor.type);
     };
 
+    // returns a boolean if the descriptor represents a value
+    // that needs to be set on the schema object.
+    // basically any key in the root object (name, sis_locked, etc.)
+    // fields within the definition object do not apply
     $scope.isSchemaValue = function() {
         return $scope.paths.length == 1 &&
                $scope.path != "definition";
     };
-
 
     $scope.canModifyChildren = function() {
         var path = $scope.path;
@@ -60,6 +64,14 @@ angular.module('sisui')
             newDesc.name = "";
         }
         descriptor.children.push(newDesc);
+    };
+
+    $scope.showAttrs = function() {
+        return $modal.open({
+            templateUrl : "public/app/partials/schema-descriptor-attrs.html",
+            scope : $scope,
+            windowClass : "narrow-modal-window"
+        });
     };
 
     var textToArray = function(text) {
@@ -277,7 +289,16 @@ angular.module('sisui')
         $scope.value = $scope.schema[$scope.descriptor.name];
     }
 
-    $scope.isCollapsed = true;
+    if ($scope.descriptor.type == 'ObjectId' &&
+        $scope.descriptor.ref) {
+        for (var i = 0; i < $scope.schemaList.length; ++i) {
+            var schema = $scope.schemaList[i];
+            if (schema.name == $scope.descriptor.ref) {
+                $scope.descriptor.ref = schema;
+                break;
+            }
+        }
+    }
 
 });
 
@@ -339,12 +360,6 @@ angular.module('sisui')
             $modalInstance.close(res);
         });
     };
-
-    if (!$scope.schemaList) {
-        endpoint.listAll({sort : "name"}).then(function(res) {
-            $scope.schemaList = res;
-        });
-    }
 
     switch ($scope.action) {
         case 'add':

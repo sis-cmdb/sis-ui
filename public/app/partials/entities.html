@@ -1,9 +1,6 @@
 <div class="row sisui-bottom-buffer">
     <h3>
         <strong>{{ schema.name }}</strong> Information
-        <a ng-show="canManageSchema(schema)" class="btn btn-xs btn-primary pull-right" ng-click="editSchema(schema);">
-            <span class="glyphicon glyphicon-edit">Edit</span>
-        </a>
     </h3>
     <div ng-controller="SchemaDefinitionController">
         <div ng-include src="'public/app/partials/schema-definition.html'"/>
@@ -48,4 +45,5 @@
             </tr>
         </tbody>
     </table>
+    <pagination direction-links="false" boundary-links="true" total-items="totalItems" page="currentPage" items-per-page="{{ pageSize }}"></pagination>
 </div>

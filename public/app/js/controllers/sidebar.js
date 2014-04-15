@@ -1,14 +1,43 @@
 angular.module('sisui')
 .controller("SidebarController", function($scope, $location, SisUser,
                                           $rootScope) {
-    $scope.loggedIn = SisUser.isLoggedIn();
-    $scope.$on("loggedIn", function() {
+
+    var getUserRoles = function() {
+        if (!$scope.currentUser) {
+            return null;
+        }
+        if ($scope.currentUser.super_user) {
+            return null;
+        }
+        var roles = $scope.currentUser.roles;
+        var keys = Object.keys(roles);
+        if (!keys.length) {
+            return null;
+        }
+        var result = { admin : [], user : [] };
+        keys.forEach(function(k) {
+            if (roles[k] == 'admin') {
+                result.admin.push(k);
+            } else {
+                result.user.push(k);
+            }
+        });
+        return result;
+    };
+
+    var refresh = function() {
         $scope.loggedIn = SisUser.isLoggedIn();
+        $scope.currentUser = SisUser.getCurrentUser();
+        $scope.roles = getUserRoles();
+    };
+    refresh();
+    $scope.$on("loggedIn", function() {
+        refresh();
     });
 
     $scope.logout = function() {
         SisUser.logout().then(function() {
-            $location.path("/");
+            $location.path("/login");
         });
     };
 

@@ -10,6 +10,13 @@ angular.module('sisui')
                  currentUser.expirationTime > Date.now());
     };
 
+    var cleanup = function() {
+        // cleanup
+        SisApi.setAuthToken(null);
+        delete localStorage[USER_KEY];
+        $rootScope.$broadcast("loggedIn", false);
+    };
+
     return {
         isLoggedIn : function() {
             if (!(USER_KEY in localStorage)) {
@@ -18,9 +25,7 @@ angular.module('sisui')
             var currentUser = angular.fromJson(localStorage[USER_KEY]);
             var expired = isExpired(currentUser);
             if (expired) {
-                // cleanup
-                SisApi.setAuthToken(null);
-                delete localStorage[USER_KEY];
+                cleanup();
             } else {
                 // ensure sis client token is set
                 SisApi.setAuthToken(currentUser.token);
@@ -34,10 +39,8 @@ angular.module('sisui')
                 var user = angular.fromJson(data);
                 if (isExpired(user)) {
                     // cleanup
-                    SisApi.setAuthToken(null);
-                    delete localStorage[USER_KEY];
                     user = null;
-                    $rootScope.$broadcast("loggedIn", true);
+                    cleanup();
                 }
                 return user;
             }
@@ -52,10 +55,8 @@ angular.module('sisui')
             var username = this.getCurrentUser().username;
             SisApi.tokens(username).delete(SisApi.getAuthToken()).then(function() {
                 // ignore errors
-                SisApi.setAuthToken(null);
-                delete localStorage[USER_KEY];
+                cleanup();
                 d.resolve(true);
-                $rootScope.$broadcast("loggedIn", false);
             });
             return d.promise;
         },

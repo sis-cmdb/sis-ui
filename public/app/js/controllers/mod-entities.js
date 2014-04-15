@@ -78,10 +78,11 @@ angular.module('sisui')
                 SisApi.schemas.get(fieldDescriptor.ref).then(function(schema) {
                     if (schema) {
                         var idField = SisUtil.getIdField(schema);
+                        var fields = '_id';
                         if (idField != '_id') {
-                            idField += ",_id";
+                            fields += "," + idField;
                         }
-                        SisApi.entities(schema.name).listAll({"fields" : idField}).then(function(results) {
+                        SisApi.entities(schema.name).listAll({"fields" : fields}).then(function(results) {
                             $scope.idField = idField;
                             $scope.entities = results;
                             if ($scope.fieldValue) {
@@ -237,17 +238,5 @@ angular.module('sisui')
             $modalInstance.close(res);
         });
     };
-
-    // switch ($scope.action) {
-    //     case 'add':
-    //         $scope.modalTitle = "Add a new entity of type " + $scope.schema.name;
-    //         break;
-    //     case 'edit':
-    //         $scope.modalTitle = "Modify entity of type " + $scope.schema.name;
-    //         break;
-    //     default:
-    //         $scope.modalTitle = "Entity information " + $scope.schema.name;
-    //         break;
-    // }
 
 });

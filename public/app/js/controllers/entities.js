@@ -1,27 +1,12 @@
 angular.module('sisui')
 .controller("EntitiesController", function($scope, $location, $route,
-                                           SisDialogs, SisUtil, SisApi) {
+                                           SisSession, SisDialogs, SisUtil,
+                                           SisApi) {
     "use strict";
     if (!($route.current && $route.current.params && $route.current.params.schema)) {
         $location.path("/#schemas");
         return;
     }
-
-
-    $scope.canManageSchema = function(schema) {
-        if (!schema) {
-            return false;
-        }
-        return SisUtil.canManageSchema(schema);
-    };
-
-    $scope.editSchema = function(schema) {
-        var dlg = SisDialogs.showSchemaDialog(schema, null, 'edit');
-        dlg.result.then(function(schema) {
-            $scope.schema = schema;
-            $scope.$broadcast('schema', schema);
-        });
-    };
 
     $scope.remove = function(entity) {
         var schemaName = $scope.schema.name;
@@ -83,21 +68,45 @@ angular.module('sisui')
         return $scope.canManage(entity) && SisUtil.canDelete(entity);
     };
 
-    SisApi.schemas.get(schemaName).then(function(schema) {
-        if (schema) {
-            $scope.$broadcast('schema', schema);
-            // grab the entities (TODO: paginate)
-            SisApi.entities(schemaName).list().then(function(entities) {
-                if (entities) {
-                    $scope.schema = schema;
-                    $scope.idField = SisUtil.getIdField(schema);
-                    $scope.entities = entities.results.map(function(ent) {
-                        return ent;
-                    });
-                }
-            });
-        } else {
-            $location.path("/#schemas");
-        }
-    });
+    $scope.pageSize = 20;
+    $scope.loadPage = function() {
+        var query = {
+            limit : $scope.pageSize,
+            offset: ($scope.currentPage - 1) * $scope.pageSize
+        };
+        SisApi.entities(schemaName).list(query).then(function(entities) {
+            if (entities) {
+                $scope.totalItems = entities.total_count;
+                $scope.entities = entities.results.map(function(ent) {
+                    return ent;
+                });
+            }
+        });
+    };
+
+    $scope.totalItems = 0;
+    var schema = SisSession.getCurrentSchema();
+    if (!schema || schema.name != schemaName) {
+        SisApi.schemas.get(schemaName).then(function(schema) {
+            if (schema) {
+                $scope.schema = schema;
+                $scope.$broadcast('schema', schema);
+                $scope.idField = SisUtil.getIdField(schema);
+            } else {
+                $location.path("/#schemas");
+            }
+        });
+    } else {
+        $scope.schema = schema;
+        $scope.$broadcast('schema', schema);
+        $scope.idField = SisUtil.getIdField(schema);
+    }
+
+    // paging
+    $scope.setPage = function(pageNum) {
+        $scope.currentPage = pageNum;
+        $scope.loadPage();
+    };
+
+    $scope.setPage(1);
 });

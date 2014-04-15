@@ -1,5 +1,5 @@
 angular.module('sisui')
-.controller("SchemasController", function($scope, $location,
+.controller("SchemasController", function($scope, $location, SisSession,
                                           SisDialogs, SisUtil, SisApi) {
     "use strict";
 
@@ -11,40 +11,24 @@ angular.module('sisui')
     $scope.remove = function(schema) {
         var name = schema.name;
         SisApi.schemas.delete(schema).then(function(res) {
-            for (var i = 0; i < $scope.schemas.length; ++i) {
-                if ($scope.schemas[i].name == name) {
-                    $scope.schemas.splice(i, 1);
-                    break;
-                }
-            }
+            SisSession.setSchemas(null);
+            loadSchemas();
         });
     };
 
     $scope.edit = function(schema) {
-        var dlg = SisDialogs.showSchemaDialog(schema, $scope.schemaList, 'edit');
+        var dlg = SisDialogs.showSchemaDialog(schema, $scope.schemas, 'edit');
         dlg.result.then(function(schema) {
-            for (var i = 0; i < $scope.schemas.length; ++i) {
-                if (schema.name == $scope.schemas[i].name) {
-                    $scope.schemas[i] = schema;
-                    break;
-                }
-            }
+            SisSession.setSchemas(null);
+            loadSchemas();
         });
     };
 
     $scope.addNew = function() {
-        var dlg = SisDialogs.showSchemaDialog(null, $scope.schemaList, 'add');
+        var dlg = SisDialogs.showSchemaDialog(null, $scope.schemas, 'add');
         dlg.result.then(function(schema) {
-            $scope.schemas.push(schema);
-            $scope.schemas.sort(function(s1, s2) {
-                if (s1.name < s2.name) {
-                    return -1;
-                } else if (s1.name > s2.name) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            });
+            SisSession.setSchemas(null);
+            loadSchemas();
         });
     };
 
@@ -60,9 +44,21 @@ angular.module('sisui')
         return $scope.canManage(schema) && SisUtil.canDelete(schema);
     };
 
-    SisApi.schemas.listAll({ sort : "name" }).then(function(schemas) {
-        if (schemas) {
+    $scope.gotoSchema = function(schema) {
+        SisSession.setCurrentSchema(schema);
+        $location.path("/entities/" + schema.name);
+    };
+
+    var loadSchemas = function() {
+        var schemas = SisSession.getSchemas();
+        if (!schemas) {
+            SisApi.schemas.listAll({ sort : "name" }).then(function(schemas) {
+                SisSession.setSchemas(schemas);
+                $scope.schemas = schemas || [];
+            });
+        } else {
             $scope.schemas = schemas;
         }
-    });
+    };
+    loadSchemas();
 });

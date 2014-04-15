@@ -21,7 +21,7 @@
         <tbody>
             <tr ng-repeat="schema in schemas | filter:filterText">
                 <td>
-                    <a href="#/entities/{{schema.name}}">{{schema.name}}</a>
+                    <a ng-click="gotoSchema(schema)">{{schema.name}}</a>
                 </td>
                 <td>
                     <span style="margin-right: 1px;" ng-repeat="owner in schema.owner" class="label label-default">{{owner}}</span>

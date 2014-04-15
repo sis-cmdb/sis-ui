@@ -67,7 +67,7 @@ angular.module('sisui')
         this.getAuthToken = function() {
             return client.authToken;
         };
-        var endpoints = ['hooks', 'schemas', 'hiera', 'users'];
+        var endpoints = ['hooks', 'hiera', 'users', 'schemas'];
         for (var i = 0; i < endpoints.length; ++i) {
             this[endpoints[i]] = wrapEndpoint(client[endpoints[i]]);
         }
