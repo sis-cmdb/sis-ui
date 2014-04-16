@@ -27,12 +27,7 @@ angular.module('sisui')
     var schemaName = $route.current.params.schema;
 
     $scope.addNew = function() {
-        var title = "Add a new entity of type " + schemaName;
-        var dlg = SisDialogs.showObjectDialog(null, $scope.schema,
-                                              'add', title);
-        dlg.result.then(function(entity) {
-            $scope.entities.push(entity);
-        });
+        $location.path("/entities/" + schemaName + "/add");
     };
 
     $scope.canAdd = function() {
@@ -41,23 +36,14 @@ angular.module('sisui')
     };
 
     $scope.editEntity = function(entity) {
-        var title = "Modify entity of type " + schemaName;
-        var dlg = SisDialogs.showObjectDialog(entity, $scope.schema,
-                                              'edit', title);
-        dlg.result.then(function(entity) {
-            for (var i = 0; i < $scope.entities.length; ++i) {
-                if ($scope.entities[i]._id == entity._id) {
-                    $scope.entities[i] = entity;
-                    break;
-                }
-            }
-        });
+        SisSession.setCurrentEntity($scope.schema, entity);
+        $location.path("/entities/" + schemaName + "/edit/" + entity._id);
     };
 
     $scope.viewEntity = function(entity) {
         var title = "Entity information " + schemaName;
-        SisDialogs.showObjectDialog(entity, $scope.schema,
-                                    'view', title);
+        SisDialogs.showViewObjectDialog(entity, $scope.schema,
+                                        title);
     };
 
     $scope.canManage = function(entity) {
@@ -85,22 +71,14 @@ angular.module('sisui')
     };
 
     $scope.totalItems = 0;
-    var schema = SisSession.getCurrentSchema();
-    if (!schema || schema.name != schemaName) {
-        SisApi.schemas.get(schemaName).then(function(schema) {
-            if (schema) {
-                $scope.schema = schema;
-                $scope.$broadcast('schema', schema);
-                $scope.idField = SisUtil.getIdField(schema);
-            } else {
-                $location.path("/#schemas");
-            }
-        });
-    } else {
+
+    SisApi.getSchema(schemaName, true).then(function(schema) {
         $scope.schema = schema;
         $scope.$broadcast('schema', schema);
         $scope.idField = SisUtil.getIdField(schema);
-    }
+    }, function(err) {
+        $location.path("/#schemas");
+    });
 
     // paging
     $scope.setPage = function(pageNum) {

@@ -10,6 +10,7 @@ angular.module('sisui')
 
     $scope.remove = function(schema) {
         var name = schema.name;
+        // TODO: show confirm
         SisApi.schemas.delete(schema).then(function(res) {
             SisSession.setSchemas(null);
             loadSchemas();
@@ -17,19 +18,12 @@ angular.module('sisui')
     };
 
     $scope.edit = function(schema) {
-        var dlg = SisDialogs.showSchemaDialog(schema, $scope.schemas, 'edit');
-        dlg.result.then(function(schema) {
-            SisSession.setSchemas(null);
-            loadSchemas();
-        });
+        SisSession.setCurrentSchema(schema);
+        $location.path("/schemas/edit/" + schema.name);
     };
 
     $scope.addNew = function() {
-        var dlg = SisDialogs.showSchemaDialog(null, $scope.schemas, 'add');
-        dlg.result.then(function(schema) {
-            SisSession.setSchemas(null);
-            loadSchemas();
-        });
+        $location.path("/schemas/add");
     };
 
     $scope.canAdd = function() {
@@ -50,15 +44,12 @@ angular.module('sisui')
     };
 
     var loadSchemas = function() {
-        var schemas = SisSession.getSchemas();
-        if (!schemas) {
-            SisApi.schemas.listAll({ sort : "name" }).then(function(schemas) {
-                SisSession.setSchemas(schemas);
-                $scope.schemas = schemas || [];
-            });
-        } else {
+        SisApi.getAllSchemas().then(function(schemas) {
+            SisSession.setSchemas(schemas);
             $scope.schemas = schemas;
-        }
+        }, function(err) {
+            $scope.schemas = [];
+        });
     };
     loadSchemas();
 });

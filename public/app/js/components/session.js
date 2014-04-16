@@ -28,6 +28,7 @@ angular.module('sisui')
             ttl = ttl || 60000;
             var expires = Date.now() + ttl;
             set('schemas', [schemas, expires]);
+            this.setCurrentSchema(null);
         };
 
         this.getSchemas = function() {

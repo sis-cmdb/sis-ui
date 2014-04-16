@@ -1,6 +1,7 @@
 // SIS API access
 angular.module('sisui')
-.factory('SisApi', function($location, API_URL, $q) {
+.factory('SisApi', function($location, API_URL, $q,
+                            SisSession) {
     "use strict";
 
     if (!API_URL) {
@@ -71,6 +72,70 @@ angular.module('sisui')
         for (var i = 0; i < endpoints.length; ++i) {
             this[endpoints[i]] = wrapEndpoint(client[endpoints[i]]);
         }
+
+        // convenience methods that hit the session first
+        // Get all the schemas sorted by name
+        this.getAllSchemas = function() {
+            var d = $q.defer();
+            var schemas = SisSession.getSchemas();
+            if (schemas) {
+                d.resolve(schemas);
+                return d.promise;
+            }
+            // need to query
+            this.schemas.listAll({ sort : 'name' }).then(function(schemas) {
+                // set the schemas
+                SisSession.setSchemas(schemas);
+                d.resolve(schemas);
+            }, function(err) {
+                d.reject(err);
+            });
+            return d.promise;
+        };
+
+        this.getSchema = function(name, setToCurrent) {
+            var d = $q.defer();
+            var currentSchema = SisSession.getCurrentSchema();
+            if (currentSchema && currentSchema.name == name) {
+                d.resolve(currentSchema);
+                return d.promise;
+            }
+            // need to query
+            this.schemas.get(name).then(function(schema) {
+                d.resolve(schema);
+                if (setToCurrent) {
+                    SisSession.setCurrentSchema(schema);
+                }
+            }, function(err) {
+                d.reject(err);
+            });
+            return d.promise;
+        };
+
+        this.getEntityWithSchema = function(entityId, schemaName, setToCurrent) {
+            var d = $q.defer();
+            var result = SisSession.getCurrentEntityAndSchemaIfMatches(schemaName, entityId);
+            if (result) {
+                d.resolve(result);
+                return d.promise;
+            }
+            // need the schema first
+            var self = this;
+            this.getSchema(schemaName, setToCurrent).then(function(schema) {
+                self.entities(schemaName).get(entityId).then(function(entity) {
+                    if (setToCurrent) {
+                        SisSession.setCurrentEntity(schema, entity);
+                    }
+                    d.resolve([schema, entity]);
+                }, function(err) {
+                    d.reject(err);
+                });
+            }, function(err) {
+                d.reject(err);
+            });
+            return d.promise;
+        };
+
     };
 
     return new Api();

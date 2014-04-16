@@ -1,5 +1,6 @@
 angular.module('sisui')
-.controller("LoginController", function($scope, $location, SisUser) {
+.controller("LoginController", function($scope, $location,
+                                        $window, SisUser) {
     "use strict";
 
     if (SisUser.isLoggedIn()) {
@@ -10,7 +11,11 @@ angular.module('sisui')
         var username = $scope.username;
         var pw = $scope.password;
         SisUser.login(username, pw).then(function() {
-            $location.path("/schemas");
+            if ($window.history.length) {
+                $window.history.back();
+            } else {
+                $location.path("/schemas");
+            }
         });
     };
 });
