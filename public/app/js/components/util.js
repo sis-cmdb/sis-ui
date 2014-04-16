@@ -240,7 +240,7 @@ angular.module('sisui')
             return [];
         }
         if (user.super_user) {
-            return [];
+            return true;
         }
         var roles = user.roles || { };
         return Object.keys(roles);

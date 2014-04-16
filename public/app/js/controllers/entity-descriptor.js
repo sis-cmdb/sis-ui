@@ -190,10 +190,13 @@ angular.module('sisui')
     $scope.valueChanged = function(value) {
         if ($scope.fieldDescriptor.type == "ObjectId" &&
             $scope.fieldDescriptor.ref) {
-            value = value._id;
+            value = value ? value._id : null;
         } else if ($scope.fieldDescriptor.type == "Mixed" &&
             typeof value === "object") {
             value = angular.toJson(value);
+        } else if ($scope.path == "owner" &&
+            $scope.fieldDescriptor.type == "String") {
+            value = value.split(",");
         }
         if ($scope.isItem()) {
             $scope.$parent.fieldValue[$scope.arrIdx] = value;

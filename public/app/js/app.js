@@ -9,8 +9,8 @@ angular.module('sisui', ['ngRoute', 'ui.bootstrap', 'sisconfig'])
             controller : 'UserLoginController'
         })
         .when("/users", {
-            templateUrl : "public/app/partials/users.html",
-            controller : "UsersController"
+            templateUrl : "public/app/partials/user-list.html",
+            controller : "UserListController"
         })
         // schemas
         .when("/schemas", {
