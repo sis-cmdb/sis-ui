@@ -1,5 +1,5 @@
 angular.module('sisui')
-.controller("UsersController", function($scope, $location, SisUser,
+.controller("UserListController", function($scope, $location, SisUser,
                                         SisDialogs, SisUtil, SisApi) {
     "use strict";
 

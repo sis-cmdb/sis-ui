@@ -1,7 +1,7 @@
 angular.module('sisui')
-.controller("EntitiesController", function($scope, $location, $route,
-                                           SisSession, SisDialogs, SisUtil,
-                                           SisApi) {
+.controller("EntityListController", function($scope, $location, $route,
+                                             SisSession, SisDialogs, SisUtil,
+                                             SisApi) {
     "use strict";
     if (!($route.current && $route.current.params && $route.current.params.schema)) {
         $location.path("/#schemas");

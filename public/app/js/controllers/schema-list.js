@@ -1,5 +1,5 @@
 angular.module('sisui')
-.controller("SchemasController", function($scope, $location, SisSession,
+.controller("SchemaListController", function($scope, $location, SisSession,
                                           SisDialogs, SisUtil, SisApi) {
     "use strict";
 

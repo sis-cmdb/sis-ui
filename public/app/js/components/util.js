@@ -370,6 +370,28 @@ angular.module('sisui')
         return result;
     };
 
+    var _getHookSchema = function() {
+        return {
+            name : "sis_hooks",
+            owner : _getAllRoles(),
+            definition : {
+                name : { type : "String", required : true, unique : true },
+                target : {
+                        type : {
+                            url : { type : "String", required : true },
+                            action : { type : "String", required : true, enum : ["GET", "POST", "PUT"]}
+                        },
+                        required : true
+                },
+                retry_count : { type : "Number", min : 0, max : 20, "default" : 0 },
+                retry_delay : { type : "Number", min : 1, max : 60, "default" : 1 },
+                events : { type : [{ type : "String", enum : ["insert", "update", "delete"] }], required : true },
+                owner : { type : ["String"] },
+                entity_type : "String"
+            }
+        };
+    };
+
     return {
         getDescriptorArray : function(schema) {
             return getDescriptors(schema.definition);
@@ -387,6 +409,7 @@ angular.module('sisui')
         getInputType : _getInputType,
         descriptorTypes : _descriptorTypes,
         attributesForType : _getAttributesForType,
+        getHookSchema : _getHookSchema,
         EndpointPager : EndpointPager
     };
 });

@@ -1,7 +1,7 @@
 
 // controller for editing a user
 angular.module('sisui')
-.controller("ModUserController", function($scope, $modalInstance,
+.controller("UserModDlgController", function($scope, $modalInstance,
                                           SisUtil, SisApi) {
     "use strict";
 

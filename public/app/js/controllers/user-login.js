@@ -1,5 +1,5 @@
 angular.module('sisui')
-.controller("LoginController", function($scope, $location,
+.controller("UserLoginController", function($scope, $location,
                                         $window, SisUser) {
     "use strict";
 

@@ -22,6 +22,7 @@ angular.module('sisui')
             cache = { };
         };
 
+
         // expose only helpers to ensure integrity
         this.setSchemas = function(schemas, ttl) {
             if (!schemas) { return set('schemas', null); }
@@ -39,6 +40,14 @@ angular.module('sisui')
             }
             this.setSchemas(null);
             return null;
+        };
+
+        this.setCurrentHook = function(hook) {
+            set('current_hook', hook);
+        };
+
+        this.getCurrentHook = function() {
+            return get('current_hook');
         };
 
         this.getCurrentSchema = function() {

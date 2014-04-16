@@ -136,6 +136,25 @@ angular.module('sisui')
             return d.promise;
         };
 
+        this.getHook = function(name, setToCurrent) {
+            var d = $q.defer();
+            var currentHook = SisSession.getCurrentHook();
+            if (currentHook && currentHook.name == name) {
+                d.resolve(currentSchema);
+                return d.promise;
+            }
+            // need to query
+            this.hooks.get(name).then(function(hook) {
+                d.resolve(hook);
+                if (setToCurrent) {
+                    SisSession.setCurrentHook(hook);
+                }
+            }, function(err) {
+                d.reject(err);
+            });
+            return d.promise;
+        };
+
     };
 
     return new Api();
