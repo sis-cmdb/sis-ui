@@ -54,37 +54,18 @@ angular.module('sisui')
         return $scope.canManage(entity) && SisUtil.canDelete(entity);
     };
 
-    $scope.pageSize = 20;
-    $scope.loadPage = function() {
-        var query = {
-            limit : $scope.pageSize,
-            offset: ($scope.currentPage - 1) * $scope.pageSize
-        };
-        SisApi.entities(schemaName).list(query).then(function(entities) {
-            if (entities) {
-                $scope.totalItems = entities.total_count;
-                $scope.entities = entities.results.map(function(ent) {
-                    return ent;
-                });
-            }
-        });
-    };
-
-    $scope.totalItems = 0;
-
     SisApi.getSchema(schemaName, true).then(function(schema) {
         $scope.schema = schema;
         $scope.$broadcast('schema', schema);
         $scope.idField = SisUtil.getIdField(schema);
+
+        // set up pager
+        var opts = { sortField : $scope.idField, itemsField : 'entities' };
+        var pager = new SisUtil.EndpointPager(SisApi.entities(schemaName),
+                                          $scope, opts);
+        pager.setPage(1);
+
     }, function(err) {
         $location.path("/#schemas");
     });
-
-    // paging
-    $scope.setPage = function(pageNum) {
-        $scope.currentPage = pageNum;
-        $scope.loadPage();
-    };
-
-    $scope.setPage(1);
 });

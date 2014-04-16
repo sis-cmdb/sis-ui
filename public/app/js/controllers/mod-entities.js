@@ -92,20 +92,6 @@ angular.module('sisui')
                             $scope.fieldValue = null;
                         });
                     }
-                    // SisApi.entities(schema.name).listAll({"fields" : fields}).then(function(results) {
-                    //     $scope.idField = idField;
-                    //     $scope.entities = results;
-                    //     if ($scope.fieldValue) {
-                    //         $scope.fieldValue = $scope.fieldValue._id || $scope.fieldValue;
-                    //         $scope.entities.some(function(e) {
-                    //             if (e._id == $scope.fieldValue) {
-                    //                 $scope.fieldValue = e;
-                    //                 return true;
-                    //             }
-                    //             return false;
-                    //         });
-                    //     }
-                    // });
                 });
             }
         }

@@ -74,7 +74,7 @@ angular.module('sisui')
 
     $scope.view = function(hook) {
         var title = "View hook " + hook.name;
-        SisDialogs.showObjectDialog(hook, hookSchema,
+        SisDialogs.showViewObjectDialog(hook, hookSchema,
                                     'view', title);
     };
 
@@ -86,9 +86,9 @@ angular.module('sisui')
         return $scope.canManage(hook) && SisUtil.canDelete(hook);
     };
 
-    SisApi.hooks.listAll({ sort : "name" }).then(function(hooks) {
-        if (hooks) {
-            $scope.hooks = hooks;
-        }
-    });
+    // setup pager
+    var opts = { sortField : 'name', itemsField : 'hooks' };
+    var endpoint = SisApi.hooks;
+    var pager = new SisUtil.EndpointPager(endpoint, $scope, opts);
+    pager.setPage(1);
 });

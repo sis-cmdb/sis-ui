@@ -44,9 +44,7 @@ angular.module('sisui')
         return adminRoles === true;
     };
 
-    SisApi.users.listAll({ sort : "name" }).then(function(users) {
-        if (users) {
-            $scope.users = users;
-        }
-    });
+    var opts = { sortField : 'name', itemsField : 'users' };
+    var pager = new SisUtil.EndpointPager(SisApi.users, $scope, opts);
+    pager.setPage(1);
 });

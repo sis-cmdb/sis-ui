@@ -32,8 +32,8 @@
                 </li>
                 <li ng-if="isSuperUser()">
                     <div class="form-group">
-                        <input ng-model="newGroup" placeholder="group">
-                        <select ng-model="newRole" ng-options="r for r in ['user', 'admin']"></select>
+                        <input ng-model="role.group" placeholder="group">
+                        <select ng-model="role.role" ng-options="r for r in ['user', 'admin']"></select>
                         <a class="btn btn-xs btn-primary" ng-click="addRole();">
                             <span class="glyphicon glyphicon-plus">Add</span>
                         </a>

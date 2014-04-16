@@ -13,11 +13,19 @@ angular.module('sisui')
 
     $scope.user = angular.copy($scope.user);
     $scope.user.roles = $scope.user.roles || { };
+    $scope.role = { };
 
     var orig = angular.copy($scope.user);
 
     $scope.isSuperUser = function() {
         return adminGroups === true;
+    };
+
+    $scope.addRole = function() {
+        if ($scope.role.role && $scope.role.group) {
+            $scope.user.roles[$scope.role.group] = $scope.role.role;
+            $scope.role = { };
+        }
     };
 
     $scope.canManageRole = function(role) {

@@ -3,6 +3,63 @@ angular.module('sisui')
 .factory('SisUtil', function(SisUser) {
     "use strict";
 
+    // Pager class
+    function EndpointPager(endpoint, scope, opts) {
+
+        var parseSearch = function(search) {
+            if (!search) {
+                return null;
+            }
+            return null;
+        };
+
+        var self = this;
+        // init
+        scope.totalItems = 0;
+        scope.currentPage = 1;
+        // opts/defaults
+        opts = opts || { };
+        scope.pageSize = opts.pageSize || 20;
+        var sortField = opts.sortField || null;
+        var searchQuery = parseSearch(opts.search);
+        var itemsField = opts.itemsField || 'items';
+
+        this.setSearch = function(search) {
+            searchQuery = parseSearch(search);
+            this.loadPage();
+        };
+
+        this.setSort = function(sort) {
+            sortField = sort;
+            this.loadPage();
+        };
+
+        this.loadPage = function() {
+            var query = {
+                limit : scope.pageSize,
+                offset: (scope.currentPage - 1) * scope.pageSize
+            };
+            if (sortField) {
+                query.sort = sortField;
+            }
+            if (searchQuery) {
+                query.q = searchQuery;
+            }
+            endpoint.list(query).then(function(items) {
+                scope.totalItems = items.total_count;
+                scope[itemsField] = items.results;
+            });
+        };
+
+        // attach some scope methods
+        this.setPage = function(pageNum) {
+            scope.currentPage = pageNum;
+            self.loadPage();
+        };
+
+        scope.setPage = this.setPage.bind(this);
+    }
+
     // add some utilities to the client
     function getArrayDescriptor(arr, name) {
         var res = {
@@ -329,6 +386,7 @@ angular.module('sisui')
         getAllRoles : _getAllRoles,
         getInputType : _getInputType,
         descriptorTypes : _descriptorTypes,
-        attributesForType : _getAttributesForType
+        attributesForType : _getAttributesForType,
+        EndpointPager : EndpointPager
     };
 });
