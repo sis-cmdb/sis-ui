@@ -154,6 +154,7 @@ module.exports = function(grunt) {
           ]
         }]
       },
+      build : 'build/*',
       server: '.tmp'
     },
     watch: {
@@ -183,6 +184,36 @@ module.exports = function(grunt) {
         ]
       }
     },
+    ngtemplates : {
+        sisui: {
+            options: {
+                module : "sisui",
+                htmlmin: {
+                  collapseBooleanAttributes:      true,
+                  collapseWhitespace:             true,
+                  removeAttributeQuotes:          true,
+                  removeComments:                 true, // Only if you don't use comment directives!
+                  removeEmptyAttributes:          true,
+                  removeRedundantAttributes:      true,
+                  removeScriptTypeAttributes:     true,
+                  removeStyleLinkTypeAttributes:  true
+                }
+            },
+            src : ["**/partials/*.html"],
+            dest : 'build/partials.js'
+        }
+    },
+    uglify: {
+      options: {
+        mangle: false,
+        sourceMap : true
+      },
+      build : {
+        files : {
+            'build/sisui.min.js' : ['public/app/js/app.js', 'public/app/js/components/*.js', 'public/app/js/controllers/*.js']
+        }
+      }
+    }
   });
 
   grunt.registerTask('serve', function (target) {
@@ -196,8 +227,11 @@ module.exports = function(grunt) {
       'watch'
     ]);
   });
+
   grunt.registerTask('build', [
     'clean:dist',
+    'ngtemplates',
+    'uglify:build',
     'copy:dist',
     'jshint:dist',
     'jade:docs'

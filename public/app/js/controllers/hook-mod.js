@@ -84,7 +84,7 @@ angular.module('sisui')
     };
 
     $scope.cancel = function() {
-        $location.path("/hooks");
+        SisUtil.goBack("/hooks");
     };
 
     parseRoute();

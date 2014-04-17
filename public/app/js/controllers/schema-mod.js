@@ -1,54 +1,54 @@
 // controller for editing/creating schemas
 angular.module('sisui')
-.controller("SchemaModController", function($scope, $route, $location,
+.controller("SchemaModController", function($scope, $route, $location, $window,
                                             SisSession, SisUtil, SisApi) {
     "use strict";
 
     var init = function(schema) {
-        var ownerDescriptor = {
-            name : "owner",
-            required : true,
-            type : "String"
-        };
-        var adminGroups = SisUtil.getAdminRoles();
-        if (adminGroups instanceof Array) {
-            ownerDescriptor.enum = adminGroups;
-            ownerDescriptor.type = "Array";
-        }
-
-        $scope.schema = schema;
-        $scope.schema.owner.sort();
-
-        var schemaDefinitionDescriptor = { name : "definition", type : "Document" };
-        var entityDescriptors = SisUtil.getDescriptorArray($scope.schema);
-
-        entityDescriptors = entityDescriptors.map(function(ed) {
-            ed._parent_ = schemaDefinitionDescriptor;
-            return ed;
-        }).filter(function(ed) {
-            return ed.name !== "owner";
-        });
-
-        schemaDefinitionDescriptor.children = entityDescriptors;
-
-
-        var descriptors = [
-            { name : "name", type : "String", required : true, readonly : $scope.action == 'edit' },
-            ownerDescriptor,
-            { name : "sis_locked", type : "Boolean" },
-            schemaDefinitionDescriptor
-        ];
-
-        var orig = angular.copy($scope.schema);
-        $scope.descriptors = descriptors;
-
         SisApi.getAllSchemas().then(function(schemas) {
             $scope.schemaList = schemas;
-        });
 
-        $scope.hasChanged = function() {
-            return !angular.equals(orig, $scope.schema);
-        };
+            var ownerDescriptor = {
+                name : "owner",
+                required : true,
+                type : "String"
+            };
+            var adminGroups = SisUtil.getAdminRoles();
+            if (adminGroups instanceof Array) {
+                ownerDescriptor.enum = adminGroups;
+                ownerDescriptor.type = "Array";
+            }
+
+            $scope.schema = schema;
+            $scope.schema.owner.sort();
+
+            var schemaDefinitionDescriptor = { name : "definition", type : "Document" };
+            var entityDescriptors = SisUtil.getDescriptorArray($scope.schema);
+
+            entityDescriptors = entityDescriptors.map(function(ed) {
+                ed._parent_ = schemaDefinitionDescriptor;
+                return ed;
+            }).filter(function(ed) {
+                return ed.name !== "owner";
+            });
+
+            schemaDefinitionDescriptor.children = entityDescriptors;
+
+
+            var descriptors = [
+                { name : "name", type : "String", required : true, readonly : $scope.action == 'edit' },
+                ownerDescriptor,
+                { name : "sis_locked", type : "Boolean" },
+                schemaDefinitionDescriptor
+            ];
+
+            var orig = angular.copy($scope.schema);
+            $scope.descriptors = descriptors;
+
+            $scope.hasChanged = function() {
+                return !angular.equals(orig, $scope.schema);
+            };
+        });
     };
 
     var createEmptySchema = function() {
@@ -101,6 +101,10 @@ angular.module('sisui')
             SisSession.setSchemas(null);
             return $location.path("/schemas");
         });
+    };
+
+    $scope.cancel = function() {
+        SisUtil.goBack("/schemas");
     };
 
 });

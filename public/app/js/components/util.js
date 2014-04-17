@@ -1,6 +1,6 @@
 // Utility methods
 angular.module('sisui')
-.factory('SisUtil', function(SisUser) {
+.factory('SisUtil', function($window, $location, SisUser) {
     "use strict";
 
     // Pager class
@@ -392,6 +392,14 @@ angular.module('sisui')
         };
     };
 
+    var _goBack = function(pathIfNotPresent) {
+        if ($window.history.length) {
+            $window.history.back();
+        } else {
+            $location.path(pathIfNotPresent);
+        }
+    };
+
     return {
         getDescriptorArray : function(schema) {
             return getDescriptors(schema.definition);
@@ -410,6 +418,7 @@ angular.module('sisui')
         descriptorTypes : _descriptorTypes,
         attributesForType : _getAttributesForType,
         getHookSchema : _getHookSchema,
-        EndpointPager : EndpointPager
+        EndpointPager : EndpointPager,
+        goBack : _goBack
     };
 });

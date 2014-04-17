@@ -1,6 +1,6 @@
 angular.module('sisui')
 .controller("UserLoginController", function($scope, $location,
-                                        $window, SisUser) {
+                                            $window, SisUser) {
     "use strict";
 
     if (SisUser.isLoggedIn()) {

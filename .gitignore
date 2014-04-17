@@ -2,4 +2,4 @@ public/app/js/config.js
 public/app/lib/sis-js.js
 node_modules
 dist
-
+build

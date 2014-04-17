@@ -84,7 +84,7 @@ angular.module('sisui')
     };
 
     $scope.cancel = function() {
-        $location.path("/entities/" + $scope.schema.name);
+        SisUtil.goBack("/entities/" + $scope.schema.name);
     };
 
     parseRoute();
