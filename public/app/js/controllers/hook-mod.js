@@ -6,7 +6,6 @@ angular.module('sisui')
         if (!SisUtil.canManageEntity(orig, $scope.schema)) {
             return $location.path("/hooks");
         }
-        $scope.entity = angular.copy(orig);
         $scope.descriptors = SisUtil.getDescriptorArray($scope.schema);
         // need to tweak this so owner and sis_locked show up..
         var foundLocked = false;
@@ -32,7 +31,8 @@ angular.module('sisui')
                 type : "Boolean"
             });
         }
-
+        orig.sis_locked = orig.sis_locked || false;
+        $scope.entity = angular.copy(orig);
         // for the valueChanged recursion
         $scope.fieldValue = $scope.entity;
 
