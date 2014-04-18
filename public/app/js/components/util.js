@@ -111,7 +111,7 @@ angular.module('sisui')
                 if (desc.type == "ObjectId" && desc.ref) {
                     result.type = desc.type;
                     result.ref = desc.ref;
-                    result.url = "#/entities/" + result.type;
+                    result.url = "#/entities/" + result.ref;
                 }
                 return result;
             } else {
