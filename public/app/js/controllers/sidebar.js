@@ -9,7 +9,7 @@ angular.module('sisui')
         if ($scope.currentUser.super_user) {
             return null;
         }
-        var roles = $scope.currentUser.roles;
+        var roles = $scope.currentUser.roles || { };
         var keys = Object.keys(roles);
         if (!keys.length) {
             return null;

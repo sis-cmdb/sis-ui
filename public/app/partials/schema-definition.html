@@ -9,4 +9,20 @@
 {{ schema | json }}
         </pre>
     </accordion-group>
+    <accordion-group heading="Admins">
+        <table class="table table-bordered table-condensed table-striped">
+            <thead>
+                <tr>
+                    <td>username</td>
+                    <td>email</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="user in admins">
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.email }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </accordion-group>
 </accordion>
