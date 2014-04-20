@@ -13,14 +13,14 @@
         <table class="table table-bordered table-condensed table-striped">
             <thead>
                 <tr>
-                    <td>username</td>
-                    <td>email</td>
+                    <td><strong>username</strong></td>
+                    <td><strong>email</strong></td>
                 </tr>
             </thead>
             <tbody>
                 <tr ng-repeat="user in admins">
                     <td>{{ user.name }}</td>
-                    <td>{{ user.email }}</td>
+                    <td><a href="mailto:{{ user.email }}">{{ user.email }}</a></td>
                 </tr>
             </tbody>
         </table>

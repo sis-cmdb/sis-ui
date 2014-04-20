@@ -63,4 +63,6 @@ angular.module('sisui')
         }
     };
 
+    SisUser.verify();
+
 });

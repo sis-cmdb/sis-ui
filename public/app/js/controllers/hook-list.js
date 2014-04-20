@@ -27,7 +27,8 @@ angular.module('sisui')
         $location.path("/hooks/edit/" + hook.name);
     };
 
-    $scope.addNew = function() {
+    $scope.addNew = function(hook) {
+        SisSession.setObjectToCopy(hookSchema.name, hook);
         SisSession.setCurrentHook(null);
         $location.path("/hooks/add");
     };

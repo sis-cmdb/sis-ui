@@ -86,6 +86,7 @@ angular.module('sisui')
                     $scope.refIdField = idField;
                     if ($scope.fieldValue) {
                         $scope.fieldValue = $scope.fieldValue._id || $scope.fieldValue;
+                        $scope.valueChanged($scope.fieldValue);
                         SisApi.entities(schema.name).get($scope.fieldValue).then(function(entity) {
                             $scope.fieldValue = entity[idField];
                         }, function(err) {

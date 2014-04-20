@@ -55,7 +55,11 @@ angular.module('sisui')
             $scope.schema = schema;
             $scope.action = action;
             $scope.title = "Add a new hook";
+            var obj = SisSession.getObjectToCopy(schema.name);
             init({ });
+            obj.owner = [];
+            $scope.entity = obj;
+            $scope.fieldValue = $scope.entity;
         } else if (action == 'edit' && hookId) {
             SisApi.getHook(hookId).then(function(res) {
                 $scope.schema = schema;
@@ -90,3 +94,6 @@ angular.module('sisui')
     parseRoute();
 
 });
+
+
+

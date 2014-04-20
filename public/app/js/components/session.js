@@ -75,6 +75,20 @@ angular.module('sisui')
             return [schema, entity];
         };
 
+        this.setObjectToCopy = function(type, obj) {
+            set('add_new|' + type, obj);
+        };
+
+        this.getObjectToCopy = function(type) {
+            var result = get('add_new|' + type) || { };
+            set('add_new|' + type, null);
+            Object.keys(result).forEach(function(k) {
+                if (k[0] == '_') {
+                    delete result[k];
+                }
+            });
+            return result;
+        };
     }
 
     return new Session();

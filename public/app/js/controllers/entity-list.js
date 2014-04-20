@@ -26,7 +26,9 @@ angular.module('sisui')
 
     var schemaName = $route.current.params.schema;
 
-    $scope.addNew = function() {
+    $scope.addNew = function(entity) {
+        SisSession.setCurrentEntity($scope.schema, null);
+        SisSession.setObjectToCopy(schemaName, entity);
         $location.path("/entities/" + schemaName + "/add");
     };
 

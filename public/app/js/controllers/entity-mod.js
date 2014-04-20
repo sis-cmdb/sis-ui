@@ -13,7 +13,14 @@ angular.module('sisui')
             var desc = $scope.descriptors[i];
             if (desc.name == 'owner') {
                 // convert owner into an enum
-                desc.enum = SisUtil.getOwnerSubset($scope.schema);
+                var subset = SisUtil.getOwnerSubset($scope.schema);
+                if (subset instanceof Array) {
+                    desc.enum = subset;
+                    desc.type = "Array";
+                } else {
+                    desc.type = "String";
+                    delete desc.enum;
+                }
             } else if (desc.name == 'sis_locked') {
                 foundLocked = true;
             }
@@ -23,8 +30,8 @@ angular.module('sisui')
                 name : "sis_locked",
                 type : "Boolean"
             });
-            orig.sis_locked = orig.sis_locked || false;
         }
+        orig.sis_locked = orig.sis_locked || false;
         $scope.entity = angular.copy(orig);
         // for the valueChanged recursion
         $scope.fieldValue = $scope.entity;
@@ -52,7 +59,11 @@ angular.module('sisui')
                 $scope.schema = schema;
                 $scope.action = action;
                 $scope.title = "Add a new entity of type " + schemaName;
+                var obj = SisSession.getObjectToCopy(schemaName);
                 init({ });
+                obj.owner = [];
+                $scope.entity = obj;
+                $scope.fieldValue = $scope.entity;
             }, function(err) {
                 return $location.path(backPath);
             });

@@ -150,11 +150,11 @@ module.exports = function(grunt) {
         files: [{
           dot: true,
           src: [
-            'dist/*'
+            'dist'
           ]
         }]
       },
-      build : 'build/*',
+      build : 'build',
       server: '.tmp'
     },
     watch: {

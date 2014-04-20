@@ -53,10 +53,12 @@ angular.module('sisui')
                 return d.promise;
             }
             var username = this.getCurrentUser().username;
+            cleanup();
             SisApi.tokens(username).delete(SisApi.getAuthToken()).then(function() {
                 // ignore errors
-                cleanup();
                 d.resolve(true);
+            }, function() {
+                d.resolve(false);
             });
             return d.promise;
         },
@@ -83,6 +85,18 @@ angular.module('sisui')
                 });
             });
             return d.promise;
+        },
+        verify : function() {
+            var user = this.getCurrentUser();
+            var self = this;
+            if (user) {
+                SisApi.tokens(user.username).list({ limit : 1 }).then(function(token) {
+                    // good to go
+                }, function(err) {
+                    // logout - something bad
+                    self.logout();
+                });
+            }
         }
     };
 });
