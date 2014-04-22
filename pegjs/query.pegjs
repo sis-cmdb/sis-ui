@@ -18,8 +18,8 @@ sep
   = c:[ \t\r\n]+ { return null; }
 
 word
- = letters:[a-zA-Z0-9_\*]+ { return letters.join(""); }
- / '"' letters:[a-zA-Z0_9_\* \?]+ '"' { return letters.join(""); }
+ = letters:[a-zA-Z0-9_\*\.]+ { return letters.join(""); }
+ / '"' letters:[a-zA-Z0_9_\*\. \?]+ '"' { return letters.join(""); }
 
 
 base
