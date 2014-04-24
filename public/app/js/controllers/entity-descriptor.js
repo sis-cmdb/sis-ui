@@ -1,5 +1,6 @@
 angular.module('sisui')
-.controller("EntityDescriptorController", function($scope, SisUtil, SisApi, $log) {
+.controller("EntityDescriptorController", function($scope, SisUtil, SisApi,
+                                                   $modal, $log) {
     "use strict";
     // the container object we are managing a field of
     // $scope.container
@@ -76,29 +77,48 @@ angular.module('sisui')
             if (fieldDescriptor.ref) {
                 // get the schema and list of entities to show
                 SisApi.schemas.get(fieldDescriptor.ref).then(function(schema) {
-                    if (schema) {
-                        var idField = SisUtil.getIdField(schema);
-                        if (idField != '_id') {
-                            idField += ",_id";
-                        }
-                        SisApi.entities(schema.name).listAll({"fields" : idField}).then(function(results) {
-                            $scope.idField = idField;
-                            $scope.entities = results;
-                            if ($scope.fieldValue) {
-                                $scope.fieldValue = $scope.fieldValue._id || $scope.fieldValue;
-                                $scope.entities.some(function(e) {
-                                    if (e._id == $scope.fieldValue) {
-                                        $scope.fieldValue = e;
-                                        return true;
-                                    }
-                                    return false;
-                                });
-                            }
+                    $scope.refSchema = schema;
+                    var idField = SisUtil.getIdField(schema);
+                    var fields = '_id';
+                    if (idField != '_id') {
+                        fields += "," + idField;
+                    }
+                    $scope.refIdField = idField;
+                    if ($scope.fieldValue) {
+                        $scope.fieldValue = $scope.fieldValue._id || $scope.fieldValue;
+                        $scope.valueChanged($scope.fieldValue);
+                        SisApi.entities(schema.name).get($scope.fieldValue).then(function(entity) {
+                            $scope.fieldValue = entity[idField];
+                        }, function(err) {
+                            $scope.fieldValue = null;
                         });
                     }
                 });
             }
         }
+    };
+
+    $scope.chooseEntity = function() {
+        if (!$scope.refSchema) {
+            return;
+        }
+        var scope = $scope.$new(true);
+        scope.schema = $scope.refSchema;
+        scope.idField = $scope.refIdField;
+        var modal = $modal.open({
+            templateUrl : "public/app/partials/entity-chooser.html",
+            scope : scope,
+            controller : "EntityChooserController",
+            windowClass : "wide-modal-window"
+        });
+        modal.result.then(function(entity) {
+            if (!entity) {
+                $scope.fieldValue = null;
+            } else {
+                $scope.fieldValue = entity[$scope.refIdField];
+            }
+            $scope.valueChanged(entity);
+        });
     };
 
     $scope.inputType = function() {
@@ -171,10 +191,13 @@ angular.module('sisui')
     $scope.valueChanged = function(value) {
         if ($scope.fieldDescriptor.type == "ObjectId" &&
             $scope.fieldDescriptor.ref) {
-            value = value._id;
+            value = value ? value._id : null;
         } else if ($scope.fieldDescriptor.type == "Mixed" &&
             typeof value === "object") {
             value = angular.toJson(value);
+        } else if ($scope.path == "owner" &&
+            $scope.fieldDescriptor.type == "String") {
+            value = value.split(",");
         }
         if ($scope.isItem()) {
             $scope.$parent.fieldValue[$scope.arrIdx] = value;
@@ -191,63 +214,5 @@ angular.module('sisui')
     };
 
     $scope.fieldValue = "<NOT_SET>";
-
-});
-
-angular.module('sisui')
-.controller("ModEntityController", function($scope, $modalInstance,
-                                             SisUtil, SisApi) {
-    var orig = $scope.obj;
-    $scope.obj = angular.copy(orig);
-    $scope.descriptors = SisUtil.getDescriptorArray($scope.schema);
-    // need to tweak this so owner and sis_locked show up..
-    var foundLocked = false;
-    for (var i = 0; i < $scope.descriptors.length; ++i) {
-        var desc = $scope.descriptors[i];
-        if (desc.name == 'owner') {
-            // convert owner into an enum
-            desc.enum = SisUtil.getOwnerSubset($scope.schema);
-        } else if (desc.name == 'sis_locked') {
-            foundLocked = true;
-        }
-    }
-    if (!foundLocked) {
-        $scope.descriptors.push({
-            name : "sis_locked",
-            type : "Boolean"
-        });
-    }
-
-    // for the valueChanged recursion
-    $scope.fieldValue = $scope.obj;
-
-
-    $scope.hasChanged = function() {
-        return !angular.equals(orig, $scope.obj);
-    };
-
-    $scope.save = function() {
-        var schemaName = $scope.schema.name;
-        var endpoint = SisApi.entities(schemaName);
-        var func = endpoint.create;
-        if ($scope.action == 'edit') {
-            func = endpoint.update;
-        }
-        func($scope.obj).then(function(res) {
-            $modalInstance.close(res);
-        });
-    };
-
-    // switch ($scope.action) {
-    //     case 'add':
-    //         $scope.modalTitle = "Add a new entity of type " + $scope.schema.name;
-    //         break;
-    //     case 'edit':
-    //         $scope.modalTitle = "Modify entity of type " + $scope.schema.name;
-    //         break;
-    //     default:
-    //         $scope.modalTitle = "Entity information " + $scope.schema.name;
-    //         break;
-    // }
 
 });

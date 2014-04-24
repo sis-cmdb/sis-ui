@@ -54,7 +54,8 @@
             </a>
             <fieldset ng-disabled="isReadOnly();">
                 <label class="entity-label" for="{{ path }}">{{ fieldName }}</label>
-                <select ng-if="fieldDescriptor.ref" ng-options="e[idField] for e in entities" ng-model="fieldValue" ng-change="valueChanged(fieldValue)" required="{{ !!fieldDescriptor.required }}"></select>
+                <input  ng-if="fieldDescriptor.ref" type="text" class="form-control input-sm" disabled="disabled" id="{{ path }}" ng-model="fieldValue" required="{{ !!fieldDescriptor.required }}">
+                <button ng-if="fieldDescriptor.ref && !isReadOnly()" class="btn btn-sm btn-info" ng-click="chooseEntity();">Choose</button>
 
                 <input ng-if="!fieldDescriptor.ref" type="text" class="form-control input-sm" id="{{ path }}" placeholder="{{ fieldDescriptor.type }}" ng-change="valueChanged(fieldValue);" ng-model="fieldValue" required="{{ !!fieldDescriptor.required }}">
             </fieldset>

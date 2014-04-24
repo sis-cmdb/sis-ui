@@ -1,11 +1,16 @@
 <div class="row sisui-bottom-buffer">
+    <h3>
+        <strong>Hooks</strong>
+    </h3>
+</div>
+<div class="row sisui-bottom-buffer">
     <form class="form-inline" role="form">
       <div class="form-group">
         <label class="sr-only" for="filter">Filter</label>
-        <input ng-model="filterText" type="text" class="form-control" id="filter" placeholder="Filter">
+        <input ng-model="filterText" type="text" class="form-control intput-sm" id="filter" placeholder="Filter">
       </div>
       <div class="form-group pull-right">
-        <button type="button" class="btn btn-primary" ng-click="addNew();">Add New</button>
+        <button type="button" class="btn btn-primary btn-sm" ng-click="addNew();">Add New</button>
       </div>
     </form>
 </div>
@@ -36,8 +41,12 @@
                     <a ng-show="canRemove(hook)" class="btn btn-xs btn-danger" ng-click="remove(hook)">
                         <span class="glyphicon glyphicon-trash">Remove</span>
                     </a>
+                    <a type="button" class="btn btn-info btn-xs" ng-click="addNew(hook);">
+                        <span class="glyphicon glyphicon-retweet">Clone</span>
+                    </a>
                 </td>
             </tr>
         </tbody>
     </table>
+    <pagination direction-links="false" boundary-links="true" total-items="totalItems" page="currentPage" items-per-page="{{ pageSize }}" class="pagination-sm"></pagination>
 </div>

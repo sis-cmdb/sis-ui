@@ -21,9 +21,13 @@ ul {
     width : 800px;
 }
 
+.narrow-modal-window .modal-dialog {
+    width : 400px;
+}
+
 .entity-label {
     width: 80px;
-    text-align: right;
+    text-align: center;
 }
 
 .collapseBtn {

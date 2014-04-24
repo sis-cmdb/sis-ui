@@ -1,10 +1,26 @@
 <div class="col-md-3 nav-toc" ng-controller="SidebarController">
     <ul class="nav affix" role="complementary">
-        <li ng-class="{active:isActive('schemas')}"><a href="#/schemas">Schemas</a></li>
+        <li ng-if="!loggedIn" ng-class="{active:isActive('login')}"><a href="#/login">Login</a></li>
+        <li ng-if="loggedIn">
+            <a style="pointer-events: none">{{ currentUser.username }}</a>
+            <ul>
+                <li ng-if="currentUser.super_user"><span class="label label-success">Super User</span></li>
+                <li ng-if="roles.admin.length">
+                    <span class="label label-primary" title="admin" ng-repeat="group in roles.admin">{{group}}</span>
+                </li>
+                <li ng-if="roles.user.length">
+                    <span class="label label-default" title="user" ng-repeat="group in roles.user">{{group}}</span>
+                </li>
+                <li><a ng-click="logout()" href="#/logout"><label class="label label-default add-pointer">Logout</label></a></li>
+            </ul>
+        </li>
+        <li ng-class="{active:isActive('schemas')}">
+            <a href="#/schemas">Schemas</a>
+            <ul ng-if="activeEntity">
+                <li><a href="#/entities/{{ activeEntity }}">{{ activeEntity }}</a></li>
+            </ul>
+        </li>
         <li ng-class="{active:isActive('hooks')}"><a href="#/hooks">Hooks</a></li>
-        <li ng-class="{active:isActive('hiera')}"><a href="#/hiera">Hiera</a></li>
         <li ng-class="{active:isActive('users')}"><a href="#/users">Users</a></li>
-        <li ng-show="!loggedIn" ng-class="{active:isActive('login')}"><a href="#/login">Login</a></li>
-        <li ng-show="loggedIn" ng-click="logout()"><a href="#/logout">Logout</a></li>
     </ul>
 </div>

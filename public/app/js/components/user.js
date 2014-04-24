@@ -10,6 +10,13 @@ angular.module('sisui')
                  currentUser.expirationTime > Date.now());
     };
 
+    var cleanup = function() {
+        // cleanup
+        SisApi.setAuthToken(null);
+        delete localStorage[USER_KEY];
+        $rootScope.$broadcast("loggedIn", false);
+    };
+
     return {
         isLoggedIn : function() {
             if (!(USER_KEY in localStorage)) {
@@ -18,9 +25,7 @@ angular.module('sisui')
             var currentUser = angular.fromJson(localStorage[USER_KEY]);
             var expired = isExpired(currentUser);
             if (expired) {
-                // cleanup
-                SisApi.setAuthToken(null);
-                delete localStorage[USER_KEY];
+                cleanup();
             } else {
                 // ensure sis client token is set
                 SisApi.setAuthToken(currentUser.token);
@@ -34,10 +39,8 @@ angular.module('sisui')
                 var user = angular.fromJson(data);
                 if (isExpired(user)) {
                     // cleanup
-                    SisApi.setAuthToken(null);
-                    delete localStorage[USER_KEY];
                     user = null;
-                    $rootScope.$broadcast("loggedIn", true);
+                    cleanup();
                 }
                 return user;
             }
@@ -50,12 +53,12 @@ angular.module('sisui')
                 return d.promise;
             }
             var username = this.getCurrentUser().username;
+            cleanup();
             SisApi.tokens(username).delete(SisApi.getAuthToken()).then(function() {
                 // ignore errors
-                SisApi.setAuthToken(null);
-                delete localStorage[USER_KEY];
                 d.resolve(true);
-                $rootScope.$broadcast("loggedIn", false);
+            }, function() {
+                d.resolve(false);
             });
             return d.promise;
         },
@@ -82,6 +85,18 @@ angular.module('sisui')
                 });
             });
             return d.promise;
+        },
+        verify : function() {
+            var user = this.getCurrentUser();
+            var self = this;
+            if (user) {
+                SisApi.tokens(user.username).list({ limit : 1 }).then(function(token) {
+                    // good to go
+                }, function(err) {
+                    // logout - something bad
+                    self.logout();
+                });
+            }
         }
     };
 });

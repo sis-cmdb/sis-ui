@@ -1,5 +1,5 @@
 angular.module('sisui')
-.controller("UsersController", function($scope, $location, SisUser,
+.controller("UserListController", function($scope, $location, SisUser,
                                         SisDialogs, SisUtil, SisApi) {
     "use strict";
 
@@ -28,8 +28,11 @@ angular.module('sisui')
     var adminRoles = SisUtil.getAdminRoles();
 
     $scope.canManage = function(user) {
-        return (!user.super_user && (adminRoles === true ||
-                                     adminRoles.length > 0)) &&
+        if (!userName || adminRoles === null) {
+            return false;
+        }
+        return (!user.super_user &&
+                (adminRoles === true || adminRoles.length)) &&
                 userName != user.name;
     };
 
@@ -41,9 +44,7 @@ angular.module('sisui')
         return adminRoles === true;
     };
 
-    SisApi.users.listAll({ sort : "name" }).then(function(users) {
-        if (users) {
-            $scope.users = users;
-        }
-    });
+    var opts = { sortField : 'name', itemsField : 'users' };
+    var pager = new SisUtil.EndpointPager(SisApi.users, $scope, opts);
+    pager.setPage(1);
 });

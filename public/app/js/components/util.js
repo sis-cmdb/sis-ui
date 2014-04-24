@@ -1,7 +1,64 @@
 // Utility methods
 angular.module('sisui')
-.factory('SisUtil', function(SisUser) {
+.factory('SisUtil', function($window, $location, SisUser) {
     "use strict";
+
+    // Pager class
+    function EndpointPager(endpoint, scope, opts) {
+
+        var parseSearch = function(search) {
+            if (!search) {
+                return null;
+            }
+            return null;
+        };
+
+        var self = this;
+        // init
+        scope.totalItems = 0;
+        scope.currentPage = 1;
+        // opts/defaults
+        opts = opts || { };
+        scope.pageSize = opts.pageSize || 20;
+        var sortField = opts.sortField || null;
+        var searchQuery = parseSearch(opts.search);
+        var itemsField = opts.itemsField || 'items';
+
+        this.setSearch = function(search) {
+            searchQuery = parseSearch(search);
+            this.loadPage();
+        };
+
+        this.setSort = function(sort) {
+            sortField = sort;
+            this.loadPage();
+        };
+
+        this.loadPage = function() {
+            var query = {
+                limit : scope.pageSize,
+                offset: (scope.currentPage - 1) * scope.pageSize
+            };
+            if (sortField) {
+                query.sort = sortField;
+            }
+            if (searchQuery) {
+                query.q = searchQuery;
+            }
+            endpoint.list(query).then(function(items) {
+                scope.totalItems = items.total_count;
+                scope[itemsField] = items.results;
+            });
+        };
+
+        // attach some scope methods
+        this.setPage = function(pageNum) {
+            scope.currentPage = pageNum;
+            self.loadPage();
+        };
+
+        scope.setPage = this.setPage.bind(this);
+    }
 
     // add some utilities to the client
     function getArrayDescriptor(arr, name) {
@@ -54,7 +111,7 @@ angular.module('sisui')
                 if (desc.type == "ObjectId" && desc.ref) {
                     result.type = desc.type;
                     result.ref = desc.ref;
-                    result.url = "#/entities/" + result.type;
+                    result.url = "#/entities/" + result.ref;
                 }
                 return result;
             } else {
@@ -183,7 +240,7 @@ angular.module('sisui')
             return [];
         }
         if (user.super_user) {
-            return [];
+            return true;
         }
         var roles = user.roles || { };
         return Object.keys(roles);
@@ -313,6 +370,36 @@ angular.module('sisui')
         return result;
     };
 
+    var _getHookSchema = function() {
+        return {
+            name : "sis_hooks",
+            owner : _getAllRoles(),
+            definition : {
+                name : { type : "String", required : true, unique : true },
+                target : {
+                        type : {
+                            url : { type : "String", required : true },
+                            action : { type : "String", required : true, enum : ["GET", "POST", "PUT"]}
+                        },
+                        required : true
+                },
+                retry_count : { type : "Number", min : 0, max : 20, "default" : 0 },
+                retry_delay : { type : "Number", min : 1, max : 60, "default" : 1 },
+                events : { type : [{ type : "String", enum : ["insert", "update", "delete"] }], required : true },
+                owner : { type : ["String"] },
+                entity_type : "String"
+            }
+        };
+    };
+
+    var _goBack = function(pathIfNotPresent) {
+        if ($window.history.length) {
+            $window.history.back();
+        } else {
+            $location.path(pathIfNotPresent);
+        }
+    };
+
     return {
         getDescriptorArray : function(schema) {
             return getDescriptors(schema.definition);
@@ -329,6 +416,9 @@ angular.module('sisui')
         getAllRoles : _getAllRoles,
         getInputType : _getInputType,
         descriptorTypes : _descriptorTypes,
-        attributesForType : _getAttributesForType
+        attributesForType : _getAttributesForType,
+        getHookSchema : _getHookSchema,
+        EndpointPager : EndpointPager,
+        goBack : _goBack
     };
 });

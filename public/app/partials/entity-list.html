@@ -1,23 +1,20 @@
 <div class="row sisui-bottom-buffer">
     <h3>
         <strong>{{ schema.name }}</strong> Information
-        <a ng-show="canManageSchema(schema)" class="btn btn-xs btn-primary pull-right" ng-click="editSchema(schema);">
-            <span class="glyphicon glyphicon-edit">Edit</span>
-        </a>
     </h3>
     <div ng-controller="SchemaDefinitionController">
         <div ng-include src="'public/app/partials/schema-definition.html'"/>
     </div>
 </div>
 <div class="row sisui-bottom-buffer">
-    <h3>Entities</h3>
+    <h3>{{ schema.name }} Entities</h3>
     <form class="form-inline" role="form">
       <div class="form-group">
         <label class="sr-only" for="filter">Filter</label>
-        <input ng-model="filterText" type="text" class="form-control" id="filter" placeholder="Filter">
+        <input ng-model="filterText" type="text" class="form-control input-sm" id="filter" placeholder="Filter">
       </div>
       <div class="form-group pull-right">
-        <button ng-show="canAdd()" type="button" class="btn btn-primary" ng-click="addNew();">Add New</button>
+        <button ng-show="canAdd()" type="button" class="btn btn-primary btn-sm" ng-click="addNew();">Add New</button>
       </div>
     </form>
 </div>
@@ -44,8 +41,12 @@
                     <a ng-show="canRemove(entity)" class="btn btn-xs btn-danger" ng-click="remove(entity)">
                         <span class="glyphicon glyphicon-trash">Remove</span>
                     </a>
+                    <a ng-show="canAdd()" type="button" class="btn btn-info btn-xs" ng-click="addNew(entity);">
+                        <span class="glyphicon glyphicon-retweet">Clone</span>
+                    </a>
                 </td>
             </tr>
         </tbody>
     </table>
+    <pagination direction-links="false" boundary-links="true" total-items="totalItems" page="currentPage" items-per-page="{{ pageSize }}" class="pagination-sm"></pagination>
 </div>
