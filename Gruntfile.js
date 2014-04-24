@@ -20,9 +20,9 @@ module.exports = function(grunt) {
 
   var getDocData = function(dest, src) {
     var replaceMents = [
-        ['./docs/rbac.md', './rbac'],
-        ['./docs/sharing.md', './sharing'],
-        ['./rbac.md', './rbac']
+        [/\.\/docs\/rbac\.md/g, './rbac'],
+        [/\.\/docs\/sharing\.md/g, './sharing'],
+        [/\.\/rbac\.md/g, './rbac']
     ];
     console.log(dest + " -> " + src);
     var srcMd = "../SIS-web/README.md";
