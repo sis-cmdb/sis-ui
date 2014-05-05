@@ -1,5 +1,7 @@
-public/app/js/config.js
-public/app/lib/sis-js.js
+.DS_Store
+src/app/js/config.js
+src/app/lib/sis-js.js
 node_modules
 dist
 build
+dev_dist
