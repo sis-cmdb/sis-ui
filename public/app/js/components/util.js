@@ -54,9 +54,13 @@ angular.module('sisui')
         // attach some scope methods
         this.setPage = function(pageNum) {
             scope.currentPage = pageNum;
-            self.loadPage();
         };
 
+        scope.$watch('currentPage', function(newVal, oldVal) {
+            if (newVal != oldVal || !scope[itemsField]) {
+                self.loadPage();
+            }
+        });
         scope.setPage = this.setPage.bind(this);
     }
 
