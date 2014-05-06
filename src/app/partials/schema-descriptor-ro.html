@@ -6,5 +6,5 @@
 <label class="label label-primary" ng-show="descriptor.required">required</label>
 <label class="label label-info" ng-show="descriptor.unique">unique</label>
 <ul ng-hide="!descriptor.children">
-    <li ng-repeat="descriptor in descriptor.children" ng-include="'public/app/partials/schema-descriptor-ro.html'"></li>
+    <li ng-repeat="descriptor in descriptor.children" ng-include="'app/partials/schema-descriptor-ro.html'"></li>
 </ul>

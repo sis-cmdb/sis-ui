@@ -106,7 +106,7 @@ angular.module('sisui')
         scope.schema = $scope.refSchema;
         scope.idField = $scope.refIdField;
         var modal = $modal.open({
-            templateUrl : "public/app/partials/entity-chooser.html",
+            templateUrl : "app/partials/entity-chooser.html",
             scope : scope,
             controller : "EntityChooserController",
             windowClass : "wide-modal-window"

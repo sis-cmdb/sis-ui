@@ -5,38 +5,38 @@ angular.module('sisui', ['ngRoute', 'ui.bootstrap', 'sisconfig'])
     $routeProvider
         // user stuff
         .when("/login", {
-            templateUrl : "public/app/partials/user-login.html",
+            templateUrl : "app/partials/user-login.html",
             controller : 'UserLoginController'
         })
         .when("/users", {
-            templateUrl : "public/app/partials/user-list.html",
+            templateUrl : "app/partials/user-list.html",
             controller : "UserListController"
         })
         // schemas
         .when("/schemas", {
-            templateUrl : "public/app/partials/schema-list.html",
+            templateUrl : "app/partials/schema-list.html",
             controller : "SchemaListController"
         })
         .when("/schemas/:action/:schema?", {
-            templateUrl : "public/app/partials/schema-mod.html",
+            templateUrl : "app/partials/schema-mod.html",
             controller : "SchemaModController"
         })
         // entities
         .when("/entities/:schema", {
-            templateUrl : "public/app/partials/entity-list.html",
+            templateUrl : "app/partials/entity-list.html",
             controller : "EntityListController"
         })
         .when("/entities/:schema/:action/:eid?", {
-            templateUrl : "public/app/partials/entity-mod.html",
+            templateUrl : "app/partials/entity-mod.html",
             controller : "EntityModController"
         })
         // hooks
         .when("/hooks", {
-            templateUrl : "public/app/partials/hook-list.html",
+            templateUrl : "app/partials/hook-list.html",
             controller : "HookListController"
         })
         .when("/hooks/:action/:hid?", {
-            templateUrl : "public/app/partials/entity-mod.html",
+            templateUrl : "app/partials/entity-mod.html",
             controller : "HookModController"
         })
         // fall back

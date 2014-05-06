@@ -68,7 +68,7 @@ angular.module('sisui')
 
     $scope.showAttrs = function() {
         return $modal.open({
-            templateUrl : "public/app/partials/schema-descriptor-attrs.html",
+            templateUrl : "app/partials/schema-descriptor-attrs.html",
             scope : $scope,
             windowClass : "narrow-modal-window"
         });

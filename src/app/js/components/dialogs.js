@@ -3,10 +3,10 @@ angular.module('sisui')
 
     "use strict";
 
-    var OBJECT_TEMPLATE = "public/app/partials/entity-view.html";
+    var OBJECT_TEMPLATE = "app/partials/entity-view.html";
     var OBJECT_CONTROLLER = "EntityViewController";
 
-    var USER_TEMPLATE = "public/app/partials/user-mod-dlg.html";
+    var USER_TEMPLATE = "app/partials/user-mod-dlg.html";
     var USER_CONTROLLER = "UserModDlgController";
 
     var openModal = function(scope, controller, template) {

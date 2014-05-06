@@ -29,7 +29,7 @@
 <div ng-if="canModifyChildren();">
     <ul>
         <li ng-repeat="descriptor in descriptor.children" ng-controller="SchemaDescriptorController">
-            <div ng-include="'public/app/partials/schema-descriptor.html'"></div>
+            <div ng-include="'app/partials/schema-descriptor.html'"></div>
         </li>
         <li ng-if="canAddChildren();">
             <a class="btn btn-xs btn-primary" ng-click="addChildDescriptor();">
