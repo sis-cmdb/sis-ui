@@ -289,7 +289,7 @@ module.exports = function(grunt) {
     grunt.config.set('sisswig.docs_' + doc, {
         // src -> dest
         src: ["<%= build_dirs.src %>/docs/docs.swig"],
-        dest : "<%= build_dirs.dist %>/docs/" + conf.out || doc,
+        dest : "<%= build_dirs.dist %>/docs/" + (conf.out || doc),
         // data
         context : {
             scripts : ['./js/vendor-libs.js', './js/sisdocs.min.js'],
