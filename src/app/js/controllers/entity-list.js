@@ -11,15 +11,11 @@ angular.module('sisui')
     $scope.remove = function(entity) {
         var schemaName = $scope.schema.name;
         SisApi.entities(schemaName).delete(entity).then(function(res) {
-            if (!err) {
-                $scope.$apply(function() {
-                    for (var i = 0; i < $scope.entities.length; ++i) {
-                        if ($scope.entities[i]._id == entity._id) {
-                            $scope.entities.splice(i, 1);
-                            break;
-                        }
-                    }
-                });
+            for (var i = 0; i < $scope.entities.length; ++i) {
+                if ($scope.entities[i]._id == entity._id) {
+                    $scope.entities.splice(i, 1);
+                    break;
+                }
             }
         });
     };
