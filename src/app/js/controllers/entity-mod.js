@@ -73,7 +73,7 @@ angular.module('sisui')
                 var idField = SisUtil.getIdField(res[0]);
                 $scope.action = action;
                 $scope.title = "Modify entity of type " + schemaName + " - " + res[1][idField];
-                init(res[1]);
+                init(angular.copy(res[1]));
             }, function(err) {
                 return $location.path(backPath);
             });

@@ -95,7 +95,7 @@ angular.module('sisui')
         } else if (descriptor.type === "Document") {
             if (descriptor.children && descriptor.children.length) {
                 result.type = { };
-                for (i = 0; i < descriptor.children; ++i) {
+                for (i = 0; i < descriptor.children.length; ++i) {
                     var child = descriptor.children[i];
                     result.type[child.name] = convertToSchemaField(child);
                 }

@@ -79,7 +79,8 @@ angular.module('sisui')
             SisApi.getSchema(schemaName, true).then(function(schema) {
                 $scope.action = action;
                 $scope.title = "Modify schema " + schemaName;
-                init(schema);
+                // clone it
+                init(angular.copy(schema));
             }, function(err) {
                 return $location.path("/schemas");
             });
