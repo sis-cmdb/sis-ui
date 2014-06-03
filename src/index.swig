@@ -27,5 +27,10 @@
         <ng-include src="'app/partials/sidebar.html'"></ng-include>
       </div>
     </div>
+    <div class="footer">
+        <div class="container">
+            <ng-include src="'app/partials/footer.html'"></ng-include>
+        </div>
+    </div>
   </body>
 </html>

@@ -14,6 +14,11 @@ module.exports = function(grunt) {
         sisjs : "../SIS-js",
         sisweb : "../SIS-web"
     },
+    buildjson : {
+        options : {
+            dest : '<%= build_dirs.dist %>'
+        }
+    },
     sismd : {
         options : {
             preprocess : function(data) {
@@ -80,16 +85,8 @@ module.exports = function(grunt) {
       }
     },
     copy: {
-      dist: {
+      dist_common : {
         files : [
-          // app
-          {
-            expand : true,
-            flatten : true,
-            cwd : '<%= build_dirs.build %>',
-            src: ['sisui.min.*', 'app/vendor-libs.js'],
-            dest: '<%= build_dirs.dist %>/app/js/',
-          },
           {
             expand : true,
             cwd : '<%= build_dirs.src %>',
@@ -104,18 +101,40 @@ module.exports = function(grunt) {
             dest: '<%= build_dirs.dist %>/',
           },
           {
-            expand : true,
-            flatten : true,
-            cwd : '<%= build_dirs.build %>',
-            src: ['sisdocs.min.*', 'docs/vendor-libs.js'],
-            dest: '<%= build_dirs.dist %>/docs/js/',
-          },
-          {
             cwd : '<%= build_dirs.src %>',
             expand : true,
             src: ['common/css/**', 'common/images/**'],
             dest: '<%= build_dirs.dist %>/',
           }
+        ]
+      },
+      dist_js: {
+        files : [
+          // app
+          {
+            expand : true,
+            flatten : true,
+            cwd : '<%= build_dirs.build %>',
+            src: ['sisui.min.*', 'app/vendor-libs.js'],
+            dest: '<%= build_dirs.dist %>/app/js/',
+          },
+          {
+            expand : true,
+            flatten : true,
+            cwd : '<%= build_dirs.build %>',
+            src: ['sisdocs.min.*', 'docs/vendor-libs.js'],
+            dest: '<%= build_dirs.dist %>/docs/js/',
+          }
+        ]
+      },
+      localconfig : {
+        files : [
+            {
+                expand : true,
+                cwd : '<%= build_dirs.src %>',
+                src: ['app/js/config.js'],
+                dest: '<%= build_dirs.dist %>/'
+            }
         ]
       }
     },
@@ -167,20 +186,43 @@ module.exports = function(grunt) {
     },
     watch: {
       js: {
-        files: ['<%= build_dirs.src %>/app/**/*.js','<%= build_dirs.src %>/docs/js/*.js'],
-        tasks: ['newer:jshint'],
+        files: ['<%= build_dirs.src %>/app/js/**/*.js'],
+        tasks: ['newer:jshint', 'uglify', 'copy:dist_js', 'copy:localconfig'],
         options: {
           livereload: true
         }
       },
-      css: {
-        files : ['<%= build_dirs.src %>/app/**/*.css'],
+      templates : {
+        files: ['<%= build_dirs.src %>/app/partials/*.html'],
+        tasks: ['ngtemplates', 'uglify', 'copy:dist_js'],
+        options: {
+            livereload : true
+        }
+      },
+      swigs : {
+        files : ['<%= build_dirs.src %>/**/*.swig'],
+        tasks: ['sisswig'],
+        options: {
+            livereload : true
+        }
+      },
+      peg : {
+        files : ['<%= build_dirs.src %>/pegjs/*.js'],
+        tasks: ['peg', 'uglify', 'copy:dist_js'],
+        options: {
+            livereload : true
+        }
+      },
+      common: {
+        files : ['<%= build_dirs.src %>/app/**/*.css',
+                 '<%= build_dirs.src %>/common/css/**',
+                 '<%= build_dirs.src %>/common/images/**',
+                 '<%= build_dirs.src %>/docs/**/*.css'
+                ],
+        tasks: ['copy:dist_common'],
         options: {
           livereload: true
         }
-      },
-      gruntfile: {
-        files: ['Gruntfile.js']
       },
       livereload: {
         options: {
@@ -217,22 +259,6 @@ module.exports = function(grunt) {
         options : {
             separator : ';'
         },
-        // app : {
-        //     options : {
-        //         separator : ''
-        //     },
-        //     files : {
-        //         // sis-ui
-        //         '<%= build_dirs.build %>/sisui.min.js' :
-        //             ['<%= build_dirs.sisjs %>/lib/sis-js.js',
-        //              '<%= build_dirs.src %>/app/js/app.js',
-        //              '<%= build_dirs.src %>/app/js/components/*.js',
-        //              '<%= build_dirs.build %>/pegjs/query.js',
-        //              '<%= build_dirs.build %>/templates/partials.js',
-        //              '<%= build_dirs.src %>/app/js/controllers/*.js'
-        //             ]
-        //     }
-        // },
         vendor : {
             files : {
                 // libs for the angular app
@@ -302,12 +328,11 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('serve', function () {
-    // copy over config.js
-    var files = grunt.config.get('copy.dist.files');
-    files.push({ src : "<%= build_dirs.src %>/app/js/config.js",
-                 dest : "<%= build_dirs.dist %>/app/js/config.js" });
-    grunt.config.set('copy.dist.files', files);
-    grunt.task.run(['build', 'connect:dist:keepalive']);
+    grunt.task.run(['build', 'copy:localconfig', 'connect:dist', 'watch']);
+  });
+
+  grunt.registerTask('copydist', function() {
+    grunt.task.run(['copy:dist_js', 'copy:dist_common']);
   });
 
   grunt.registerTask('build', [
@@ -318,7 +343,8 @@ module.exports = function(grunt) {
     'ngtemplates',
     'uglify',
     'concat',
-    'copy',
+    'copydist',
+    'buildjson',
     'sisswig'
   ]);
 
