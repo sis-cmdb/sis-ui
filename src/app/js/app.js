@@ -39,6 +39,10 @@ angular.module('sisui', ['ngRoute', 'ui.bootstrap', 'sisconfig'])
             templateUrl : "app/partials/entity-mod.html",
             controller : "HookModController"
         })
+        .when("/tokens", {
+            templateUrl : "app/partials/token-list.html",
+            controller : "TokenListController"
+        })
         // fall back
         .otherwise({
             redirectTo: '/schemas'

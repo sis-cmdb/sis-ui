@@ -1,0 +1,64 @@
+<div class="row sisui-bottom-buffer">
+    <h3>
+        <strong>Tokens</strong>
+    </h3>
+</div>
+<div class="row sisui-bottom-buffer">
+    <h4>Temporary Tokens</h4>
+</div>
+<div class="row sis-ui-bottom-buffer">
+    <table class="table table-bordered table-condensed table-striped">
+        <thead>
+            <tr>
+                <th>Token</th>
+                <th>Expires in</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="token in temps">
+                <td>{{ token.name }}</td>
+                <td>{{ token.expires | moment }}</td>
+                <td>
+                    <span ng-if="isCurrent(token)" class="label label-primary">Current Token</span>
+                    <a ng-if="!isCurrent(token)" class="btn btn-xs btn-danger" ng-click="remove(token, true)">
+                        <span class="glyphicon glyphicon-trash">Remove</span>
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="row sisui-bottom-buffer">
+    <h4>Persistent Tokens</h4>
+</div>
+<div class="row sisui-bottom-buffer" ng-if="canAdd()">
+    <form class="form-inline" role="form">
+      <div class="form-group">
+        <input ng-model="newToken.desc" type="text" class="form-control input-sm" placeholder="Description">
+        <button type="button" class="btn btn-primary btn-sm" ng-click="addNew();" ng-disabled="!newToken.desc">Add New</button>
+      </div>
+    </form>
+</div>
+<div class="row">
+    <table class="table table-bordered table-condensed table-striped">
+        <thead>
+            <tr>
+                <td>Name</td>
+                <td>Description</td>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="token in persistent">
+                <td>{{ token.name }}</td>
+                <td>{{ token.desc }}</td>
+                <td>
+                    <a class="btn btn-xs btn-danger" ng-click="remove(token, false)">
+                        <span class="glyphicon glyphicon-trash">Remove</span>
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

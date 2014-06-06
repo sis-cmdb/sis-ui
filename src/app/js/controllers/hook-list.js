@@ -9,17 +9,11 @@ angular.module('sisui')
     };
 
     var hookSchema = SisUtil.getHookSchema();
+    var pager = null;
 
     $scope.remove = function(hook) {
-        var name = hook.name;
-        SisApi.hooks.delete(hook).then(function(res) {
-            for (var i = 0; i < $scope.hooks.length; ++i) {
-                if ($scope.hooks[i].name == name) {
-                    $scope.hooks.splice(i, 1);
-                    break;
-                }
-            }
-        });
+        if (!pager) { return; }
+        pager.remove(hook);
     };
 
     $scope.edit = function(hook) {
@@ -50,6 +44,6 @@ angular.module('sisui')
     // setup pager
     var opts = { sortField : 'name', itemsField : 'hooks' };
     var endpoint = SisApi.hooks;
-    var pager = new SisUtil.EndpointPager(endpoint, $scope, opts);
+    pager = new SisUtil.EndpointPager(endpoint, $scope, opts);
     pager.setPage(1);
 });

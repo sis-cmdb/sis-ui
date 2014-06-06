@@ -1,10 +1,10 @@
 angular.module('sisui')
-.controller("FooterController", function($scope, SisInfo) {
+.controller("FooterController", function($scope, SisApi) {
 
-    SisInfo.apiInfo.success(function(data) {
+    SisApi.apiInfo.success(function(data) {
         $scope.apiInfo = data;
     });
-    SisInfo.uiInfo.success(function(data) {
+    SisApi.uiInfo.success(function(data) {
         $scope.uiInfo = data;
     });
 

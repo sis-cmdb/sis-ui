@@ -14,6 +14,9 @@
                 <li><a ng-click="logout()" href="#/logout"><label class="label label-default add-pointer">Logout</label></a></li>
             </ul>
         </li>
+        <li ng-if="loggedIn" ng-class="{active:isActive('tokens')}">
+            <a href="#/tokens">Manage Tokens</a>
+        </li>
         <li ng-class="{active:isActive('schemas')}">
             <a href="#/schemas">Schemas</a>
             <ul ng-if="activeEntity">

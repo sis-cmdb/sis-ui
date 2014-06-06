@@ -268,6 +268,7 @@ module.exports = function(grunt) {
                      '<%= build_dirs.src %>/common/js/vendor/angularjs/1.2.15/angular.min.js',
                      '<%= build_dirs.src %>/common/js/vendor/angularjs/1.2.15/angular-route.min.js',
                      '<%= build_dirs.src %>/common/js/vendor/ui.bootstrap/0.10.0/ui-bootstrap-tpls-0.10.0.min.js',
+                     '<%= build_dirs.src %>/common/js/vendor/moment.min.js',
                     ],
                 // libs for docs
                 '<%= build_dirs.build %>/docs/vendor-libs.js' :

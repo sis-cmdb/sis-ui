@@ -1,6 +1,7 @@
 // Utility methods
 angular.module('sisui')
-.factory('SisUtil', function($window, $location, SisUser) {
+.factory('SisUtil', function($window, $location, SisUser,
+                             $q) {
     "use strict";
 
     // Pager class
@@ -10,6 +11,7 @@ angular.module('sisui')
             if (!search) {
                 return null;
             }
+
             return null;
         };
 
@@ -23,6 +25,9 @@ angular.module('sisui')
         var sortField = opts.sortField || null;
         var searchQuery = parseSearch(opts.search);
         var itemsField = opts.itemsField || 'items';
+        var idField = opts.idField || 'name';
+
+        this.endpoint = endpoint;
 
         this.setSearch = function(search) {
             searchQuery = parseSearch(search);
@@ -54,6 +59,24 @@ angular.module('sisui')
         // attach some scope methods
         this.setPage = function(pageNum) {
             scope.currentPage = pageNum;
+        };
+
+        this.remove = function(item) {
+            var d = $q.defer();
+            endpoint.delete(item).then(function(res) {
+                var items = scope[itemsField];
+                var itemId = item[idField];
+                for (var i = 0; i < items.length; ++i) {
+                    if (items[i][idField] == itemId) {
+                        items.splice(i, 1);
+                        break;
+                    }
+                }
+                d.resolve(res);
+            }, function(err) {
+                d.reject(err);
+            });
+            return d.promise;
         };
 
         scope.$watch('currentPage', function(newVal, oldVal) {

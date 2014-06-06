@@ -1,7 +1,7 @@
 // SIS API access
 angular.module('sisui')
 .factory('SisApi', function($location, API_URL, $q,
-                            SisSession) {
+                            SisSession, $http) {
     "use strict";
 
     if (!API_URL) {
@@ -154,6 +154,9 @@ angular.module('sisui')
             });
             return d.promise;
         };
+
+        this.apiInfo = $http.get(API_URL + "/api/v1/info");
+        this.uiInfo = $http.get("build.json");
 
     };
 

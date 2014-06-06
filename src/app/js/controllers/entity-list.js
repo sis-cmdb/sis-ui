@@ -8,15 +8,12 @@ angular.module('sisui')
         return;
     }
 
+    var pager = null;
+
     $scope.remove = function(entity) {
-        var schemaName = $scope.schema.name;
-        SisApi.entities(schemaName).delete(entity).then(function(res) {
-            for (var i = 0; i < $scope.entities.length; ++i) {
-                if ($scope.entities[i]._id == entity._id) {
-                    $scope.entities.splice(i, 1);
-                    break;
-                }
-            }
+        if (!pager) { return; }
+        pager.remove(entity).then(function(removed) {
+            SisSession.setCurrentEntity($scope.schema, null);
         });
     };
 
@@ -58,8 +55,10 @@ angular.module('sisui')
         $scope.idField = SisUtil.getIdField(schema);
 
         // set up pager
-        var opts = { sortField : $scope.idField, itemsField : 'entities' };
-        var pager = new SisUtil.EndpointPager(SisApi.entities(schemaName),
+        var opts = { sortField : $scope.idField,
+                     itemsField : 'entities',
+                     idField : '_id' };
+        pager = new SisUtil.EndpointPager(SisApi.entities(schemaName),
                                           $scope, opts);
         pager.setPage(1);
 
