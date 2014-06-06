@@ -27,8 +27,8 @@
             <tr ng-repeat="user in users | filter:filterText">
                 <td>{{user.name}}</td>
                 <td>
-                    <span ng-if="!user.super_user" style="margin-right: 1px;" ng-repeat="(group, role) in user.roles" class="label" ng-class="{ 'label-default' : role == 'user', 'label-primary' : role == 'admin' }" title="{{ role }}">{{group}}</span>
-                    <span ng-if="user.super_user" class="label label-success">Super User</span>
+                    <span ng-if="!user.super_user" style="margin-right: 1px;" ng-repeat="(group, role) in user.roles" class="label clickable" ng-class="{ 'label-default' : role == 'user', 'label-primary' : role == 'admin' }" title="{{ role }}" ng-click="sisDlg.showUsersInGroup(group);">{{group}}</span>
+                    <span ng-click="sisDlg.showSuperUsers();" ng-if="user.super_user" class="clickable label label-success">Super User</span>
                 </td>
                 <td>
                     <a ng-show="!canManage(user)" class="btn btn-xs btn-default" disabled="disabled">

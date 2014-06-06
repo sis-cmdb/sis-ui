@@ -30,7 +30,7 @@ angular.module('sisui')
     $scope.view = function(hook) {
         var title = "View hook " + hook.name;
         SisDialogs.showViewObjectDialog(hook, hookSchema,
-                                    'view', title);
+                                        title);
     };
 
     $scope.canManage = function(hook) {

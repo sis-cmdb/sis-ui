@@ -32,6 +32,9 @@
 <div class="row sisui-bottom-buffer">
     <h4>Persistent Tokens</h4>
 </div>
+<div class="row" ng-if="!canAdd()">
+    <strong>Super users cannot create tokens yet.</strong>
+</div>
 <div class="row sisui-bottom-buffer" ng-if="canAdd()">
     <form class="form-inline" role="form">
       <div class="form-group">
@@ -40,7 +43,7 @@
       </div>
     </form>
 </div>
-<div class="row">
+<div class="row" ng-if="canAdd()">
     <table class="table table-bordered table-condensed table-striped">
         <thead>
             <tr>

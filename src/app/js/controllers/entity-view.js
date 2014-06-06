@@ -1,5 +1,5 @@
 angular.module('sisui')
-.controller("EntityViewController", function($scope, $modalInstance,
+.controller("EntityViewController", function($scope,
                                              SisUtil, SisApi) {
     var orig = $scope.obj;
     $scope.obj = angular.copy(orig);

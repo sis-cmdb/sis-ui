@@ -3,11 +3,6 @@ angular.module('sisui')
                                         SisDialogs, SisUtil, SisApi) {
     "use strict";
 
-    var query = {
-        sort : "name",
-        fields : "name,super_user,roles"
-    };
-
     $scope.edit = function(user) {
         var title = "Edit user " + user.name;
         var dlg = SisDialogs.showUserDialog(user);
@@ -46,5 +41,8 @@ angular.module('sisui')
 
     var opts = { sortField : 'name', itemsField : 'users' };
     var pager = new SisUtil.EndpointPager(SisApi.users, $scope, opts);
+    if ($scope.search) {
+        pager.setSearch($scope.search);
+    }
     pager.setPage(1);
 });

@@ -30,7 +30,7 @@
                 <td>
                     <a href="#/entities/{{hook.entity_type}}">{{hook.entity_type}}</a>
                 </td>
-                <td><span style="margin-right: 1px;" ng-repeat="owner in hook.owner" class="label label-default">{{owner}}</span></td>
+                <td><span style="margin-right: 1px;" ng-repeat="owner in hook.owner" ng-click="sisDlg.showUsersInGroup(owner)" class="label label-default clickable">{{owner}}</span></td>
                 <td>
                     <a ng-show="!canManage(hook)" class="btn btn-xs btn-default" disabled="disabled">
                         <span class="glyphicon glyphicon-lock"></span>

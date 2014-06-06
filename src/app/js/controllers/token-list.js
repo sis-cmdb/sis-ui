@@ -31,7 +31,7 @@ angular.module('sisui')
     };
 
     $scope.canAdd = function() {
-        return user && !user.super_user;
+        return !user.super_user;
     };
 
     $scope.addNew = function() {

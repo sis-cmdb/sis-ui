@@ -30,7 +30,7 @@
         <tbody>
             <tr ng-repeat="entity in entities | filter:filterText">
                 <td><a ng-click="viewEntity(entity);">{{entity[$parent.idField]}}</a></td>
-                <td><span style="margin-right: 1px;" ng-repeat="owner in entity.owner" class="label label-default">{{owner}}</span></td>
+                <td><span style="margin-right: 1px;" ng-repeat="owner in entity.owner" ng-click="sisDlg.showUsersInGroup(owner)" class="label label-default clickable">{{owner}}</span></td>
                 <td>
                     <a ng-show="!canManage(entity)" class="btn btn-xs btn-default" disabled="disabled">
                         <span class="glyphicon glyphicon-lock"></span>

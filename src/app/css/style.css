@@ -10,7 +10,8 @@ ul {
     font-weight: bold;
     text-shadow: 0 1px 0 rgba(0,0,0,.15);
 }
-.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+.nav, .pagination, .carousel, .panel-title, a, .clickable { cursor: pointer; }
+
 .add-pointer { cursor: pointer; }
 
 .no-item-display li {

@@ -11,7 +11,9 @@ angular.module('sisui')
             if (!search) {
                 return null;
             }
-
+            if (typeof search === 'object') {
+                return search;
+            }
             return null;
         };
 
@@ -23,6 +25,7 @@ angular.module('sisui')
         opts = opts || { };
         scope.pageSize = opts.pageSize || 20;
         var sortField = opts.sortField || null;
+        var fields = opts.fields || null;
         var searchQuery = parseSearch(opts.search);
         var itemsField = opts.itemsField || 'items';
         var idField = opts.idField || 'name';
@@ -46,6 +49,9 @@ angular.module('sisui')
             };
             if (sortField) {
                 query.sort = sortField;
+            }
+            if (fields) {
+                query.fields = fields;
             }
             if (searchQuery) {
                 query.q = searchQuery;
