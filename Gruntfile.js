@@ -167,7 +167,10 @@ module.exports = function(grunt) {
             context : {
                 scripts : ['./app/js/vendor-libs.js', './app/js/config.js', './app/js/sisui.min.js'],
                 css : ['./common/css/bootswatch/3.1.1/flatly/bootstrap.min.css',
-                       './app/css/style.css']
+                       './common/css/jsondiffpatch/html.css',
+                       './common/css/jsondiffpatch/annotated.css',
+                       './app/css/style.css'],
+                version : ( Math.round(Date.now() / 1000) )
             }
         }
     },
@@ -187,31 +190,23 @@ module.exports = function(grunt) {
     watch: {
       js: {
         files: ['<%= build_dirs.src %>/app/js/**/*.js'],
-        tasks: ['newer:jshint', 'uglify', 'copy:dist_js', 'copy:localconfig'],
-        options: {
-          livereload: true
-        }
+        tasks: ['newer:jshint', 'uglify', 'copy:dist_js', 'copy:localconfig']
+      },
+      libs : {
+        files: ['<%= build_dirs.sisjs %>/lib/sis-js.js'],
+        tasks: ['concat', 'copy:dist_js']
       },
       templates : {
         files: ['<%= build_dirs.src %>/app/partials/*.html'],
-        tasks: ['ngtemplates', 'uglify', 'copy:dist_js'],
-        options: {
-            livereload : true
-        }
+        tasks: ['ngtemplates', 'uglify', 'copy:dist_js']
       },
       swigs : {
         files : ['<%= build_dirs.src %>/**/*.swig'],
-        tasks: ['sisswig'],
-        options: {
-            livereload : true
-        }
+        tasks: ['sisswig']
       },
       peg : {
         files : ['<%= build_dirs.src %>/pegjs/*.js'],
-        tasks: ['peg', 'uglify', 'copy:dist_js'],
-        options: {
-            livereload : true
-        }
+        tasks: ['peg', 'uglify', 'copy:dist_js']
       },
       common: {
         files : ['<%= build_dirs.src %>/app/**/*.css',
@@ -219,10 +214,7 @@ module.exports = function(grunt) {
                  '<%= build_dirs.src %>/common/images/**',
                  '<%= build_dirs.src %>/docs/**/*.css'
                 ],
-        tasks: ['copy:dist_common'],
-        options: {
-          livereload: true
-        }
+        tasks: ['copy:dist_common']
       },
       livereload: {
         options: {
@@ -230,7 +222,8 @@ module.exports = function(grunt) {
         },
         files: [
           '<%= build_dirs.dist %>/**/*.html',
-          '<%= build_dirs.dist %>/app/**/*.js'
+          '<%= build_dirs.dist %>/app/**/*.js',
+          '<%= build_dirs.dist %>/app/**/*.css'
         ]
       }
     },
@@ -269,6 +262,8 @@ module.exports = function(grunt) {
                      '<%= build_dirs.src %>/common/js/vendor/angularjs/1.2.15/angular-route.min.js',
                      '<%= build_dirs.src %>/common/js/vendor/ui.bootstrap/0.10.0/ui-bootstrap-tpls-0.10.0.min.js',
                      '<%= build_dirs.src %>/common/js/vendor/moment.min.js',
+                     '<%= build_dirs.src %>/common/js/vendor/jsondiffpatch/bundle-full.min.js',
+                     '<%= build_dirs.src %>/common/js/vendor/jsondiffpatch/formatters.min.js'
                     ],
                 // libs for docs
                 '<%= build_dirs.build %>/docs/vendor-libs.js' :

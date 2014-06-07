@@ -38,6 +38,11 @@ angular.module('sisui')
         return $scope.canManage(schema) && SisUtil.canDelete(schema);
     };
 
+    $scope.viewCommits = function(schema) {
+        var path = "/commits/schemas/" + schema.name;
+        $location.path(path);
+    };
+
     $scope.gotoSchema = function(schema) {
         SisSession.setCurrentSchema(schema);
         $location.path("/entities/" + schema.name);

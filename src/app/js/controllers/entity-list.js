@@ -41,6 +41,11 @@ angular.module('sisui')
                                         title);
     };
 
+    $scope.viewCommits = function(entity) {
+        var path = "/commits/entities/" + schemaName + "/" + entity._id;
+        $location.path(path);
+    };
+
     $scope.canManage = function(entity) {
         return SisUtil.canManageEntity(entity, $scope.schema);
     };

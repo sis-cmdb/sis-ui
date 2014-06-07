@@ -42,10 +42,18 @@ angular.module('sisui')
         var result = { };
         for (var k in endpoint) {
             if (endpoint.hasOwnProperty(k) &&
+                k != 'commits' &&
                 typeof endpoint[k] == 'function') {
                 var func = endpoint[k];
                 result[k] = wrapFunc(endpoint, func);
             }
+        }
+        // handle commits endpoint
+        if (endpoint.commits) {
+            result.commits = function(id) {
+                var commitEndpoint = endpoint.commits(id);
+                return wrapEndpoint(commitEndpoint);
+            };
         }
         return result;
     };
@@ -157,6 +165,10 @@ angular.module('sisui')
 
         this.apiInfo = $http.get(API_URL + "/api/v1/info");
         this.uiInfo = $http.get("build.json");
+
+        this.commits = function(endpoint) {
+
+        };
 
     };
 

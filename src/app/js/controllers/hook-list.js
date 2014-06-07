@@ -33,6 +33,11 @@ angular.module('sisui')
                                         title);
     };
 
+    $scope.viewCommits = function(hook) {
+        var path = "/commits/hooks/" + hook.name;
+        $location.path(path);
+    };
+
     $scope.canManage = function(hook) {
         return SisUtil.canManageEntity(hook, { owner : [] });
     };

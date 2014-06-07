@@ -1,5 +1,5 @@
 angular.module('sisui')
-.filter("moment", function() {
+.filter("expireTime", function() {
     "use strict";
     return function(expiresSecs) {
         var secs = parseInt(expiresSecs, 10);
@@ -7,5 +7,17 @@ angular.module('sisui')
             return "Expired.";
         }
         return moment(Date.now() + secs).fromNow();
+    };
+})
+.filter('momentUTC', function() {
+    "use strict";
+    return function(utcTime, format) {
+        utcTime = parseInt(utcTime, 10);
+        var m = moment(new Date(utcTime));
+        if (!format) {
+            return m.fromNow();
+        } else {
+            return m.format(format);
+        }
     };
 });

@@ -35,6 +35,17 @@ ul {
     margin-bottom: 2px;
 }
 
+pre {
+  overflow: auto;
+  word-wrap: normal;
+  white-space: pre;
+}
+
+.jsondiffpatch-delta {
+    width: 100%;
+    overflow-x: scroll;
+}
+
 /* Sticky footer styles
 -------------------------------------------------- */
 html {

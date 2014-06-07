@@ -39,6 +39,11 @@ angular.module('sisui')
         return adminRoles === true;
     };
 
+    $scope.viewCommits = function(user) {
+        var path = "/commits/users/" + user.name;
+        $location.path(path);
+    };
+
     var opts = { sortField : 'name', itemsField : 'users' };
     var pager = new SisUtil.EndpointPager(SisApi.users, $scope, opts);
     if ($scope.search) {

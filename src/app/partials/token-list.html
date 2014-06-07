@@ -18,7 +18,7 @@
         <tbody>
             <tr ng-repeat="token in temps">
                 <td>{{ token.name }}</td>
-                <td>{{ token.expires | moment }}</td>
+                <td>{{ token.expires | expireTime }}</td>
                 <td>
                     <span ng-if="isCurrent(token)" class="label label-primary">Current Token</span>
                     <a ng-if="!isCurrent(token)" class="btn btn-xs btn-danger" ng-click="remove(token, true)">

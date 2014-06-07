@@ -39,9 +39,15 @@ angular.module('sisui', ['ngRoute', 'ui.bootstrap', 'sisconfig'])
             templateUrl : "app/partials/entity-mod.html",
             controller : "HookModController"
         })
+        // tokens
         .when("/tokens", {
             templateUrl : "app/partials/token-list.html",
             controller : "TokenListController"
+        })
+        // commits
+        .when("/commits/:type/:idOrType/:eid?", {
+            templateUrl : "app/partials/commit-list.html",
+            controller : "CommitListController"
         })
         // fall back
         .otherwise({

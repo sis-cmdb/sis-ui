@@ -44,9 +44,12 @@
                     <a ng-show="canAdd()" type="button" class="btn btn-info btn-xs" ng-click="addNew(entity);">
                         <span class="glyphicon glyphicon-retweet">Clone</span>
                     </a>
+                    <a type="buton" class="btn btn-info btn-xs" ng-click="viewCommits(entity)">
+                        <span class="glyphicon glyphicon-list">History</span>
+                    </a>
                 </td>
             </tr>
         </tbody>
     </table>
-    <pagination direction-links="false" boundary-links="true" total-items="totalItems" page="currentPage" items-per-page="{{ pageSize }}" class="pagination-sm" max-size="10" rotate="false"></pagination>
+    <pagination direction-links="false" boundary-links="true" total-items="totalItems" page="currentPage" items-per-page="20" class="pagination-sm" max-size="10" rotate="false"></pagination>
 </div>
