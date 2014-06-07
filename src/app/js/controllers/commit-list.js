@@ -1,5 +1,5 @@
 angular.module('sisui')
-.controller("CommitListController", function($scope, $routeParams,
+.controller("CommitListController", function($scope, $routeParams, $location,
                                              SisApi, SisUtil, $sce) {
     "use strict";
     var type = $routeParams.type;
@@ -8,7 +8,6 @@ angular.module('sisui')
     var supportedTypes = [
         'schemas',
         'hooks',
-        'users',
         'hiera',
         'entities'
     ];
