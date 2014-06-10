@@ -20,4 +20,15 @@ angular.module('sisui')
             return m.format(format);
         }
     };
+})
+.filter("labelWidth", function() {
+    "use strict";
+    return function(len) {
+        var result = len * 9;
+        if (result < 40) {
+            return '40px';
+        } else {
+            return result + 'px';
+        }
+    };
 });

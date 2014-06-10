@@ -18,13 +18,6 @@ angular.module('sisui')
                path !== "definition.sis_locked";
     };
 
-    $scope.canModifyDescriptorName = function() {
-        var path = $scope.path;
-        var descriptor = $scope.descriptor;
-        return $scope.canModifyDescriptor() &&
-               descriptor._parent_.type !== "Array";
-    };
-
     $scope.inputType = function() {
         return SisUtil.getInputType($scope.descriptor.type);
     };
