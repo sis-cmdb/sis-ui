@@ -53,9 +53,11 @@ angular.module('sisui')
         var descriptor = $scope.descriptor;
         descriptor.children = descriptor.children || [];
         var newDesc = { type : "String", _parent_ : descriptor };
+        newDesc._isNew_ = true;
         if (descriptor.type === "Document") {
             newDesc.name = "";
         }
+        delete descriptor._max_field_len_;
         descriptor.children.push(newDesc);
     };
 

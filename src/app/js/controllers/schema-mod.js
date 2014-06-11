@@ -48,8 +48,14 @@ angular.module('sisui')
             // assumes all descriptors have a name
             var getMaxFieldName = function(descriptors) {
                 return descriptors.reduce(function(max, desc) {
-                    if (max < desc.name.length) {
-                        max = desc.name.length;
+                    var len = 0;
+                    if (desc._isNew_) {
+                        len = 15;
+                    } else {
+                        len = desc.name.length;
+                    }
+                    if (max < len) {
+                        max = len;
                     }
                     return max;
                 }, 0);

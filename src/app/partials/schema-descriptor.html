@@ -1,10 +1,11 @@
-<ng-form class="form-inline" role="form">
+<div>
     <label class="schema-label" style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}" ng-if="path === 'definition'" for="{{ path }}">{{ descriptor.name }}</label>
     <div ng-if="canModifyDescriptor()">
-        <a ng-disabled="!canDelete();" class="btn btn-xs btn-primary" ng-click="deleteDescriptor();">
+        <a ng-disabled="!canDelete();" class="btn btn-xs btn-primary" ng-click="deleteDescriptor();" style="margin-right: 4px;">
             <span class="glyphicon glyphicon-minus"></span>
         </a>
-        <label class="schema-label" style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}" for="{{ path }}">{{ descriptor.name }}</label>
+        <label class="schema-label" style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}" for="{{ path }}" ng-if="!descriptor._isNew_">{{ descriptor.name }}</label>
+        <input style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}; margin-right: 4px;" for="{{ path }}" ng-model="descriptor.name" ng-if="descriptor._isNew_" ng-change="nameChanged(descriptor)">
         <select ng-model="descriptor.type" ng-options="type for type in validDescriptorTypes" style="margin-right: 4px;" ng-change="typeChanged(descriptor);"></select>
         <a ng-click="showAttrs();">Attributes</a>
     </div>
@@ -25,7 +26,7 @@
         </div>
         <input ng-if="!descriptor.enum" type="{{ inputType() }}" placeholder="{{descriptor.type}}" ng-model="value" ng-disabled="descriptor.readonly" ng-change="schemaValueChanged(value)" id="{{ path }}"/>
     </div>
-</ng-form>
+</div>
 <div ng-if="canModifyChildren();">
     <ul>
         <li ng-repeat="descriptor in descriptor.children" ng-controller="SchemaDescriptorController">
