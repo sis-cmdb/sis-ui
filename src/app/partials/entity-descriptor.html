@@ -3,10 +3,14 @@
         <a ng-show="canDelete();" class="btn btn-xs btn-primary" ng-click="delItem(arrIdx);">
             <span class="glyphicon glyphicon-minus"></span>
         </a>
-        <a class="btn btn-xs btn-default collapse-btn" ng-click="isCollapsed = !isCollapsed">
-            <span ng-show="isCollapsed" class="glyphicon glyphicon-chevron-right"> {{ fieldName }}</span>
-            <span ng-show="!isCollapsed" class="glyphicon glyphicon-chevron-down"> {{ fieldName }}</span>
-        </a>
+        <div style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}">
+            <a class="btn btn-xs btn-default collapse-btn pull-left" ng-click="isCollapsed = !isCollapsed">
+                <span ng-show="isCollapsed" class="glyphicon glyphicon-chevron-right"></span>
+                <span ng-show="!isCollapsed" class="glyphicon glyphicon-chevron-down"></span>
+            </a>
+            <label class="pull-right">{{ fieldName }}</label>
+            <br style="clear: both;"/>
+        </div>
         <ul collapse="isCollapsed">
             <li ng-controller="EntityDescriptorController" ng-repeat="descriptor in children" ng-init="init($parent.fieldValue, descriptor);">
                 <div ng-include="'app/partials/entity-descriptor.html'"></div>
@@ -17,19 +21,24 @@
         <a ng-show="canDelete();" class="btn btn-xs btn-primary" ng-click="delItem(arrIdx);">
             <span class="glyphicon glyphicon-minus"></span>
         </a>
-        <a class="btn btn-xs btn-default collapse-btn" ng-click="isCollapsed = !isCollapsed">
-            <span ng-show="isCollapsed" class="glyphicon glyphicon-chevron-right"> {{ fieldName }}</span>
-            <span ng-show="!isCollapsed" class="glyphicon glyphicon-chevron-down"> {{ fieldName }}</span>
-        </a>
+        <div style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}">
+            <a class="btn btn-xs btn-default collapse-btn pull-left" ng-click="isCollapsed = !isCollapsed">
+                <span ng-show="isCollapsed" class="glyphicon glyphicon-chevron-right"></span>
+                <span ng-show="!isCollapsed" class="glyphicon glyphicon-chevron-down"></span>
+            </a>
+            <label class="pull-right">{{ fieldName }}</label>
+            <br style="clear: both;"/>
+        </div>
         <div ng-if="fieldDescriptor.enum">
             <ul collapse="isCollapsed">
                 <li>
                     <fieldset ng-disabled="isReadOnly();">
-                    <label ng-repeat="choice in fieldDescriptor.enum">
-                        <input type="checkbox"
-                           ng-checked="fieldValue.indexOf(choice) >= 0"
-                           ng-click="toggleChoice(choice)"> {{ choice }}
-                    </label>
+                        <div  ng-repeat="choice in fieldDescriptor.enum">
+                            <input type="checkbox"
+                                   ng-checked="fieldValue.indexOf(choice) >= 0"
+                                   ng-click="toggleChoice(choice)">
+                            <label style="margin-left: 4px;">{{ choice }}</label>
+                        </div>
                     </fieldset>
                 </li>
             </ul>
@@ -53,7 +62,7 @@
                 <span class="glyphicon glyphicon-minus"></span>
             </a>
             <fieldset ng-disabled="isReadOnly();">
-                <label class="entity-label" for="{{ path }}">{{ fieldName }}</label>
+                <label style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}" class="entity-label" for="{{ path }}">{{ fieldName }}</label>
                 <input  ng-if="fieldDescriptor.ref" type="text" class="form-control input-sm" disabled="disabled" id="{{ path }}" ng-model="fieldValue" required="{{ !!fieldDescriptor.required }}">
                 <button ng-if="fieldDescriptor.ref && !isReadOnly()" class="btn btn-sm btn-info" ng-click="chooseEntity();">Choose</button>
 
@@ -67,7 +76,8 @@
                 <a ng-show="canDelete();" class="btn btn-xs btn-primary" ng-click="delItem(arrIdx);">
                     <span class="glyphicon glyphicon-minus"></span>
                 </a>
-                <label ng-class="{ 'entity-label' : !isItem() }" for="{{ path }}">{{ fieldName }}</label>
+                <label ng-if="isItem()" for="{{ path }}">{{ fieldName }}</label>
+                <label style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}" ng-if="!isItem()" class="entity-label" for="{{ path }}">{{ fieldName }}</label>
                 <select ng-if="fieldDescriptor.enum" ng-options="choice for choice in fieldDescriptor.enum" ng-model="fieldValue" ng-change="valueChanged(fieldValue)" required="{{ !!fieldDescriptor.required }}"></select>
 
                 <input ng-if="!fieldDescriptor.enum" type="{{ inputType() }}" class="form-control input-sm" id="{{ path }}" placeholder="{{ fieldDescriptor.type }}" ng-change="valueChanged(fieldValue);" ng-model="fieldValue" required="{{ !!fieldDescriptor.required }}">

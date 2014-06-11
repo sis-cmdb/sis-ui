@@ -36,6 +36,39 @@ angular.module('sisui')
         // for the valueChanged recursion
         $scope.fieldValue = $scope.entity;
 
+        // assumes all descriptors have a name
+        var getMaxFieldName = function(descriptors) {
+            return descriptors.reduce(function(max, desc) {
+                if (max < desc.name.length) {
+                    max = desc.name.length;
+                }
+                return max;
+            }, 0);
+        };
+
+        var maxFieldLen = getMaxFieldName($scope.descriptors);
+
+        $scope.maxFieldNameLength = function(descriptor) {
+            if (!descriptor) {
+                return 0;
+            }
+            if (descriptor._parent_) {
+                if (descriptor._parent_._max_field_len_) {
+                    return descriptor._parent_._max_field_len_;
+                }
+                if (descriptor._parent_.type == "Document") {
+                    descriptor._parent_._max_field_len_ = getMaxFieldName(descriptor._parent_.children);
+                } else {
+                    // array - just return something for 9999 elems
+                    descriptor._parent_._max_field_len_ = 4;
+                }
+                return descriptor._parent_._max_field_len_;
+            } else {
+                // root
+                return maxFieldLen;
+            }
+        };
+
         $scope.hasChanged = function() {
             return !angular.equals(orig, $scope.entity);
         };

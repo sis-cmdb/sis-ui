@@ -1,15 +1,15 @@
 <ng-form class="form-inline" role="form">
-    <label class="entity-label" style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}" ng-if="path === 'definition'" for="{{ path }}">{{ descriptor.name }}</label>
+    <label class="schema-label" style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}" ng-if="path === 'definition'" for="{{ path }}">{{ descriptor.name }}</label>
     <div ng-if="canModifyDescriptor()">
         <a ng-disabled="!canDelete();" class="btn btn-xs btn-primary" ng-click="deleteDescriptor();">
             <span class="glyphicon glyphicon-minus"></span>
         </a>
-        <label class="entity-label" style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}" for="{{ path }}">{{ descriptor.name }}</label>
+        <label class="schema-label" style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}" for="{{ path }}">{{ descriptor.name }}</label>
         <select ng-model="descriptor.type" ng-options="type for type in validDescriptorTypes" ng-change="typeChanged(descriptor);"></select>
         <a ng-click="showAttrs();">Attributes</a>
     </div>
     <div ng-if="isSchemaValue()">
-        <label class="entity-label" style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}" for="{{ path }}">{{ descriptor.name }}</label>
+        <label class="schema-label" style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}" for="{{ path }}">{{ descriptor.name }}</label>
         <div ng-if="descriptor.enum" id="{{ path }}">
             <ul>
                 <li>

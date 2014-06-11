@@ -166,10 +166,6 @@ angular.module('sisui')
         this.apiInfo = $http.get(API_URL + "/api/v1/info");
         this.uiInfo = $http.get("build.json");
 
-        this.commits = function(endpoint) {
-
-        };
-
     };
 
     return new Api();
