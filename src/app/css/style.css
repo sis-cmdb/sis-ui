@@ -30,7 +30,6 @@ ul {
     width: 120px;
     text-align: right;
     margin-right: 5px;
-    border-left: black solid 1px;
 }
 
 .schema-label {
@@ -39,6 +38,9 @@ ul {
     margin-right: 5px;
 }
 
+.left-border {
+    border-left: black solid 1px;
+}
 
 .collapseBtn {
     margin-bottom: 2px;
