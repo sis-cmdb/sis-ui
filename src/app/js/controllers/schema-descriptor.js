@@ -35,6 +35,7 @@ angular.module('sisui')
         var path = $scope.path;
         var type = $scope.descriptor.type;
         return (type === "Array" || type === "Document") &&
+               $scope.descriptor.name &&
                path !== "definition.owner" &&
                (path === "definition" ||
                $scope.isEntityDescriptor());
@@ -42,6 +43,9 @@ angular.module('sisui')
 
     $scope.canAddChildren = function() {
         var descriptor = $scope.descriptor;
+        if (!descriptor.name) {
+            return false;
+        }
         if (descriptor.type === "Array") {
             return !descriptor.children ||
                     descriptor.children.length === 0;
@@ -49,14 +53,21 @@ angular.module('sisui')
         return descriptor.type === "Document";
     };
 
+    $scope.canModifyDescriptorName = function() {
+        var descriptor = $scope.descriptor;
+        if (descriptor._isNew_) {
+            return !descriptor._parent_ ||
+                descriptor._parent_.type != 'Array';
+        }
+        return false;
+    };
+
     $scope.addChildDescriptor = function() {
         var descriptor = $scope.descriptor;
         descriptor.children = descriptor.children || [];
         var newDesc = { type : "String", _parent_ : descriptor };
         newDesc._isNew_ = true;
-        if (descriptor.type === "Document") {
-            newDesc.name = "";
-        }
+        newDesc.name = "field";
         delete descriptor._max_field_len_;
         descriptor.children.push(newDesc);
     };
@@ -129,7 +140,9 @@ angular.module('sisui')
             for (var i = 0; i < children.length; ++i) {
                 var child = parent.children[i];
                 var childField = convertToSchemaField(child);
-                doc[child.name] = childField;
+                if (child.name) {
+                    doc[child.name] = childField;
+                }
             }
         } else {
             doc = [];
@@ -209,7 +222,8 @@ angular.module('sisui')
                 descriptor.children.push({
                     name: "field",
                     type: "String",
-                    _parent_ : descriptor
+                    _parent_ : descriptor,
+                    _isNew_ : true
                 });
             }
         } else {
@@ -276,6 +290,15 @@ angular.module('sisui')
     };
 
     $scope.validDescriptorTypes = SisUtil.descriptorTypes;
+    if ($scope.descriptor._parent_ &&
+        $scope.descriptor._parent_.type == "Array") {
+        var types = angular.copy(SisUtil.descriptorTypes);
+        var idx = types.indexOf('Array');
+        if (idx != -1) {
+            types.splice(idx, 1);
+            $scope.validDescriptorTypes = types;
+        }
+    }
 
     $scope.additionalFields = SisUtil.attributesForType($scope.descriptor.type);
 
