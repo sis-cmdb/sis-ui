@@ -12,6 +12,8 @@ angular.module('sisui')
     var USER_LIST_CONTROLLER = "UserListController";
     var USER_GROUP_TEMPLATE = "app/partials/user-group-list-dlg.html";
 
+    var CONFIRM_DELETE_TEMPLATE = "app/partials/confirm-delete-dlg.html";
+
     var openModal = function(scope, controller, template) {
         return $modal.open({
             templateUrl : template,
@@ -58,5 +60,35 @@ angular.module('sisui')
     };
 
     $rootScope.sisDlg = this;
+
+    this.addRemoveDialog = function(scope, type, idField) {
+        var oldRemove = scope.remove;
+        if (!oldRemove) {
+            return;
+        }
+        if (!idField) {
+            idField = 'name';
+        }
+        // may be called w/ more than one arg.
+        scope.remove = function(obj) {
+            if (!obj) {
+                // nothing to do.
+                return;
+            }
+            // may be multiple args to the old Remove
+            var args = Array.prototype.slice.call(arguments);
+            // insert confirm
+            var modalScope = $rootScope.$new(true);
+            modalScope.type = type;
+            modalScope.id = obj[idField];
+            $modal.open({
+                templateUrl : CONFIRM_DELETE_TEMPLATE,
+                scope : modalScope
+            }).result.then(function(ok) {
+                // call the old remove
+                oldRemove.apply(scope, args);
+            });
+        };
+    };
 
 });

@@ -57,4 +57,6 @@ angular.module('sisui')
         });
     };
     loadSchemas();
+    // patch scope
+    SisDialogs.addRemoveDialog($scope, 'schema');
 });

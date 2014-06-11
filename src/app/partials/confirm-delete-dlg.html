@@ -1,0 +1,12 @@
+<div>
+    <div class="modal-header">
+        <h3>Confirm delete ({{ type }})</h3>
+    </div>
+    <div class="modal-body no-item-display">
+        <p>Are you sure you want to delete {{ id }}</p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-warning" ng-click="$dismiss('Close');">Cancel</button>
+        <button class="btn btn-primary" ng-click="$close('ok');">Confirm</button>
+    </div>
+</div>

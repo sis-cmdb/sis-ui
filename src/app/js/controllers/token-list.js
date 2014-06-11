@@ -1,6 +1,6 @@
 angular.module('sisui')
 .controller("TokenListController", function($scope, $location, SisUser,
-                                            SisUtil, SisApi) {
+                                            SisDialogs, SisUtil, SisApi) {
     "use strict";
     $scope.temps = [];
     $scope.persistent = [];
@@ -52,5 +52,8 @@ angular.module('sisui')
             }
         });
     });
+
+    // patch scope
+    SisDialogs.addRemoveDialog($scope, 'token');
 
 });

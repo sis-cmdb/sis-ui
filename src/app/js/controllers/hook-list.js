@@ -51,4 +51,7 @@ angular.module('sisui')
     var endpoint = SisApi.hooks;
     pager = new SisUtil.EndpointPager(endpoint, $scope, opts);
     pager.setPage(1);
+
+    // patch scope
+    SisDialogs.addRemoveDialog($scope, 'hook');
 });

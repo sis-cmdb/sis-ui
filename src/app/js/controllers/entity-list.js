@@ -67,7 +67,12 @@ angular.module('sisui')
                                           $scope, opts);
         pager.setPage(1);
 
+        // patch scope
+        SisDialogs.addRemoveDialog($scope, $scope.schema.name,
+                                   $scope.idField);
+
     }, function(err) {
         $location.path("/#schemas");
     });
+
 });
