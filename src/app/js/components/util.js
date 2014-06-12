@@ -359,6 +359,8 @@ angular.module('sisui')
             return { };
         } else if (desc.type == "Array") {
             return [];
+        } else if (desc.enum && desc.enum.length) {
+            return desc.enum[0];
         } else {
             return "";
         }
@@ -376,9 +378,14 @@ angular.module('sisui')
     };
 
     var _descriptorTypes = ["Boolean", "String", "Number", "Mixed",
-                            "Document", "Array", "ObjectId"];
+                            "Document", "Array", "ObjectId", "IpAddress"];
+
+    var attrsCache = { };
 
     var _getAttributesForType = function(type) {
+        if (attrsCache[type]) {
+            return attrsCache[type];
+        }
         var result = [
             {name : 'required', type : 'checkbox'},
             {name : 'unique', type : 'checkbox'},
@@ -394,6 +401,7 @@ angular.module('sisui')
                 result.push({ name : "trim", type : "checkbox" });
                 result.push({ name : "uppercase", type : "checkbox" });
                 result.push({ name : "enum", type : "textArray" });
+                result.push({ name : "match", type : "regex" });
                 break;
             case "ObjectId":
                 result.push({ name : "ref", type : "select", values : "schemaList" });
@@ -401,6 +409,7 @@ angular.module('sisui')
             default:
                 break;
         }
+        attrsCache[type] = result;
         return result;
     };
 
@@ -409,7 +418,7 @@ angular.module('sisui')
             name : "sis_hooks",
             owner : _getAllRoles(),
             definition : {
-                name : { type : "String", required : true, unique : true },
+                name : { type : "String", required : true, unique : true, match : '/^[0-9a-z_]+$/' },
                 target : {
                         type : {
                             url : { type : "String", required : true },
@@ -434,6 +443,30 @@ angular.module('sisui')
         }
     };
 
+    var _toRegex = function(str) {
+        try {
+            if (str instanceof RegExp) {
+                return str;
+            }
+            if (!str || str[0] != '/') {
+                return null;
+            }
+            var splits = str.split('/');
+            if (splits.length < 3 || splits[0]) {
+                return null;
+            }
+            var flags = splits.pop();
+            splits.shift();
+            var regex = splits.join("/");
+            if (!regex) {
+                return null;
+            }
+            return new RegExp(regex, flags);
+        } catch(ex) {
+        }
+        return null;
+    };
+
     return {
         getDescriptorArray : function(schema) {
             return getDescriptors(schema.definition);
@@ -453,6 +486,7 @@ angular.module('sisui')
         attributesForType : _getAttributesForType,
         getHookSchema : _getHookSchema,
         EndpointPager : EndpointPager,
-        goBack : _goBack
+        goBack : _goBack,
+        toRegex : _toRegex
     };
 });

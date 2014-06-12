@@ -5,7 +5,7 @@
             <span class="glyphicon glyphicon-minus"></span>
         </a>
         <label class="schema-label" style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}" for="{{ path }}" ng-if="!descriptor._isNew_">{{ descriptor.name }}</label>
-        <input style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}; margin-right: 4px;" for="{{ path }}" ng-model="descriptor.name" ng-if="canModifyDescriptorName()" ng-change="nameChanged(descriptor)">
+        <input style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}; margin-right: 4px;" for="{{ path }}" ng-model="descriptor.name" ng-if="canModifyDescriptorName()" ng-change="nameChanged(descriptor)" required>
         <select ng-model="descriptor.type" ng-options="type for type in validDescriptorTypes" style="margin-right: 4px;" ng-change="typeChanged(descriptor);"></select>
         <a ng-click="showAttrs();">Attributes</a>
     </div>

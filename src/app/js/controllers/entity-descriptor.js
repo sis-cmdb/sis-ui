@@ -158,10 +158,7 @@ angular.module('sisui')
     };
 
     $scope.canDelete = function() {
-        if ($scope.action == "view") {
-            return false;
-        }
-        return $scope.isItem();
+        return $scope.action !== "view" && $scope.isItem();
     };
 
     $scope.canAdd = function() {
@@ -169,6 +166,18 @@ angular.module('sisui')
             return false;
         }
         return ($scope.fieldValue instanceof Array);
+    };
+
+    $scope.getErrorMsg = function(field) {
+        for (var k in field.$error) {
+            if (field.$error[k]) {
+                if ($scope.descriptor[k]) {
+                    return "Invalid : (" + k + " - " + $scope.descriptor[k] + ")";
+                }
+                return "Invalid : (" + k + ")";
+            }
+        }
+        return "";
     };
 
     // initialize a controller where value is a

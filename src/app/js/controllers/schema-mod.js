@@ -27,6 +27,9 @@ angular.module('sisui')
 
             entityDescriptors = entityDescriptors.map(function(ed) {
                 ed._parent_ = schemaDefinitionDescriptor;
+                if ($scope.action == "add") {
+                    ed._isNew_ = true;
+                }
                 return ed;
             }).filter(function(ed) {
                 return ed.name !== "owner";
@@ -36,7 +39,7 @@ angular.module('sisui')
 
 
             var descriptors = [
-                { name : "name", type : "String", required : true, readonly : $scope.action == 'edit' },
+                { name : "name", type : "String", required : true, readonly : $scope.action == 'edit', match : '/^[0-9a-z_]+$/' },
                 ownerDescriptor,
                 { name : "sis_locked", type : "Boolean" },
                 schemaDefinitionDescriptor

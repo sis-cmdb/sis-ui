@@ -39,8 +39,19 @@ angular.module('sisui')
         // assumes all descriptors have a name
         var getMaxFieldName = function(descriptors) {
             return descriptors.reduce(function(max, desc) {
-                if (max < desc.name.length) {
-                    max = desc.name.length;
+                // either a name or a number label for an array
+                var len = desc.name ? desc.name.length : 4;
+                if (desc.children && desc.children.length) {
+                    // is a container
+                    if ($scope.action != 'view') {
+                        // two buttons - dleete and collaps
+                        len += 5;
+                    } else {
+                        len += 3;
+                    }
+                }
+                if (max < len) {
+                    max = len;
                 }
                 return max;
             }, 0);
@@ -48,9 +59,17 @@ angular.module('sisui')
 
         var maxFieldLen = getMaxFieldName($scope.descriptors);
 
-        $scope.maxFieldNameLength = function(descriptor) {
+        $scope.maxFieldNameLength = function(descriptor, isItem) {
             if (!descriptor) {
                 return 0;
+            }
+            if (isItem) {
+                if ($scope.action != 'view') {
+                    // delete + label
+                    return 7;
+                } else {
+                    return 4;
+                }
             }
             if (descriptor._parent_) {
                 if (descriptor._parent_._max_field_len_) {
@@ -65,12 +84,22 @@ angular.module('sisui')
                 return descriptor._parent_._max_field_len_;
             } else {
                 // root
+                if (!descriptor.name) {
+                    // what?
+                    console.log("?? " + descriptor);
+                } else {
+                    console.log(descriptor.name);
+                }
                 return maxFieldLen;
             }
         };
 
-        $scope.hasChanged = function() {
+        var hasChanged = function() {
             return !angular.equals(orig, $scope.entity);
+        };
+
+        $scope.canSave = function() {
+            return hasChanged() && $scope.entityMod.$valid;
         };
     };
 

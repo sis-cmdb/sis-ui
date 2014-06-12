@@ -34,11 +34,20 @@ angular.module('sisui')
     $scope.canModifyChildren = function() {
         var path = $scope.path;
         var type = $scope.descriptor.type;
-        return (type === "Array" || type === "Document") &&
-               $scope.descriptor.name &&
+        var result = (type === "Array" || type === "Document") &&
                path !== "definition.owner" &&
                (path === "definition" ||
+                // ensure it's within the definition
                $scope.isEntityDescriptor());
+        if (!result) {
+            return false;
+        }
+        // a little more validation
+        if (!$scope.descriptor.name) {
+            // only ok if the parent of this is an array
+            return $scope.descriptor._parent_.type === "Array";
+        }
+        return true;
     };
 
     $scope.canAddChildren = function() {
@@ -70,6 +79,7 @@ angular.module('sisui')
         newDesc.name = "field";
         delete descriptor._max_field_len_;
         descriptor.children.push(newDesc);
+        updateParentSchemaField(newDesc);
     };
 
     $scope.showAttrs = function() {
@@ -107,8 +117,12 @@ angular.module('sisui')
                 }
             }
         }
-        for (i = 0; i < $scope.additionalFields.length; ++i) {
-            var field = $scope.additionalFields[i];
+        // cannot use $scope.additionalFields here since
+        // we are not necessarily in the descriptors scope due to
+        // recursion
+        var additionalFields = SisUtil.attributesForType(descriptor.type);
+        for (i = 0; i < additionalFields.length; ++i) {
+            var field = additionalFields[i];
             var fieldName = field.name;
             if (!descriptor[fieldName] &&
                 descriptor[fieldName] !== 0) {
