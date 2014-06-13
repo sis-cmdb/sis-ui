@@ -62,11 +62,11 @@
                 <span class="glyphicon glyphicon-minus"></span>
             </a>
             <fieldset ng-disabled="isReadOnly();">
-                <label style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}" class="entity-label" for="{{ path }}">{{ fieldName }}</label>
-                <input  ng-if="fieldDescriptor.ref" type="text" class="form-control input-sm" disabled="disabled" id="{{ path }}" ng-model="fieldValue" required="{{ !!fieldDescriptor.required }}">
+                <label style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}" class="entity-label left-border" for="{{ path }}">{{ fieldName }}</label>
+                <input  ng-if="fieldDescriptor.ref" type="text" class="form-control input-sm" disabled="disabled" id="{{ path }}" ng-model="fieldValue" required="{{ !!fieldDescriptor.required }}" placeholder="{{ fieldDescriptor.comment }}">
                 <button ng-if="fieldDescriptor.ref && !isReadOnly()" class="btn btn-sm btn-info" ng-click="chooseEntity();">Choose</button>
 
-                <input ng-if="!fieldDescriptor.ref" type="text" class="form-control input-sm" id="{{ path }}" placeholder="{{ fieldDescriptor.type }}" ng-change="valueChanged(fieldValue);" ng-model="fieldValue" required="{{ !!fieldDescriptor.required }}">
+                <input ng-if="!fieldDescriptor.ref" type="text" class="form-control input-sm" id="{{ path }}" placeholder="{{ fieldDescriptor.comment || fieldDescriptor.type }}" ng-change="valueChanged(fieldValue);" ng-model="fieldValue" required="{{ !!fieldDescriptor.required }}">
             </fieldset>
         </div>
     </ng-form>
@@ -77,10 +77,10 @@
                     <span class="glyphicon glyphicon-minus"></span>
                 </a>
                 <label ng-if="isItem()" for="{{ path }}">{{ fieldName }}</label>
-                <label style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}" ng-if="!isItem()" class="entity-label" for="{{ path }}">{{ fieldName }}</label>
+                <label style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}" ng-if="!isItem()" class="entity-label left-border" for="{{ path }}">{{ fieldName }}</label>
                 <select ng-if="fieldDescriptor.enum" ng-options="choice for choice in fieldDescriptor.enum" ng-model="fieldValue" ng-change="valueChanged(fieldValue)" required="{{ !!fieldDescriptor.required }}"></select>
 
-                <input ng-if="!fieldDescriptor.enum" type="{{ inputType() }}" class="form-control input-sm" id="{{ path }}" placeholder="{{ fieldDescriptor.type }}" ng-change="valueChanged(fieldValue);" ng-model="fieldValue" required="{{ !!fieldDescriptor.required }}">
+                <input ng-if="!fieldDescriptor.enum" type="{{ inputType() }}" class="form-control input-sm" id="{{ path }}" placeholder="{{ fieldDescriptor.comment || fieldDescriptor.type }}" ng-change="valueChanged(fieldValue);" ng-model="fieldValue" required="{{ !!fieldDescriptor.required }}">
 
             </fieldset>
         </div>

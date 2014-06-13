@@ -5,7 +5,7 @@
             <span class="glyphicon glyphicon-minus"></span>
         </a>
         <label class="schema-label" style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}" for="{{ path }}">{{ descriptor.name }}</label>
-        <select ng-model="descriptor.type" ng-options="type for type in validDescriptorTypes" ng-change="typeChanged(descriptor);"></select>
+        <select ng-model="descriptor.type" ng-options="type for type in validDescriptorTypes" style="margin-right: 4px;" ng-change="typeChanged(descriptor);"></select>
         <a ng-click="showAttrs();">Attributes</a>
     </div>
     <div ng-if="isSchemaValue()">

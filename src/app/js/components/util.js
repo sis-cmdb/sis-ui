@@ -381,7 +381,8 @@ angular.module('sisui')
     var _getAttributesForType = function(type) {
         var result = [
             {name : 'required', type : 'checkbox'},
-            {name : 'unique', type : 'checkbox'}
+            {name : 'unique', type : 'checkbox'},
+            {name : 'comment', type : 'text'}
         ];
         switch (type) {
             case "Number":
