@@ -172,7 +172,11 @@ angular.module('sisui')
         var withName = descriptor._parent_.children.filter(function(cd) {
             return cd.name == descriptor.name;
         });
-        if (withName.length > 1) {
+        var valid = withName.length == 1;
+        if (descriptor._nameCtrl_) {
+            descriptor._nameCtrl_.$setValidity("unique", valid);
+        }
+        if (!valid) {
             $log.debug("Fields with the same name exist.");
             return;
         }
@@ -303,6 +307,16 @@ angular.module('sisui')
         delete descriptor._parent_;
     };
 
+    $scope.getErrorMsg = function(field) {
+        if (!field) { return ""; }
+        for (var k in field.$error) {
+            if (field.$error[k]) {
+                return "Invalid : (" + k + ")";
+            }
+        }
+        return "";
+    };
+
     $scope.validDescriptorTypes = SisUtil.descriptorTypes;
     if ($scope.descriptor._parent_ &&
         $scope.descriptor._parent_.type == "Array") {
@@ -329,6 +343,25 @@ angular.module('sisui')
                 $scope.descriptor.ref = schema;
                 break;
             }
+        }
+    }
+
+    if ($scope.descriptor.match &&
+        $scope.descriptorForm &&
+        $scope.descriptorForm.valueField) {
+        var regex = SisUtil.toRegex($scope.descriptor.match);
+        if (regex) {
+            $scope.descriptorForm.valueField.$parsers.push(function(viewValue) {
+                if (regex.test(viewValue)) {
+                  // it is valid
+                  ctrl.$setValidity('match', true);
+                  return viewValue;
+                } else {
+                  // it is invalid, return undefined (no model update)
+                  ctrl.$setValidity('match', false);
+                  return undefined;
+                }
+            });
         }
     }
 

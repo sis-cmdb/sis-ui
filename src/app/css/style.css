@@ -23,7 +23,7 @@ ul {
 }
 
 .narrow-modal-window .modal-dialog {
-    width : 400px;
+    width : 500px;
 }
 
 .entity-label {
@@ -40,6 +40,11 @@ ul {
 
 .left-border {
     /*border-left: black solid 1px;*/
+}
+
+/* stolen from bootstrap */
+.input-error input {
+    border: 2px solid #e74c3c;
 }
 
 .collapseBtn {

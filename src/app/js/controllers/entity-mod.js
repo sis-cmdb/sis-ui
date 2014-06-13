@@ -6,6 +6,7 @@ angular.module('sisui')
         if (!SisUtil.canManageEntity(orig, $scope.schema)) {
             return $location.path("/entities/" + $scope.schema.name);
         }
+        $scope.showJson = false;
         $scope.descriptors = SisUtil.getDescriptorArray($scope.schema);
         // need to tweak this so owner and sis_locked show up..
         var foundLocked = false;
@@ -83,13 +84,6 @@ angular.module('sisui')
                 }
                 return descriptor._parent_._max_field_len_;
             } else {
-                // root
-                if (!descriptor.name) {
-                    // what?
-                    console.log("?? " + descriptor);
-                } else {
-                    console.log(descriptor.name);
-                }
                 return maxFieldLen;
             }
         };

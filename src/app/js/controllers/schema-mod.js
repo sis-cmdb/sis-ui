@@ -5,18 +5,20 @@ angular.module('sisui')
     "use strict";
 
     var init = function(schema) {
+        $scope.showJson = false;
         SisApi.getAllSchemas().then(function(schemas) {
             $scope.schemaList = schemas;
 
             var ownerDescriptor = {
                 name : "owner",
-                required : true,
                 type : "String"
             };
             var adminGroups = SisUtil.getAdminRoles();
             if (adminGroups instanceof Array) {
                 ownerDescriptor.enum = adminGroups;
                 ownerDescriptor.type = "Array";
+            } else {
+                ownerDescriptor.required = true;
             }
 
             $scope.schema = schema;
@@ -36,7 +38,6 @@ angular.module('sisui')
             });
 
             schemaDefinitionDescriptor.children = entityDescriptors;
-
 
             var descriptors = [
                 { name : "name", type : "String", required : true, readonly : $scope.action == 'edit', match : '/^[0-9a-z_]+$/' },
@@ -87,8 +88,12 @@ angular.module('sisui')
                 }
             };
 
-            $scope.hasChanged = function() {
+            var hasChanged = function() {
                 return !angular.equals(orig, $scope.schema);
+            };
+
+            $scope.canSave = function() {
+                return $scope.schemaMod.$valid && hasChanged();
             };
         });
     };
@@ -113,12 +118,18 @@ angular.module('sisui')
         var action = params.action;
         var schemaName = params.schema;
         if (action == 'add' && !schemaName) {
+            if (!(SisUtil.getAdminRoles())) {
+                return $location.path("/schemas");
+            }
             // adding a schema
             $scope.action = action;
             $scope.title = "Add a new schema";
             init(createEmptySchema());
         } else if (action == 'edit' && schemaName) {
             SisApi.getSchema(schemaName, true).then(function(schema) {
+                if (!SisUtil.canManageSchema(schema)) {
+                    return $location.path("/schemas");
+                }
                 $scope.action = action;
                 $scope.title = "Modify schema " + schemaName;
                 // clone it

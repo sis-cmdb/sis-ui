@@ -62,9 +62,12 @@
                 <span class="glyphicon glyphicon-minus"></span>
             </a>
             <label style="width: {{ maxFieldNameLength(descriptor, isItem()) | labelWidth }}" class="entity-label left-border" for="innerFormField">{{ fieldName }}</label>
-            <sis-entity-input field-descriptor="fieldDescriptor" path="'innerFormField'" ng-model="fieldValue" value-changed="valueChanged"></sis-entity-input>
+            <sis-entity-input field-descriptor="fieldDescriptor" path="innerFormField" ng-model="fieldValue" value-changed="valueChanged"></sis-entity-input>
             <button style="margin-left: 4px;" ng-if="fieldDescriptor.ref && !isReadOnly()" class="btn btn-sm btn-info" ng-click="chooseEntity();">Choose</button>
-            <small style="margin-left: 4px;" ng-if="!innerForm.innerFormField.$valid">{{ getErrorMsg(innerForm.innerFormField) }}</small>
+            <div ng-if="!innerForm.innerFormField.$valid">
+                <label style="width: {{ maxFieldNameLength(descriptor, isItem()) | labelWidth }}" class="entity-label left-border" for="innerFormField"></label>
+                <small style="margin-left: 4px;" ng-if="!innerForm.innerFormField.$valid">{{ getErrorMsg(innerForm.innerFormField) }}</small>
+            </div>
         </fieldset>
     </div>
 </div>

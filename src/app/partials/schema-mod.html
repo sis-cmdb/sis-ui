@@ -2,16 +2,19 @@
     <h3><strong>{{ title }}</strong></h3>
 </div>
 <div class="row sisui-bottom-buffer">
-    <button ng-disabled="!hasChanged()" class="btn btn-primary btn-sm" ng-click="save();">Save</button>
+    <button ng-disabled="!canSave()" class="btn btn-primary btn-sm" ng-click="save();">Save</button>
     <button class="btn btn-warning btn-sm" ng-click="cancel();">Cancel</button>
+    <button type="button" class="btn btn-info btn-sm" ng-model="showJson" btn-checkbox btn-checkbox-true="1" btn-checkbox-false="0">Toggle JSON</button>
 </div>
 <div class="row no-item-display">
-    <form class="form-inline" role="form" novalidate>
-        <li ng-controller="SchemaDescriptorController" ng-repeat="descriptor in descriptors">
-            <div ng-include="'app/partials/schema-descriptor.html'"></div>
-        </li>
-    </form>
-    <pre>
-{{ schema | json }}
-    </pre>
+    <div ng-class="{ 'col-md-12' : !showJson, 'col-md-6' : showJson }">
+        <form class="form-inline" role="form" novalidate name="schemaMod">
+            <li ng-controller="SchemaDescriptorController" ng-repeat="descriptor in descriptors">
+                <div ng-include="'app/partials/schema-descriptor.html'"></div>
+            </li>
+        </form>
+    </div>
+    <div ng-if="showJson" class="col-md-6">
+        <pre>{{ schema | json }}</pre>
+    </div>
 </div>
