@@ -5,16 +5,15 @@
     </div>
     <div class="modal-body no-item-display">
         <div class="row">
-            <div ng-repeat="f in additionalFields" class="form-group">
-                <label class="entity-label">{{ f.name }}</label>
-                <input ng-if="f.type == 'checkbox'" type="checkbox" ng-model="descriptor[f.name]" ng-change="attrChanged(descriptor, f)">
-                <input ng-if="f.type == 'textArray' || f.type == 'text'" type="text" ng-model="descriptor[f.name]" ng-change="attrChanged(descriptor, f)" class="input-sm" placeholder="{{ f.name }}">
-                <input ng-if="f.type == 'number'" type="number" ng-model="descriptor[f.name]" ng-change="attrChanged(descriptor, f)" class="input-sm" placeholder="{{ f.name }}">
-                <select ng-if="f.type == 'select'" ng-model="descriptor[f.name]" ng-options="s.name for s in schemaList" ng-change="attrChanged(descriptor, f)"></select>
+            <div ng-class="{ 'input-error' : !inner.$valid }" ng-repeat="f in additionalFields" class="form-group" ng-form="inner">
+                <label class="entity-label control-label">{{ f.name }}</label>
+                <sis-schema-attr name="attr" field="f" changed="attrChanged" choices="schemaList" descriptor="descriptor"></sis-schema-attr>
+                <small style="margin-left: 4px;" ng-if="!inner.attr.$valid">{{ getErrorMsg(inner.attr) }}</small>
+
             </div>
         </div>
     </div>
     <div class="modal-footer">
-        <button class="btn btn-warning" ng-click="$dismiss('Close');">Close</button>
+        <button class="btn btn-warning" ng-click="$dismiss('Close');">Ok</button>
     </div>
 </div>

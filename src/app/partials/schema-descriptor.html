@@ -1,31 +1,36 @@
-<ng-form class="form-inline" role="form">
+<div>
     <label class="schema-label" style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}" ng-if="path === 'definition'" for="{{ path }}">{{ descriptor.name }}</label>
-    <div ng-if="canModifyDescriptor()">
-        <a ng-disabled="!canDelete();" class="btn btn-xs btn-primary" ng-click="deleteDescriptor();">
-            <span class="glyphicon glyphicon-minus"></span>
-        </a>
-        <label class="schema-label" style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}" for="{{ path }}">{{ descriptor.name }}</label>
-        <select ng-model="descriptor.type" ng-options="type for type in validDescriptorTypes" style="margin-right: 4px;" ng-change="typeChanged(descriptor);"></select>
-        <a ng-click="showAttrs();">Attributes</a>
-    </div>
-    <div ng-if="isSchemaValue()">
-        <label class="schema-label" style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}" for="{{ path }}">{{ descriptor.name }}</label>
-        <div ng-if="descriptor.enum" id="{{ path }}">
-            <ul>
-                <li>
-                    <fieldset>
-                    <label ng-repeat="choice in descriptor.enum">
-                        <input type="checkbox"
-                           ng-checked="schema[descriptor.name].indexOf(choice) >= 0"
-                           ng-click="toggleChoice(choice)"> {{ choice }}
-                    </label>
-                    </fieldset>
-                </li>
-            </ul>
+    <div ng-if="canModifyDescriptor()" ng-form="nameForm" >
+        <div ng-class="{ 'input-error' : !nameForm.$valid }">
+            <a ng-disabled="!canDelete();" class="btn btn-xs btn-primary" ng-click="deleteDescriptor();" style="margin-right: 4px;">
+                <span class="glyphicon glyphicon-minus"></span>
+            </a>
+            <label class="schema-label" style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}" for="{{ path }}" ng-if="!canModifyDescriptorName()">{{ descriptor.name }}</label>
+            <input style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}; margin-right: 4px;" ng-model="descriptor.name" ng-if="canModifyDescriptorName()" ng-change="nameChanged(descriptor)" required name="nameField" >
+            <select ng-model="descriptor.type" ng-options="type for type in validDescriptorTypes" style="margin-right: 4px;" ng-change="typeChanged(descriptor);"></select>
+            <a ng-click="showAttrs();">Attributes</a>
         </div>
-        <input ng-if="!descriptor.enum" type="{{ inputType() }}" placeholder="{{descriptor.type}}" ng-model="value" ng-disabled="descriptor.readonly" ng-change="schemaValueChanged(value)" id="{{ path }}"/>
     </div>
-</ng-form>
+    <div ng-if="isSchemaValue()" ng-form="valueForm" >
+        <div ng-class="{ 'input-error' : !valueForm.valueField.$valid }">
+            <label class="schema-label" style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}">{{ descriptor.name }}</label>
+            <div ng-if="descriptor.enum">
+                <ul>
+                    <li>
+                        <fieldset>
+                        <label ng-repeat="choice in descriptor.enum">
+                            <input type="checkbox"
+                               ng-checked="schema[descriptor.name].indexOf(choice) >= 0"
+                               ng-click="toggleChoice(choice)"> {{ choice }}
+                        </label>
+                        </fieldset>
+                    </li>
+                </ul>
+            </div>
+            <input ng-if="!descriptor.enum" type="{{ inputType() }}" placeholder="{{descriptor.type}}" ng-model="value" ng-disabled="descriptor.readonly" ng-change="schemaValueChanged(value)" name="valueField"/>
+        </div>
+    </div>
+</div>
 <div ng-if="canModifyChildren();">
     <ul>
         <li ng-repeat="descriptor in descriptor.children" ng-controller="SchemaDescriptorController">

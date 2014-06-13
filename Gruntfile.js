@@ -250,7 +250,7 @@ module.exports = function(grunt) {
     concat : {
         // vendor libs
         options : {
-            separator : ';'
+            separator : ';\n'
         },
         vendor : {
             files : {
@@ -258,8 +258,8 @@ module.exports = function(grunt) {
                 '<%= build_dirs.build %>/app/vendor-libs.js' :
                     // order matters
                     ['<%= build_dirs.src %>/common/js/vendor/jquery/1.11.0/jquery-1.11.0.min.js',
-                     '<%= build_dirs.src %>/common/js/vendor/angularjs/1.2.15/angular.min.js',
-                     '<%= build_dirs.src %>/common/js/vendor/angularjs/1.2.15/angular-route.min.js',
+                     '<%= build_dirs.src %>/common/js/vendor/angularjs/1.2.17/angular.min.js',
+                     '<%= build_dirs.src %>/common/js/vendor/angularjs/1.2.17/angular-route.min.js',
                      '<%= build_dirs.src %>/common/js/vendor/ui.bootstrap/0.10.0/ui-bootstrap-tpls-0.10.0.min.js',
                      '<%= build_dirs.src %>/common/js/vendor/moment.min.js',
                      '<%= build_dirs.src %>/common/js/vendor/jsondiffpatch/bundle-full.min.js',

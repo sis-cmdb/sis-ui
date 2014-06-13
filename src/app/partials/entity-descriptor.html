@@ -1,9 +1,9 @@
 <div ng-switch on="fieldDescriptor.type">
     <div ng-switch-when="Document">
-        <a ng-show="canDelete();" class="btn btn-xs btn-primary" ng-click="delItem(arrIdx);">
-            <span class="glyphicon glyphicon-minus"></span>
-        </a>
-        <div style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}">
+        <div style="width: {{ maxFieldNameLength(descriptor) | labelWidth }};">
+            <a ng-show="canDelete();" class="btn btn-xs btn-primary" ng-click="delItem(arrIdx);">
+                <span class="glyphicon glyphicon-minus"></span>
+            </a>
             <a class="btn btn-xs btn-default collapse-btn pull-left" ng-click="isCollapsed = !isCollapsed">
                 <span ng-show="isCollapsed" class="glyphicon glyphicon-chevron-right"></span>
                 <span ng-show="!isCollapsed" class="glyphicon glyphicon-chevron-down"></span>
@@ -18,10 +18,10 @@
         </ul>
     </div>
     <div ng-switch-when="Array">
-        <a ng-show="canDelete();" class="btn btn-xs btn-primary" ng-click="delItem(arrIdx);">
-            <span class="glyphicon glyphicon-minus"></span>
-        </a>
         <div style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}">
+            <a ng-show="canDelete();" class="btn btn-xs btn-primary" ng-click="delItem(arrIdx);">
+                <span class="glyphicon glyphicon-minus"></span>
+            </a>
             <a class="btn btn-xs btn-default collapse-btn pull-left" ng-click="isCollapsed = !isCollapsed">
                 <span ng-show="isCollapsed" class="glyphicon glyphicon-chevron-right"></span>
                 <span ng-show="!isCollapsed" class="glyphicon glyphicon-chevron-down"></span>
@@ -56,33 +56,18 @@
             </ul>
         </div>
     </div>
-    <ng-form ng-switch-when="ObjectId" class="form-inline css-form" role="form" novalidate>
-        <div class="form-group">
+    <div ng-form="innerForm" ng-switch-default class="form-group" ng-class="{ 'has-error' : !innerForm.$valid }">
+        <fieldset ng-disabled="isReadOnly();">
             <a ng-show="canDelete();" class="btn btn-xs btn-primary" ng-click="delItem(arrIdx);">
                 <span class="glyphicon glyphicon-minus"></span>
             </a>
-            <fieldset ng-disabled="isReadOnly();">
-                <label style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}" class="entity-label left-border" for="{{ path }}">{{ fieldName }}</label>
-                <input  ng-if="fieldDescriptor.ref" type="text" class="form-control input-sm" disabled="disabled" id="{{ path }}" ng-model="fieldValue" required="{{ !!fieldDescriptor.required }}" placeholder="{{ fieldDescriptor.comment }}">
-                <button ng-if="fieldDescriptor.ref && !isReadOnly()" class="btn btn-sm btn-info" ng-click="chooseEntity();">Choose</button>
-
-                <input ng-if="!fieldDescriptor.ref" type="text" class="form-control input-sm" id="{{ path }}" placeholder="{{ fieldDescriptor.comment || fieldDescriptor.type }}" ng-change="valueChanged(fieldValue);" ng-model="fieldValue" required="{{ !!fieldDescriptor.required }}">
-            </fieldset>
-        </div>
-    </ng-form>
-    <ng-form ng-switch-default class="form-inline css-form" role="form" novalidate>
-        <div class="form-group">
-            <fieldset ng-disabled="isReadOnly();">
-                <a ng-show="canDelete();" class="btn btn-xs btn-primary" ng-click="delItem(arrIdx);">
-                    <span class="glyphicon glyphicon-minus"></span>
-                </a>
-                <label ng-if="isItem()" for="{{ path }}">{{ fieldName }}</label>
-                <label style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}" ng-if="!isItem()" class="entity-label left-border" for="{{ path }}">{{ fieldName }}</label>
-                <select ng-if="fieldDescriptor.enum" ng-options="choice for choice in fieldDescriptor.enum" ng-model="fieldValue" ng-change="valueChanged(fieldValue)" required="{{ !!fieldDescriptor.required }}"></select>
-
-                <input ng-if="!fieldDescriptor.enum" type="{{ inputType() }}" class="form-control input-sm" id="{{ path }}" placeholder="{{ fieldDescriptor.comment || fieldDescriptor.type }}" ng-change="valueChanged(fieldValue);" ng-model="fieldValue" required="{{ !!fieldDescriptor.required }}">
-
-            </fieldset>
-        </div>
-    </form>
+            <label style="width: {{ maxFieldNameLength(descriptor, isItem()) | labelWidth }}" class="entity-label left-border" for="innerFormField">{{ fieldName }}</label>
+            <sis-entity-input field-descriptor="fieldDescriptor" path="innerFormField" ng-model="fieldValue" value-changed="valueChanged"></sis-entity-input>
+            <button style="margin-left: 4px;" ng-if="fieldDescriptor.ref && !isReadOnly()" class="btn btn-sm btn-info" ng-click="chooseEntity();">Choose</button>
+            <div ng-if="!innerForm.innerFormField.$valid">
+                <label style="width: {{ maxFieldNameLength(descriptor, isItem()) | labelWidth }}" class="entity-label left-border" for="innerFormField"></label>
+                <small style="margin-left: 4px;" ng-if="!innerForm.innerFormField.$valid">{{ getErrorMsg(innerForm.innerFormField) }}</small>
+            </div>
+        </fieldset>
+    </div>
 </div>

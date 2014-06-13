@@ -34,14 +34,27 @@ angular.module('sisui')
     $scope.canModifyChildren = function() {
         var path = $scope.path;
         var type = $scope.descriptor.type;
-        return (type === "Array" || type === "Document") &&
+        var result = (type === "Array" || type === "Document") &&
                path !== "definition.owner" &&
                (path === "definition" ||
+                // ensure it's within the definition
                $scope.isEntityDescriptor());
+        if (!result) {
+            return false;
+        }
+        // a little more validation
+        if (!$scope.descriptor.name) {
+            // only ok if the parent of this is an array
+            return $scope.descriptor._parent_.type === "Array";
+        }
+        return true;
     };
 
     $scope.canAddChildren = function() {
         var descriptor = $scope.descriptor;
+        if (!descriptor.name) {
+            return false;
+        }
         if (descriptor.type === "Array") {
             return !descriptor.children ||
                     descriptor.children.length === 0;
@@ -49,14 +62,24 @@ angular.module('sisui')
         return descriptor.type === "Document";
     };
 
+    $scope.canModifyDescriptorName = function() {
+        var descriptor = $scope.descriptor;
+        if (descriptor._isNew_) {
+            return !descriptor._parent_ ||
+                descriptor._parent_.type != 'Array';
+        }
+        return false;
+    };
+
     $scope.addChildDescriptor = function() {
         var descriptor = $scope.descriptor;
         descriptor.children = descriptor.children || [];
         var newDesc = { type : "String", _parent_ : descriptor };
-        if (descriptor.type === "Document") {
-            newDesc.name = "";
-        }
+        newDesc._isNew_ = true;
+        newDesc.name = "field";
+        delete descriptor._max_field_len_;
         descriptor.children.push(newDesc);
+        updateParentSchemaField(newDesc);
     };
 
     $scope.showAttrs = function() {
@@ -94,8 +117,12 @@ angular.module('sisui')
                 }
             }
         }
-        for (i = 0; i < $scope.additionalFields.length; ++i) {
-            var field = $scope.additionalFields[i];
+        // cannot use $scope.additionalFields here since
+        // we are not necessarily in the descriptors scope due to
+        // recursion
+        var additionalFields = SisUtil.attributesForType(descriptor.type);
+        for (i = 0; i < additionalFields.length; ++i) {
+            var field = additionalFields[i];
             var fieldName = field.name;
             if (!descriptor[fieldName] &&
                 descriptor[fieldName] !== 0) {
@@ -127,7 +154,9 @@ angular.module('sisui')
             for (var i = 0; i < children.length; ++i) {
                 var child = parent.children[i];
                 var childField = convertToSchemaField(child);
-                doc[child.name] = childField;
+                if (child.name) {
+                    doc[child.name] = childField;
+                }
             }
         } else {
             doc = [];
@@ -143,7 +172,11 @@ angular.module('sisui')
         var withName = descriptor._parent_.children.filter(function(cd) {
             return cd.name == descriptor.name;
         });
-        if (withName.length > 1) {
+        var valid = withName.length == 1;
+        if (descriptor._nameCtrl_) {
+            descriptor._nameCtrl_.$setValidity("unique", valid);
+        }
+        if (!valid) {
             $log.debug("Fields with the same name exist.");
             return;
         }
@@ -207,7 +240,8 @@ angular.module('sisui')
                 descriptor.children.push({
                     name: "field",
                     type: "String",
-                    _parent_ : descriptor
+                    _parent_ : descriptor,
+                    _isNew_ : true
                 });
             }
         } else {
@@ -273,7 +307,26 @@ angular.module('sisui')
         delete descriptor._parent_;
     };
 
+    $scope.getErrorMsg = function(field) {
+        if (!field) { return ""; }
+        for (var k in field.$error) {
+            if (field.$error[k]) {
+                return "Invalid : (" + k + ")";
+            }
+        }
+        return "";
+    };
+
     $scope.validDescriptorTypes = SisUtil.descriptorTypes;
+    if ($scope.descriptor._parent_ &&
+        $scope.descriptor._parent_.type == "Array") {
+        var types = angular.copy(SisUtil.descriptorTypes);
+        var idx = types.indexOf('Array');
+        if (idx != -1) {
+            types.splice(idx, 1);
+            $scope.validDescriptorTypes = types;
+        }
+    }
 
     $scope.additionalFields = SisUtil.attributesForType($scope.descriptor.type);
 
@@ -290,6 +343,25 @@ angular.module('sisui')
                 $scope.descriptor.ref = schema;
                 break;
             }
+        }
+    }
+
+    if ($scope.descriptor.match &&
+        $scope.descriptorForm &&
+        $scope.descriptorForm.valueField) {
+        var regex = SisUtil.toRegex($scope.descriptor.match);
+        if (regex) {
+            $scope.descriptorForm.valueField.$parsers.push(function(viewValue) {
+                if (regex.test(viewValue)) {
+                  // it is valid
+                  ctrl.$setValidity('match', true);
+                  return viewValue;
+                } else {
+                  // it is invalid, return undefined (no model update)
+                  ctrl.$setValidity('match', false);
+                  return undefined;
+                }
+            });
         }
     }
 
