@@ -95,7 +95,7 @@ angular.module('sisui')
     var getTemplate = function(type, name) {
         var attrs = [
             "ng-model='descriptor[field.name]'",
-            "ng-change='changed(descriptor, field)'",
+            "ng-change='changed(descriptor, field, formCtrl)'",
             'name="' + name + '"'
         ];
         var elem = "input";
@@ -121,18 +121,18 @@ angular.module('sisui')
         }
         return template;
     };
-    var linker = function(scope, element, attrs, ctrl) {
+    var linker = function(scope, element, attrs, formCtrl) {
         var field = scope.field;
-        var fName = field.name;
         var descriptor = scope.descriptor;
         var type = field.type;
-        var name = scope.name;
-        element.html(getTemplate(type, scope.name)).show();
+        var name = field.name;
+        scope.formCtrl = formCtrl;
+        element.html(getTemplate(type, name)).show();
         $compile(element.contents())(scope);
-        if (!ctrl || !ctrl[name]) {
+        if (!formCtrl || !formCtrl[name]) {
             return;
         }
-        ctrl = ctrl[name];
+        var ctrl = formCtrl[name];
         if (type == 'regex') {
             ctrl.$parsers.unshift(function(viewValue) {
                 if (!viewValue) {
@@ -150,34 +150,6 @@ angular.module('sisui')
                     return undefined;
                 }
             });
-        } else if (type == "number") {
-            ctrl.$parsers.push(function(viewValue) {
-                if (field.name == "min" && "max" in descriptor) {
-                    if (!viewValue) {
-                        ctrl.$setValidity('minVal', true);
-                        return viewValue;
-                    }
-                    if (parseInt(viewValue, 10) > descriptor.max) {
-                        ctrl.$setValidity('minVal', false);
-                        return undefined;
-                    }
-                    ctrl.$setValidity('minVal', true);
-                    return viewValue;
-                } else if (field.name == "max" && "min" in descriptor) {
-                    if (!viewValue) {
-                        ctrl.$setValidity('maxVal', true);
-                        return viewValue;
-                    }
-                    if (parseInt(viewValue, 10) < descriptor.min) {
-                        ctrl.$setValidity('maxVal', false);
-                        return undefined;
-                    }
-                    ctrl.$setValidity('maxVal', true);
-                    return viewValue;
-                } else {
-                    return viewValue;
-                }
-            });
         }
     };
     return {
@@ -186,11 +158,46 @@ angular.module('sisui')
         transclude : true,
         require: "^form",
         scope : {
-            name : '@',
+            name : '&',
             field : "=",
             changed : "=",
             choices : "&",
             descriptor : "="
+        }
+    };
+})
+.directive("sisSchemaFieldName", function(SisUtil, $compile) {
+    var getTemplate = function(readOnly, name) {
+        if (!readOnly) {
+            return '<input name="' + name + '" ' +
+                'style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}; "' +
+                'margin-right: 4px;" ng-model="descriptor.name" ' +
+                'ng-change="change(descriptor)" required>';
+        } else {
+            return '<label class="schema-label" ' +
+                'style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}; "' +
+                'margin-right: 4px;">{{ descriptor.name }}</label>';
+        }
+    };
+    var linker = function(scope, element, attrs, formCtrl) {
+        var readOnly = scope.readOnly();
+        var name = scope.name();
+        element.html(getTemplate(readOnly, name)).show();
+        $compile(element.contents())(scope);
+        scope.$watch('descriptor._isDupe_', function(nv) {
+            formCtrl[name].$setValidity('unique', !nv);
+        });
+    };
+    return {
+        link : linker,
+        restrict : 'E',
+        transclude : true,
+        require: '^form',
+        scope : {
+            name : '&',
+            readOnly : '&',
+            descriptor : '=',
+            change : '='
         }
     };
 });

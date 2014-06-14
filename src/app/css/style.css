@@ -43,7 +43,7 @@ ul {
 }
 
 /* stolen from bootstrap */
-.input-error input {
+input.ng-invalid {
     border: 2px solid #e74c3c;
 }
 
