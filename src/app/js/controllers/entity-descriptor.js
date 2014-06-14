@@ -54,6 +54,11 @@ angular.module('sisui')
             typeof $scope.fieldValue === "object") {
             $scope.fieldValue = angular.toJson($scope.fieldValue);
         }
+        // special owner handling
+        if (fieldDescriptor.name == "owner" && !fieldDescriptor._parent_ &&
+            fieldDescriptor.type == "String" && !$scope.fieldValue.length) {
+            $scope.fieldValue = "";
+        }
     };
 
     // set up the controller after init has been called
@@ -206,7 +211,9 @@ angular.module('sisui')
             value = angular.toJson(value);
         } else if ($scope.path == "owner" &&
             $scope.fieldDescriptor.type == "String") {
-            value = value.split(",");
+            value = value.split(",").map(function(str) {
+                return str.trim();
+            });
         }
         if ($scope.isItem()) {
             $scope.$parent.fieldValue[$scope.arrIdx] = value;
