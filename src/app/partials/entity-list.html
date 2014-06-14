@@ -1,6 +1,7 @@
 <div class="row sisui-bottom-buffer">
     <h3>
         <strong>{{ schema.name }}</strong> Information
+        <small ng-if="schema.description">{{ schema.description }}</small>
     </h3>
     <div ng-controller="SchemaDefinitionController">
         <div ng-include src="'app/partials/schema-definition.html'"/>
