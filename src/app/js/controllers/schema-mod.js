@@ -41,6 +41,7 @@ angular.module('sisui')
 
             var descriptors = [
                 { name : "name", type : "String", required : true, readonly : $scope.action == 'edit', match : '/^[0-9a-z_]+$/' },
+                { name : "description", type : "String" },
                 ownerDescriptor,
                 { name : "sis_locked", type : "Boolean" },
                 schemaDefinitionDescriptor
