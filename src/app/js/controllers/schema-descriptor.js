@@ -71,6 +71,46 @@ angular.module('sisui')
         return false;
     };
 
+    var updateParentSchemaField = function(descriptor) {
+        var parent = descriptor._parent_;
+        var doc = null;
+        var children = parent.children || [];
+        if (parent.type === "Document") {
+            doc = { };
+            for (var i = 0; i < children.length; ++i) {
+                var child = parent.children[i];
+                var childField = convertToSchemaField(child);
+                if (child.name) {
+                    doc[child.name] = childField;
+                }
+            }
+        } else {
+            doc = [];
+            if (children.length) {
+                doc.push(convertToSchemaField(children[0]));
+            }
+        }
+        setSchemaField(parent, doc);
+    };
+
+    var assignValidity = function(fieldIndexes, desc) {
+        var valid = fieldIndexes.length == 1;
+        fieldIndexes.forEach(function(idx) {
+            desc.children[idx]._isDupe_ = !valid;
+        });
+    };
+
+    var updateDuplicateStatus = function(parent) {
+        var names = parent.children.reduce(function(names, desc, idx) {
+            names[desc.name] = names[desc.name] || [];
+            names[desc.name].push(idx);
+            return names;
+        }, { });
+        for (var k in names) {
+            assignValidity(names[k], parent);
+        }
+    };
+
     $scope.addChildDescriptor = function() {
         var descriptor = $scope.descriptor;
         descriptor.children = descriptor.children || [];
@@ -79,14 +119,36 @@ angular.module('sisui')
         newDesc.name = "field";
         delete descriptor._max_field_len_;
         descriptor.children.push(newDesc);
+        updateDuplicateStatus(descriptor);
         updateParentSchemaField(newDesc);
     };
 
     $scope.showAttrs = function() {
+        var descriptor = $scope.descriptor;
+        var modalScope = $scope.$new(true);
+        modalScope.additionalFields = angular.copy($scope.additionalFields);
+        modalScope.name = descriptor.name;
+        modalScope.schemaList = $scope.schemaList;
+        modalScope.descriptor = modalScope.additionalFields.reduce(function(ret, f) {
+            if (typeof descriptor[f.name] !== 'undefined') {
+                ret[f.name] = descriptor[f.name];
+            }
+            return ret;
+        }, { });
         return $modal.open({
             templateUrl : "app/partials/schema-descriptor-attrs.html",
-            scope : $scope,
+            scope : modalScope,
+            controller : "SchemaAttrsDescriptorController",
             windowClass : "narrow-modal-window"
+        }).result.then(function(attrs) {
+            modalScope.additionalFields.forEach(function(f) {
+                if (attrs[f.name] || attrs[f.name] === 0) {
+                    descriptor[f.name] = attrs[f.name];
+                } else {
+                    delete descriptor[f.name];
+                }
+            });
+            setSchemaField(descriptor, convertToSchemaField(descriptor));
         });
     };
 
@@ -145,37 +207,10 @@ angular.module('sisui')
         return result;
     };
 
-    var updateParentSchemaField = function(descriptor) {
-        var parent = descriptor._parent_;
-        var doc = null;
-        var children = parent.children || [];
-        if (parent.type === "Document") {
-            doc = { };
-            for (var i = 0; i < children.length; ++i) {
-                var child = parent.children[i];
-                var childField = convertToSchemaField(child);
-                if (child.name) {
-                    doc[child.name] = childField;
-                }
-            }
-        } else {
-            doc = [];
-            if (children.length) {
-                doc.push(convertToSchemaField(children[0]));
-            }
-        }
-        setSchemaField(parent, doc);
-    };
-
     $scope.nameChanged = function(descriptor) {
         // ensure we're the only one with this name
-        var withName = descriptor._parent_.children.filter(function(cd) {
-            return cd.name == descriptor.name;
-        });
-        var valid = withName.length == 1;
-        if (descriptor._nameCtrl_) {
-            descriptor._nameCtrl_.$setValidity("unique", valid);
-        }
+        updateDuplicateStatus(descriptor._parent_);
+        var valid = !descriptor._isDupe_;
         if (!valid) {
             $log.debug("Fields with the same name exist.");
             return;
@@ -255,9 +290,6 @@ angular.module('sisui')
         setSchemaField(descriptor, convertToSchemaField(descriptor));
     };
 
-    $scope.attrChanged = function(descriptor, f) {
-        setSchemaField(descriptor, convertToSchemaField(descriptor));
-    };
 
     $scope.$on("parentPathChanged", function() {
         $scope.paths = SisUtil.getDescriptorPath($scope.descriptor);
@@ -305,6 +337,7 @@ angular.module('sisui')
         }
         updateParentSchemaField(descriptor);
         delete descriptor._parent_;
+        updateDuplicateStatus(parent);
     };
 
     $scope.getErrorMsg = function(field) {
@@ -333,6 +366,11 @@ angular.module('sisui')
     $scope.value = "<not set>";
     if ($scope.isSchemaValue()) {
         $scope.value = $scope.schema[$scope.descriptor.name];
+        if ($scope.descriptor.name == "owner" &&
+            !$scope.descriptor.enum &&
+            !$scope.value.length) {
+            $scope.value = "";
+        }
     }
 
     if ($scope.descriptor.type == 'ObjectId' &&

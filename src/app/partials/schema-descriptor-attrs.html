@@ -1,19 +1,19 @@
 
 <div>
     <div class="modal-header">
-        <h3><b>{{ descriptor.name }}</b> Attributes</h3>
+        <h3><b>{{ name }}</b> Attributes</h3>
     </div>
     <div class="modal-body no-item-display">
-        <div class="row">
-            <div ng-class="{ 'input-error' : !inner.$valid }" ng-repeat="f in additionalFields" class="form-group" ng-form="inner">
+        <div class="row" ng-form name="inner">
+            <div ng-repeat="f in additionalFields" class="form-group">
                 <label class="entity-label control-label">{{ f.name }}</label>
-                <sis-schema-attr name="attr" field="f" changed="attrChanged" choices="schemaList" descriptor="descriptor"></sis-schema-attr>
-                <small style="margin-left: 4px;" ng-if="!inner.attr.$valid">{{ getErrorMsg(inner.attr) }}</small>
-
+                <sis-schema-attr field="f" changed="attrChanged" choices="schemaList" descriptor="descriptor"></sis-schema-attr>
+                <small style="margin-left: 4px;" ng-if="!inner[f.name].$valid">{{ getErrorMsg(inner[f.name]) }}</small>
             </div>
         </div>
     </div>
     <div class="modal-footer">
-        <button class="btn btn-warning" ng-click="$dismiss('Close');">Ok</button>
+        <button class="btn btn-warning" ng-click="$dismiss('OK');">Cancel</button>
+        <button ng-disabled="!inner.$valid" class="btn btn-warning" ng-click="$close(descriptor);">Ok</button>
     </div>
 </div>

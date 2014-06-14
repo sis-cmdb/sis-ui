@@ -1,18 +1,19 @@
 <div>
     <label class="schema-label" style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}" ng-if="path === 'definition'" for="{{ path }}">{{ descriptor.name }}</label>
-    <div ng-if="canModifyDescriptor()" ng-form="nameForm" >
+    <div ng-if="canModifyDescriptor()" >
         <div ng-class="{ 'input-error' : !nameForm.$valid }">
             <a ng-disabled="!canDelete();" class="btn btn-xs btn-primary" ng-click="deleteDescriptor();" style="margin-right: 4px;">
                 <span class="glyphicon glyphicon-minus"></span>
             </a>
-            <label class="schema-label" style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}" for="{{ path }}" ng-if="!canModifyDescriptorName()">{{ descriptor.name }}</label>
-            <input style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}; margin-right: 4px;" ng-model="descriptor.name" ng-if="canModifyDescriptorName()" ng-change="nameChanged(descriptor)" required name="nameField" >
+            <sis-schema-field-name name="'field_' + $index" read-only="!canModifyDescriptorName()" descriptor="descriptor" change="nameChanged"></sis-schema-field-name>
             <select ng-model="descriptor.type" ng-options="type for type in validDescriptorTypes" style="margin-right: 4px;" ng-change="typeChanged(descriptor);"></select>
-            <a ng-click="showAttrs();">Attributes</a>
+            <button type="button" class="btn btn-default btn-xs" ng-click="showAttrs();">
+                <span class="glyphicon glyphicon-list"></span>
+            </button>
         </div>
     </div>
-    <div ng-if="isSchemaValue()" ng-form="valueForm" >
-        <div ng-class="{ 'input-error' : !valueForm.valueField.$valid }">
+    <div ng-if="isSchemaValue()">
+        <div ng-form="valueForm">
             <label class="schema-label" style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}">{{ descriptor.name }}</label>
             <div ng-if="descriptor.enum">
                 <ul>
@@ -27,12 +28,12 @@
                     </li>
                 </ul>
             </div>
-            <input ng-if="!descriptor.enum" type="{{ inputType() }}" placeholder="{{descriptor.type}}" ng-model="value" ng-disabled="descriptor.readonly" ng-change="schemaValueChanged(value)" name="valueField"/>
+            <input ng-if="!descriptor.enum" type="{{ inputType() }}" placeholder="{{descriptor.type}}" ng-model="value" ng-disabled="descriptor.readonly" ng-change="schemaValueChanged(value)" name="valueField" ng-pattern="{{ descriptor.match }}" ng-required="descriptor.required"/>
         </div>
     </div>
 </div>
 <div ng-if="canModifyChildren();">
-    <ul>
+    <ul ng-form name="childrenForm">
         <li ng-repeat="descriptor in descriptor.children" ng-controller="SchemaDescriptorController">
             <div ng-include="'app/partials/schema-descriptor.html'"></div>
         </li>
