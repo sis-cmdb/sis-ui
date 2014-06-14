@@ -19,6 +19,7 @@ angular.module('sisui')
                     desc.type = "Array";
                 } else {
                     desc.type = "String";
+                    desc.required = true;
                     delete desc.enum;
                 }
             } else if (desc.name == 'sis_locked') {
@@ -38,6 +39,57 @@ angular.module('sisui')
 
         $scope.hasChanged = function() {
             return !angular.equals(orig, $scope.entity);
+        };
+
+        // assumes all descriptors have a name
+        var getMaxFieldName = function(descriptors) {
+            return descriptors.reduce(function(max, desc) {
+                // either a name or a number label for an array
+                var len = desc.name ? desc.name.length : 4;
+                if (desc.children && desc.children.length) {
+                    // is a container
+                    if ($scope.action != 'view') {
+                        // two buttons - dleete and collaps
+                        len += 5;
+                    } else {
+                        len += 3;
+                    }
+                }
+                if (max < len) {
+                    max = len;
+                }
+                return max;
+            }, 0);
+        };
+
+        var maxFieldLen = getMaxFieldName($scope.descriptors);
+
+        $scope.maxFieldNameLength = function(descriptor, isItem) {
+            if (!descriptor) {
+                return 0;
+            }
+            if (isItem) {
+                if ($scope.action != 'view') {
+                    // delete + label
+                    return 7;
+                } else {
+                    return 4;
+                }
+            }
+            if (descriptor._parent_) {
+                if (descriptor._parent_._max_field_len_) {
+                    return descriptor._parent_._max_field_len_;
+                }
+                if (descriptor._parent_.type == "Document") {
+                    descriptor._parent_._max_field_len_ = getMaxFieldName(descriptor._parent_.children);
+                } else {
+                    // array - just return something for 9999 elems
+                    descriptor._parent_._max_field_len_ = 4;
+                }
+                return descriptor._parent_._max_field_len_;
+            } else {
+                return maxFieldLen;
+            }
         };
     };
 

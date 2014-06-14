@@ -20,6 +20,7 @@ angular.module('sisui')
                     desc.type = "Array";
                 } else {
                     desc.type = "String";
+                    desc.required = true;
                     delete desc.enum;
                 }
             } else if (desc.name == 'sis_locked') {
