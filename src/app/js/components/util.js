@@ -152,6 +152,10 @@ angular.module('sisui')
 
         // add the filter method
         scope.filter = function(text) {
+            if (!text) {
+                self.setSearch(text);
+                return;
+            }
             var parsed = self.parseSearch(text);
             if (!parsed) {
                 scope.filterError = "invalid query";
