@@ -499,7 +499,7 @@ angular.module('sisui')
                 retry_delay : { type : "Number", min : 1, max : 60, "default" : 1 },
                 events : { type : [{ type : "String", enum : ["insert", "update", "delete"] }], required : true },
                 owner : { type : ["String"] },
-                entity_type : "String"
+                entity_type : { type : "String", required : true }
             }
         };
     };
