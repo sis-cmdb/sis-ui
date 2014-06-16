@@ -257,13 +257,22 @@ module.exports = function(grunt) {
                 // libs for the angular app
                 '<%= build_dirs.build %>/app/vendor-libs.js' :
                     // order matters
+                    // jquery
                     ['<%= build_dirs.src %>/common/js/vendor/jquery/1.11.0/jquery-1.11.0.min.js',
+                    // angular
                      '<%= build_dirs.src %>/common/js/vendor/angularjs/1.2.17/angular.min.js',
                      '<%= build_dirs.src %>/common/js/vendor/angularjs/1.2.17/angular-route.min.js',
+                     // angular bootstrap
                      '<%= build_dirs.src %>/common/js/vendor/ui.bootstrap/0.10.0/ui-bootstrap-tpls-0.10.0.min.js',
+                     // moment
                      '<%= build_dirs.src %>/common/js/vendor/moment.min.js',
+                     // jsondiff -
                      '<%= build_dirs.src %>/common/js/vendor/jsondiffpatch/bundle-full.min.js',
-                     '<%= build_dirs.src %>/common/js/vendor/jsondiffpatch/formatters.min.js'
+                     '<%= build_dirs.src %>/common/js/vendor/jsondiffpatch/formatters.min.js',
+                     // ipv6 - https://github.com/beaugunderson/javascript-ipv6
+                     '<%= build_dirs.src %>/common/js/vendor/ipv6/jsbn-combined.js',
+                     '<%= build_dirs.src %>/common/js/vendor/ipv6/sprintf.js',
+                     '<%= build_dirs.src %>/common/js/vendor/ipv6/ipv6.js'
                     ],
                 // libs for docs
                 '<%= build_dirs.build %>/docs/vendor-libs.js' :

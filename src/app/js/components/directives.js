@@ -72,6 +72,22 @@ angular.module('sisui')
                 });
             }
         }
+        if (descriptor.type == "IpAddress") {
+            ctrl.$parsers.unshift(function(viewValue) {
+                if (!viewValue) {
+                    ctrl.$setValidity('ip', true);
+                    return viewValue;
+                }
+                var addr = null;
+                if (viewValue.indexOf(':') != -1) {
+                    addr = new v6.Address(viewValue);
+                } else {
+                    addr = new v4.Address(viewValue);
+                }
+                ctrl.$setValidity('ip', addr.isValid());
+                return addr.isValid() ? viewValue : undefined;
+            });
+        }
     };
     return {
         link : linker,
@@ -185,7 +201,9 @@ angular.module('sisui')
         element.html(getTemplate(readOnly, name)).show();
         $compile(element.contents())(scope);
         scope.$watch('descriptor._isDupe_', function(nv) {
-            formCtrl[name].$setValidity('unique', !nv);
+            if (formCtrl && formCtrl[name]) {
+                formCtrl[name].$setValidity('unique', !nv);
+            }
         });
     };
     return {
