@@ -53,6 +53,10 @@ angular.module('sisui')
         if (fieldDescriptor.type === "Mixed" &&
             typeof $scope.fieldValue === "object") {
             $scope.fieldValue = angular.toJson($scope.fieldValue);
+        } else if (fieldDescriptor.type == "IpAddress" &&
+            typeof $scope.fieldValue === "object") {
+            var addrString = $scope.fieldValue.ip_address + "/" + $scope.fieldValue.cidr;
+            $scope.fieldValue = addrString;
         }
         // special owner handling
         if (fieldDescriptor.name == "owner" && !fieldDescriptor._parent_ &&

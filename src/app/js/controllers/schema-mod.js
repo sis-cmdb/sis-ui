@@ -44,11 +44,13 @@ angular.module('sisui')
                 { name : "description", type : "String" },
                 ownerDescriptor,
                 { name : "sis_locked", type : "Boolean" },
+                { name : "locked_fields", type : "String" },
                 schemaDefinitionDescriptor
             ];
 
             var orig = angular.copy($scope.schema);
             $scope.descriptors = descriptors;
+            $scope.originalLockedFields = orig.locked_fields || [];
 
             // assumes all descriptors have a name
             var getMaxFieldName = function(descriptors) {

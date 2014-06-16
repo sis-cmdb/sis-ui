@@ -13,6 +13,7 @@ angular.module('sisui')
     var USER_GROUP_TEMPLATE = "app/partials/user-group-list-dlg.html";
 
     var CONFIRM_DELETE_TEMPLATE = "app/partials/confirm-delete-dlg.html";
+    var FILTER_REFERENCE_TEMPLATE = "app/partials/filter-reference-dlg.html";
 
     var openModal = function(scope, controller, template) {
         return $modal.open({
@@ -61,6 +62,16 @@ angular.module('sisui')
 
     $rootScope.sisDlg = this;
 
+    this.openConfirmDialog = function(title, body) {
+        var modalScope = $rootScope.$new(true);
+        modalScope.title = title;
+        modalScope.body = body;
+        return $modal.open({
+            templateUrl : CONFIRM_DELETE_TEMPLATE,
+            scope : modalScope
+        });
+    };
+
     this.addRemoveDialog = function(scope, type, idField) {
         var oldRemove = scope.remove;
         if (!oldRemove) {
@@ -69,6 +80,7 @@ angular.module('sisui')
         if (!idField) {
             idField = 'name';
         }
+        var self = this;
         // may be called w/ more than one arg.
         scope.remove = function(obj) {
             if (!obj) {
@@ -78,17 +90,20 @@ angular.module('sisui')
             // may be multiple args to the old Remove
             var args = Array.prototype.slice.call(arguments);
             // insert confirm
-            var modalScope = $rootScope.$new(true);
-            modalScope.type = type;
-            modalScope.id = obj[idField];
-            $modal.open({
-                templateUrl : CONFIRM_DELETE_TEMPLATE,
-                scope : modalScope
-            }).result.then(function(ok) {
+            var title = "Confirm delete (" + type + ")";
+            var body = "Are you sure you want to delete " + obj[idField];
+            self.openConfirmDialog(title, body).result.then(function(ok) {
                 // call the old remove
                 oldRemove.apply(scope, args);
             });
         };
+    };
+
+    this.showFilterHelp = function() {
+        return $modal.open({
+            templateUrl : FILTER_REFERENCE_TEMPLATE,
+            windowClass : "wide-modal-window"
+        });
     };
 
 });

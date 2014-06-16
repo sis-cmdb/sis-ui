@@ -300,12 +300,15 @@ angular.module('sisui')
         var descriptor = $scope.descriptor;
         if (descriptor.name == 'owner') {
             if (typeof value === 'string') {
-                value = value.split(",").map(function(s) {
-                    return s.trim();
-                });
+                value = textToArray(value);
             }
             value = value.sort();
             $scope.schema.owner = value;
+        } else if (descriptor.name == "locked_fields") {
+            if (typeof value === 'string') {
+                value = textToArray(value);
+            }
+            $scope.schema.locked_fields = value;
         } else {
             $scope.schema[descriptor.name] = value;
         }
@@ -314,14 +317,21 @@ angular.module('sisui')
     // only called within canModifyDescriptor block
     $scope.canDelete = function() {
         var descriptor = $scope.descriptor;
+        var paths = SisUtil.getDescriptorPath(descriptor);
+        // remove the definition part of the path
+        paths.shift();
+        var path = paths.join(".");
+        if ($scope.originalLockedFields.indexOf(path) >= 0 ||
+            $scope.schema.locked_fields.indexOf(path) >= 0) {
+            return false;
+        }
         if (descriptor._parent_.type === 'Document') {
             return descriptor._parent_.children.length > 1;
         }
         return true;
     };
 
-    // only called within canModifyDescriptor block
-    $scope.deleteDescriptor = function() {
+    var doDeleteDescriptor = function() {
         var descriptor = $scope.descriptor;
         var parent = descriptor._parent_;
         if (parent.type === "Document") {
@@ -338,6 +348,19 @@ angular.module('sisui')
         updateParentSchemaField(descriptor);
         delete descriptor._parent_;
         updateDuplicateStatus(parent);
+    };
+
+    // only called within canModifyDescriptor block
+    $scope.deleteDescriptor = function() {
+        var descriptor = $scope.descriptor;
+        if (!descriptor.name || descriptor._isNew_) {
+            return doDeleteDescriptor();
+        }
+        var title = "Confirm delete";
+        var body = "Are you sure you want to delete field '" + descriptor.name + "'";
+        $scope.sisDlg.openConfirmDialog(title, body).result.then(function(ok) {
+            doDeleteDescriptor();
+        });
     };
 
     $scope.getErrorMsg = function(field) {
