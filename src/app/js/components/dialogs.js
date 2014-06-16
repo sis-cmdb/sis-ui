@@ -13,6 +13,7 @@ angular.module('sisui')
     var USER_GROUP_TEMPLATE = "app/partials/user-group-list-dlg.html";
 
     var CONFIRM_DELETE_TEMPLATE = "app/partials/confirm-delete-dlg.html";
+    var FILTER_REFERENCE_TEMPLATE = "app/partials/filter-reference-dlg.html";
 
     var openModal = function(scope, controller, template) {
         return $modal.open({
@@ -96,6 +97,13 @@ angular.module('sisui')
                 oldRemove.apply(scope, args);
             });
         };
+    };
+
+    this.showFilterHelp = function() {
+        return $modal.open({
+            templateUrl : FILTER_REFERENCE_TEMPLATE,
+            windowClass : "wide-modal-window"
+        });
     };
 
 });

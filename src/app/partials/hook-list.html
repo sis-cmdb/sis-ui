@@ -7,7 +7,10 @@
     <form class="form-inline" role="form">
       <div class="form-group">
         <label class="sr-only" for="filter">Filter</label>
-        <input ng-model="filterText" type="text" class="form-control input-sm" id="filter" placeholder="Filter">
+        <input ng-model="filterText" type="text" class="form-control input-sm" placeholder="Filter">
+        <button type="button" class="btn btn-primary btn-sm" ng-click="filter(filterText);">Filter</button>
+        <span class="glyphicon glyphicon-question-sign" ng-click="sisDlg.showFilterHelp();"></span>
+        <small ng-if="filterError">{{ filterError }}</small>
       </div>
       <div class="form-group pull-right">
         <button type="button" class="btn btn-primary btn-sm" ng-click="addNew();">Add New</button>
@@ -25,7 +28,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="hook in hooks | filter:filterText">
+            <tr ng-repeat="hook in hooks">
                 <td><a ng-click="view(hook);">{{ hook.name }}</a></td>
                 <td>
                     <a href="#/entities/{{hook.entity_type}}">{{hook.entity_type}}</a>

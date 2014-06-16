@@ -48,7 +48,7 @@ module.exports = function(grunt) {
           dest: "<%= build_dirs.build %>/pegjs/query.js",
           angular: {
             module: "sisui",
-            factory: "queryParser"
+            factory: "SisQueryParser"
           }
         }
     },

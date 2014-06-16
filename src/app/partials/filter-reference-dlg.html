@@ -1,0 +1,41 @@
+<div>
+    <div class="modal-header">
+        <h3>Filter reference</h3>
+    </div>
+    <div class="modal-body no-item-display">
+        <table class="table table-bordered table-condensed table-striped">
+            <thead>
+                <tr><th>Sample</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>field = value<br/>field = "value"</td>
+                    <td>Objects where field = 'value'. Other operators supported are <strong>&gt;, &gt;=, &lt;=, !=</strong>.</td>
+                </tr>
+                <tr>
+                    <td>field like "foo.*"</td>
+                    <td>Case insensitive regex match.  In this case look for documents where field starts with "foo".  Note that the .* is needed.</td>
+                </tr>
+                <tr>
+                    <td>field &gt; 10 and field &lt; 20</td>
+                    <td>field is between 10 and 20.  Combine basic expressions with <strong>and</strong> and <strong>or</strong></td>
+                </tr>
+                <tr>
+                    <td>(field &gt; 10 and field &lt; 20) or name = "bar"</td>
+                    <td>field is between 10 and 20 OR name is "bar".  Parentheses provide priority as expected.</td>
+                </tr>
+                <tr>
+                    <td>field in "foo,bar,baz"</td>
+                    <td>field is one of foo, bar, or baz.  Also <strong>nin</strong> can be used for "not in".</td>
+                </tr>
+            </tbody>
+        </table>
+        <strong>Note</strong> the query parser attempts to convert values to numbers before sending to the backend.<br/>
+        To clear the query, push filter with an empty string.
+
+
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="$close('ok');">Close</button>
+    </div>
+</div>
