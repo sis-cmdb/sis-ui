@@ -1,5 +1,5 @@
 [gerrit]
-host=10.175.245.108
+host=10.175.246.9
 port=29418
 project=SIS-ui
 defaultbranch=develop
