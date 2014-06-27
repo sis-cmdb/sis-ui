@@ -13,7 +13,7 @@
   <body data-target=".nav-toc">
     <header class="navbar navbar-default navbar-static-top">
       <div class="container">
-        <div class="navbar-header"><a href="./" class="navbar-brand">SIS</a></div>
+        <div class="navbar-header"><a ui-sref="app" class="navbar-brand">SIS</a></div>
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
             <li><a href="./docs">API</a></li>
@@ -22,10 +22,7 @@
       </div>
     </header>
     <div class="container">
-      <div class="row">
-        <div ng-view class="col-md-9"></div>
-        <ng-include src="'app/partials/sidebar.html'"></ng-include>
-      </div>
+      <ui-view></ui-view>
     </div>
     <div class="footer">
         <div class="container">

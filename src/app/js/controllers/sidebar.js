@@ -1,5 +1,5 @@
 angular.module('sisui')
-.controller("SidebarController", function($scope, $location, SisUser,
+.controller("SidebarController", function($scope, SisUser,
                                           $rootScope) {
 
     var getUserRoles = function() {
@@ -37,7 +37,7 @@ angular.module('sisui')
 
     $scope.logout = function() {
         SisUser.logout().then(function() {
-            $location.path("/login");
+            $scope.$state.go("login");
         });
     };
 

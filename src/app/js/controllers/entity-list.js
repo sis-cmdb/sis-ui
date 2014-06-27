@@ -1,10 +1,10 @@
 angular.module('sisui')
-.controller("EntityListController", function($scope, $location, $route,
+.controller("EntityListController", function($scope,
                                              SisSession, SisDialogs, SisUtil,
                                              SisApi) {
     "use strict";
-    if (!($route.current && $route.current.params && $route.current.params.schema)) {
-        $location.path("/#schemas");
+    if (!($scope.$stateParams.schema)) {
+        $scope.$state.go("app.schemas.list");
         return;
     }
 
@@ -17,12 +17,12 @@ angular.module('sisui')
         });
     };
 
-    var schemaName = $route.current.params.schema;
+    var schemaName = $scope.$stateParams.schema;
 
     $scope.addNew = function(entity) {
         SisSession.setCurrentEntity($scope.schema, null);
         SisSession.setObjectToCopy(schemaName, entity);
-        $location.path("/entities/" + schemaName + "/add");
+        $scope.$state.go("^.add");
     };
 
     $scope.canAdd = function() {
@@ -32,7 +32,7 @@ angular.module('sisui')
 
     $scope.editEntity = function(entity) {
         SisSession.setCurrentEntity($scope.schema, entity);
-        $location.path("/entities/" + schemaName + "/edit/" + entity._id);
+        $scope.$state.go("^.edit", { eid : entity._id });
     };
 
     $scope.viewEntity = function(entity) {
@@ -42,8 +42,7 @@ angular.module('sisui')
     };
 
     $scope.viewCommits = function(entity) {
-        var path = "/commits/entities/" + schemaName + "/" + entity._id;
-        $location.path(path);
+        $scope.$state.go("app.commits.entities", { schema : schemaName, id : entity._id });
     };
 
     $scope.canManage = function(entity) {
@@ -72,7 +71,7 @@ angular.module('sisui')
                                    $scope.idField);
 
     }, function(err) {
-        $location.path("/#schemas");
+        $scope.$state.go("app.schemas.list");
     });
 
 });

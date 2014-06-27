@@ -1,5 +1,5 @@
 angular.module('sisui')
-.controller("HookListController", function($scope, $location, SisSession,
+.controller("HookListController", function($scope, SisSession,
                                            SisDialogs, SisUtil, SisApi) {
     "use strict";
 
@@ -18,13 +18,13 @@ angular.module('sisui')
 
     $scope.edit = function(hook) {
         SisSession.setCurrentHook(hook);
-        $location.path("/hooks/edit/" + hook.name);
+        $scope.$state.go("^.edit", { hid : hook.name });
     };
 
     $scope.addNew = function(hook) {
         SisSession.setObjectToCopy(hookSchema.name, hook);
         SisSession.setCurrentHook(null);
-        $location.path("/hooks/add");
+        $scope.$state.go("^.add");
     };
 
     $scope.view = function(hook) {
@@ -34,8 +34,7 @@ angular.module('sisui')
     };
 
     $scope.viewCommits = function(hook) {
-        var path = "/commits/hooks/" + hook.name;
-        $location.path(path);
+        $scope.$state.go("app.commits.sisobj", { type : "hooks", id : hook.name });
     };
 
     $scope.canManage = function(hook) {

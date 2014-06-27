@@ -1,10 +1,10 @@
 // modify a hook (or add)
 angular.module('sisui')
-.controller("HookModController", function($scope, $route, $location,
-                                          SisSession, SisUtil, SisApi) {
+.controller("HookModController", function($scope, SisSession,
+                                          SisUtil, SisApi) {
     var init = function(orig) {
         if (!SisUtil.canManageEntity(orig, $scope.schema)) {
-            return $location.path("/hooks");
+            return $scope.$state.go("^.list");
         }
         $scope.descriptors = SisUtil.getDescriptorArray($scope.schema);
         // need to tweak this so owner and sis_locked show up..
@@ -37,8 +37,8 @@ angular.module('sisui')
         // for the valueChanged recursion
         $scope.fieldValue = $scope.entity;
 
-        $scope.hasChanged = function() {
-            return !angular.equals(orig, $scope.entity);
+        $scope.canSave = function() {
+            return !angular.equals(orig, $scope.entity) && $scope.entityMod.$valid;
         };
 
         // assumes all descriptors have a name
@@ -94,13 +94,9 @@ angular.module('sisui')
     };
 
     var parseRoute = function() {
-        if (!($route.current && $route.current.params)) {
-            return $location.path("/hooks");
-        }
-        var params = $route.current.params;
-        var action = params.action;
+        var params = $scope.$stateParams;
         var hookId = params.hid;
-        var backPath = "/hooks";
+        var action = hookId ? "edit" : "add";
         var schema = SisUtil.getHookSchema();
         if (action == 'add' && !hookId) {
             // adding..
@@ -119,10 +115,10 @@ angular.module('sisui')
                 $scope.title = "Modify hook " + hookId;
                 init(res);
             }, function(err) {
-                return $location.path(backPath);
+                return $scope.$state.go("^.list");
             });
         } else {
-            return $location.path(backPath);
+            return $scope.$state.go("^.list");
         }
     };
 
@@ -135,12 +131,12 @@ angular.module('sisui')
         }
         func($scope.entity).then(function(res) {
             SisSession.setCurrentHook(null);
-            $location.path("/hooks");
+            $scope.$state.go("^.list");
         });
     };
 
     $scope.cancel = function() {
-        SisUtil.goBack("/hooks");
+        SisUtil.goBack("^.list");
     };
 
     parseRoute();

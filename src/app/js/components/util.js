@@ -1,6 +1,6 @@
 // Utility methods
 angular.module('sisui')
-.factory('SisUtil', function($window, $location, SisUser,
+.factory('SisUtil', function($window, $state, SisUser,
                              $q, SisQueryParser) {
     "use strict";
 
@@ -508,11 +508,11 @@ angular.module('sisui')
         };
     };
 
-    var _goBack = function(pathIfNotPresent) {
+    var _goBack = function(state) {
         if ($window.history.length) {
             $window.history.back();
         } else {
-            $location.path(pathIfNotPresent);
+            $state.go(state);
         }
     };
 

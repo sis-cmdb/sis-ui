@@ -1,5 +1,5 @@
 angular.module('sisui')
-.controller("TokenListController", function($scope, $location, SisUser,
+.controller("TokenListController", function($scope, SisUser,
                                             SisDialogs, SisUtil, SisApi) {
     "use strict";
     $scope.temps = [];
@@ -8,7 +8,7 @@ angular.module('sisui')
 
     var user = SisUser.getCurrentUser();
     if (!user) {
-        $location.path("/users");
+        $scope.$state.go("app.users");
         return;
     }
 

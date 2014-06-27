@@ -5,6 +5,7 @@
     <button ng-disabled="!canSave()" class="btn btn-primary btn-sm" ng-click="save();">Save</button>
     <button class="btn btn-warning btn-sm" ng-click="cancel();">Cancel</button>
     <button type="button" class="btn btn-info btn-sm" ng-model="showJson" btn-checkbox btn-checkbox-true="1" btn-checkbox-false="0">Toggle JSON</button>
+    <button type="button" class="btn btn-info btn-sm" ng-click="lockAllFields();">Lock All</button>
 </div>
 <div class="row no-item-display">
     <div ng-class="{ 'col-md-12' : !showJson, 'col-md-6' : showJson }">
