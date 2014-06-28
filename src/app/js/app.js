@@ -2,7 +2,9 @@ angular.module('sisui', ['ui.router', 'ui.bootstrap', 'sisconfig'])
 .config(function($stateProvider, $urlRouterProvider) {
     "use strict";
 
-    $urlRouterProvider.otherwise("/schemas");
+    $urlRouterProvider
+        .when("/docs", "/docs/index")
+        .otherwise("/schemas");
 
     $stateProvider
         // root state
@@ -114,7 +116,17 @@ angular.module('sisui', ['ui.router', 'ui.bootstrap', 'sisconfig'])
             url : "/:type/:id",
             templateUrl : "app/partials/commit-list.html",
             controller : "CommitListController"
-        });
+        })
+
+        // docs
+        .state("docs", {
+            url : "/docs/:doc",
+            templateUrl : function(params) {
+                var doc = params.doc;
+                return "app/docs/" + doc;
+            }
+        })
+        ;
 })
 // From http://stackoverflow.com/a/17472118/263895
 .directive('ngEnter', function () {

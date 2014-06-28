@@ -20,19 +20,6 @@ module.exports = function(grunt) {
         }
     },
     sismd : {
-        options : {
-            preprocess : function(data) {
-                var replacements = [
-                    [/\.\/docs\/rbac\.md/g, './rbac'],
-                    [/\.\/docs\/sharing\.md/g, './sharing'],
-                    [/\.\/rbac\.md/g, './rbac']
-                ];
-                replacements.forEach(function(r) {
-                    data = data.replace(r[0], r[1]);
-                });
-                return data;
-            }
-        },
         docs : {
             files : {
                 "<%= build_dirs.build %>/docs/index" : ["<%= build_dirs.sisweb %>/README.md"],
@@ -166,8 +153,9 @@ module.exports = function(grunt) {
             // data
             context : {
                 scripts : ['./app/js/vendor-libs.js', './app/js/config.js', './app/js/sisui.min.js'],
-                css : ['./common/css/bootswatch/3.1.1/flatly/bootstrap.min.css',
-                       './common/css/jsondiffpatch/html.css',
+                theme : './common/css/bootswatch/3.1.1/{{ bootstrap_theme }}/bootstrap.min.css',
+                themes : ['flatly', 'darkly', 'slate'],
+                css : ['./common/css/jsondiffpatch/html.css',
                        './common/css/jsondiffpatch/annotated.css',
                        './app/css/style.css'],
                 version : ( Math.round(Date.now() / 1000) )
@@ -310,7 +298,7 @@ module.exports = function(grunt) {
 
   // dynamic config the docs for swig
   var docs = [
-    { path : 'index', title : "SIS", out : 'index.html' },
+    { path : 'index', title : "SIS" },
     { path : 'rbac', title : "SIS RBAC" },
     { path : 'sharing', title : "SIS Data Sharing" }
   ];
@@ -320,7 +308,7 @@ module.exports = function(grunt) {
     grunt.config.set('sisswig.docs_' + doc, {
         // src -> dest
         src: ["<%= build_dirs.src %>/docs/docs.swig"],
-        dest : "<%= build_dirs.dist %>/docs/" + (conf.out || doc),
+        dest : "<%= build_dirs.dist %>/app/docs/" + (conf.out || doc),
         // data
         context : {
             scripts : ['./js/vendor-libs.js', './js/sisdocs.min.js'],
