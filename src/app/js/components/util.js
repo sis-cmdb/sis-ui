@@ -434,6 +434,8 @@ angular.module('sisui')
             return [];
         } else if (desc.enum && desc.enum.length) {
             return desc.enum[0];
+        } else if (desc.type == "ObjectId") {
+            return null;
         } else {
             return "";
         }
