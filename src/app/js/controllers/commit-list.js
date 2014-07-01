@@ -1,10 +1,10 @@
 angular.module('sisui')
-.controller("CommitListController", function($scope, $routeParams, $location,
-                                             SisApi, SisUtil, $sce) {
+.controller("CommitListController", function($scope, SisApi,
+                                             SisUtil, $sce) {
     "use strict";
-    var type = $routeParams.type;
-    var idOrType = $routeParams.idOrType;
-    var eid = $routeParams.eid;
+    var type = $scope.$stateParams.type || "entities";
+    var id = $scope.$stateParams.id;
+    var schemaName = $scope.$stateParams.schema;
     var supportedTypes = [
         'schemas',
         'hooks',
@@ -12,8 +12,8 @@ angular.module('sisui')
         'entities'
     ];
     if (supportedTypes.indexOf(type) == -1 ||
-        (type == 'entities' && !eid)) {
-            $location.path("/#schemas");
+        (type == 'entities' && !id)) {
+            $scope.$state.go("app.schemas.list");
             return;
     }
 
@@ -43,14 +43,14 @@ angular.module('sisui')
     };
 
     if (type != 'entities') {
-        var endpoint = SisApi[type].commits(idOrType);
-        setup(endpoint, type, idOrType);
+        var endpoint = SisApi[type].commits(id);
+        setup(endpoint, type, id);
     } else {
-        SisApi.getSchema(idOrType, false).then(function(schema) {
-            var endpoint = SisApi.entities(idOrType).commits(eid);
-            setup(endpoint, idOrType, eid);
+        SisApi.getSchema(schemaName, false).then(function(schema) {
+            var endpoint = SisApi.entities(schemaName).commits(id);
+            setup(endpoint, schemaName, id);
         }, function(err) {
-            $location.path("/#schemas");
+            $scope.$state.go("app.schemas.list");
             return;
         });
     }

@@ -1,5 +1,5 @@
 angular.module('sisui')
-.controller("UserListController", function($scope, $location, SisUser,
+.controller("UserListController", function($scope, SisUser,
                                         SisDialogs, SisUtil, SisApi) {
     "use strict";
 
@@ -40,8 +40,7 @@ angular.module('sisui')
     };
 
     $scope.viewCommits = function(user) {
-        var path = "/commits/users/" + user.name;
-        $location.path(path);
+        $state.go("app.commits.sisobj", { type : "users", id : user.name });
     };
 
     var opts = { sortField : 'name', itemsField : 'users' };

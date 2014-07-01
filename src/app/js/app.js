@@ -1,58 +1,132 @@
-angular.module('sisui', ['ngRoute', 'ui.bootstrap', 'sisconfig'])
-.config(function($routeProvider) {
+angular.module('sisui', ['ui.router', 'ui.bootstrap', 'sisconfig'])
+.config(function($stateProvider, $urlRouterProvider) {
     "use strict";
 
-    $routeProvider
+    $urlRouterProvider
+        .when("/docs", "/docs/index")
+        .otherwise("/schemas");
+
+    $stateProvider
+        // root state
+        .state("app", {
+            url : "",
+            templateUrl : "app/partials/app-root-state.html",
+            abstract : true
+        })
         // user stuff
-        .when("/login", {
+        .state("app.login", {
+            url : "/login",
             templateUrl : "app/partials/user-login.html",
             controller : 'UserLoginController'
         })
-        .when("/users", {
+        .state("app.users", {
+            url : "/users",
             templateUrl : "app/partials/user-list.html",
             controller : "UserListController"
         })
+
         // schemas
-        .when("/schemas", {
+        .state("app.schemas", {
+            url : "/schemas",
+            template : "<ui-view></ui-view>",
+            abstract : true
+        })
+        .state("app.schemas.list", {
+            url : "",
             templateUrl : "app/partials/schema-list.html",
             controller : "SchemaListController"
         })
-        .when("/schemas/:action/:schema?", {
+        // TODO - turn this into optional params
+        .state("app.schemas.add", {
+            url : "/add",
             templateUrl : "app/partials/schema-mod.html",
             controller : "SchemaModController"
         })
+        .state("app.schemas.edit", {
+            url : "/edit/:schema",
+            templateUrl : "app/partials/schema-mod.html",
+            controller : "SchemaModController"
+        })
+
         // entities
-        .when("/entities/:schema", {
+        .state("app.entities", {
+            url : "/entities/:schema",
+            template : "<ui-view></ui-view>",
+            abstract : true
+        })
+        .state("app.entities.list", {
+            url : "",
             templateUrl : "app/partials/entity-list.html",
             controller : "EntityListController"
         })
-        .when("/entities/:schema/:action/:eid?", {
+        // TODO - turn this into optional params
+        .state("app.entities.add", {
+            url : "/add",
             templateUrl : "app/partials/entity-mod.html",
             controller : "EntityModController"
         })
+        .state("app.entities.edit", {
+            url : "/edit/:eid",
+            templateUrl : "app/partials/entity-mod.html",
+            controller : "EntityModController"
+        })
+
         // hooks
-        .when("/hooks", {
+        .state("app.hooks", {
+            url : "/hooks",
+            template : "<ui-view></ui-view>",
+            abstract : true
+        })
+        .state("app.hooks.list", {
+            url : "",
             templateUrl : "app/partials/hook-list.html",
             controller : "HookListController"
         })
-        .when("/hooks/:action/:hid?", {
+        // TODO - turn this into optional params
+        .state("app.hooks.add", {
+            url : "/add",
             templateUrl : "app/partials/entity-mod.html",
             controller : "HookModController"
         })
+        .state("app.hooks.edit", {
+            url : "/edit/:hid",
+            templateUrl : "app/partials/entity-mod.html",
+            controller : "HookModController"
+        })
+
         // tokens
-        .when("/tokens", {
+        .state("app.tokens", {
+            url : "/tokens",
             templateUrl : "app/partials/token-list.html",
             controller : "TokenListController"
         })
         // commits
-        .when("/commits/:type/:idOrType/:eid?", {
+        .state("app.commits", {
+            url : "/commits",
+            template : "<ui-view></ui-view>",
+            abstract : true
+        })
+        // TODO - turn this into optional params
+        .state("app.commits.entities", {
+            url : "/entities/:schema/:id",
             templateUrl : "app/partials/commit-list.html",
             controller : "CommitListController"
         })
-        // fall back
-        .otherwise({
-            redirectTo: '/schemas'
-        });
+        .state("app.commits.sisobj", {
+            url : "/:type/:id",
+            templateUrl : "app/partials/commit-list.html",
+            controller : "CommitListController"
+        })
+
+        // docs
+        .state("docs", {
+            url : "/docs/:doc",
+            templateUrl : function(params) {
+                var doc = params.doc;
+                return "app/docs/" + doc;
+            }
+        })
+        ;
 })
 // From http://stackoverflow.com/a/17472118/263895
 .directive('ngEnter', function () {
@@ -67,4 +141,8 @@ angular.module('sisui', ['ngRoute', 'ui.bootstrap', 'sisconfig'])
             }
         });
     };
+})
+.run(function ($rootScope,   $state,   $stateParams) {
+    $rootScope.$state = $state;
+    $rootScope.$stateParams = $stateParams;
 });

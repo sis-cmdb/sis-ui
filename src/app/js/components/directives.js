@@ -218,4 +218,122 @@ angular.module('sisui')
             change : '='
         }
     };
+})
+.directive("sisDocumentation", function($compile, $http, $templateCache,
+                                        $location, $window) {
+    // Shoutout to https://gist.github.com/alxhill/6886760
+    // for the scroll spy sim
+    var setup = function(scope, element) {
+        var leftCol = element.find("#_doc_left");
+        var rightCol = element.find("#_doc_right");
+        var toc = leftCol.find("#table-of-contents");
+        if (toc) {
+            // apply it
+            var ul = toc.next('ul');
+            ul = $(ul);
+            var spies = [];
+            ul.find("a").each(function() {
+                var a = $(this);
+                var href = a.attr("href");
+                a.removeAttr('href');
+                href = href.substring(1);
+                spies.push({
+                    id : href,
+                    elem : leftCol.find('#' + href),
+                    menuElem : a.parent()
+                });
+                a.click(function() {
+                    scope.$apply(function() {
+                        $location.hash(href);
+                    });
+                });
+            });
+            var content = toc.next("h1");
+            ul.addClass('nav affix');
+            ul.attr("role", "complementary");
+            ul.children('li').children('ul').addClass('expand');
+
+            rightCol.append(ul);
+            toc.remove();
+
+            rightCol.find('table').addClass('table');
+
+            var jqRight = $("#_doc_right");
+
+            var updateToc = function() {
+                jqRight.find('li > ul').not('.expand').addClass('collapse');
+                jqRight.find('li.active > ul').removeClass('collapse');
+            };
+
+            var setActive = function(elem, func) {
+                while (elem.prop("tagName") == "LI") {
+                    elem[func]('active');
+                    elem = elem.parent();
+                    if (elem.prop("tagName") == "UL") {
+                        elem = elem.parent();
+                    }
+                }
+            };
+
+            var jqWindow = $($window);
+            var highlightSpy = null;
+            var scrollHandler = function(e) {
+                var currentSpy = null;
+                spies.forEach(function(spy) {
+                    var offset = spy.elem.offset();
+                    if (!offset) { return; }
+                    var pos = offset.top;
+                    if (pos - $window.scrollY <= 0) {
+                        spy.pos = pos;
+                        if (!currentSpy) {
+                            currentSpy = spy;
+                        }
+                        if (currentSpy.pos < spy.pos) {
+                            currentSpy = spy;
+                        }
+                    }
+                });
+
+                if (currentSpy != highlightSpy) {
+                    scope.$apply(function() {
+                        if (highlightSpy) {
+                            setActive(highlightSpy.menuElem, 'removeClass');
+                        }
+                        if (currentSpy) {
+                            setActive(currentSpy.menuElem, 'addClass');
+                        }
+                        highlightSpy = currentSpy;
+                        updateToc();
+                    });
+                }
+            };
+
+            var endsWith = function(str, suffix) {
+               return str.indexOf(suffix, str.length - suffix.length) !== -1;
+            };
+
+            leftCol.find("a").each(function() {
+                var a = $(this);
+                var ref = a.attr("href");
+                if (ref[0] == '.' && endsWith(ref, '.md')) {
+                    var page = ref.split('/').pop().split('.')[0];
+                    a.removeAttr('href');
+                    a.click(function() {
+                        scope.$state.go("docs", { doc : page });
+                    });
+                }
+            });
+
+            jqWindow.scroll(scrollHandler);
+            updateToc();
+            scope.$on("$destroy", function() {
+                jqWindow.off('scroll', scrollHandler);
+            });
+        }
+    };
+
+    return {
+        link : setup,
+        restrict : "E",
+    };
 });

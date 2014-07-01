@@ -98,8 +98,10 @@ angular.module('sisui')
                         $scope.valueChanged($scope.fieldValue);
                         SisApi.entities(schema.name).get($scope.fieldValue).then(function(entity) {
                             $scope.fieldValue = entity[idField];
+                            $scope.valueChanged($scope.fieldValue);
                         }, function(err) {
                             $scope.fieldValue = null;
+                            $scope.valueChanged($scope.fieldValue);
                         });
                     }
                 });
@@ -189,27 +191,17 @@ angular.module('sisui')
         return "";
     };
 
-    // initialize a controller where value is a
-    // container object (document or array),
-    // descriptor is a field of the container that is managed
-    // and arrIdx is the index of the array container if value
-    // is an array
-    $scope.init = function(c, d, aIdx) {
-        $scope.container = c;
-        $scope.fieldDescriptor = d;
-        $scope.arrIdx = aIdx;
-        $scope.isCollapsed = false;
-        initializeFieldValue();
-        setupScope();
-    };
-
     // Dirty hack.  Better way would be to make binding fieldValue
     // and propagating that up without ngChange
     // TODO: debug why binding w/ ng-model only didn't work.
     $scope.valueChanged = function(value) {
         if ($scope.fieldDescriptor.type == "ObjectId" &&
             $scope.fieldDescriptor.ref) {
-            value = value ? value._id : null;
+            if (!value) {
+                value = null;
+            } else if (typeof value === 'object') {
+                value = value._id;
+            }
         } else if ($scope.fieldDescriptor.type == "Mixed" &&
             typeof value === "object") {
             value = angular.toJson(value);
@@ -234,5 +226,19 @@ angular.module('sisui')
     };
 
     $scope.fieldValue = "<NOT_SET>";
+
+    // initialize a controller where value is a
+    // container object (document or array),
+    // descriptor is a field of the container that is managed
+    // and arrIdx is the index of the array container if value
+    // is an array
+    $scope.init = function(c, d, aIdx) {
+        $scope.container = c;
+        $scope.fieldDescriptor = d;
+        $scope.arrIdx = aIdx;
+        $scope.isCollapsed = false;
+        initializeFieldValue();
+        setupScope();
+    };
 
 });

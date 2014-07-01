@@ -1,7 +1,7 @@
 // controller for editing/creating schemas
 angular.module('sisui')
-.controller("SchemaModController", function($scope, $route, $location, $window,
-                                            SisSession, SisUtil, SisApi) {
+.controller("SchemaModController", function($scope, SisSession,
+                                            SisUtil, SisApi) {
     "use strict";
 
     var init = function(schema) {
@@ -98,6 +98,31 @@ angular.module('sisui')
             $scope.canSave = function() {
                 return $scope.schemaMod.$valid && hasChanged();
             };
+
+            $scope.lockAllFields = function() {
+                var paths = [];
+                var getPaths = function(descriptor) {
+                    var result = [];
+                    var path = SisUtil.getDescriptorPath(descriptor);
+                    // remove the definition part
+                    path.shift();
+                    result.push(path.join("."));
+                    if (descriptor.children && descriptor.type == "Document") {
+                        descriptor.children.forEach(function(d) {
+                            result = result.concat(getPaths(d));
+                        });
+                    }
+                    return result;
+                };
+                var children = schemaDefinitionDescriptor.children;
+                children.forEach(function(d) {
+                    paths = paths.concat(getPaths(d));
+                });
+                // set it
+                $scope.schema.locked_fields = paths;
+                // broadcast
+                $scope.$broadcast("locked_fields_updated");
+            };
         });
     };
 
@@ -114,15 +139,12 @@ angular.module('sisui')
     };
 
     var parseRoute = function() {
-        if (!($route.current && $route.current.params)) {
-            return $location.path("/schemas");
-        }
-        var params = $route.current.params;
-        var action = params.action;
+        var params = $scope.$stateParams;
         var schemaName = params.schema;
+        var action = schemaName ? 'edit' : 'add';
         if (action == 'add' && !schemaName) {
             if (!(SisUtil.getAdminRoles())) {
-                return $location.path("/schemas");
+                return $scope.$state.go("app.schemas.list");
             }
             // adding a schema
             $scope.action = action;
@@ -131,17 +153,17 @@ angular.module('sisui')
         } else if (action == 'edit' && schemaName) {
             SisApi.getSchema(schemaName, true).then(function(schema) {
                 if (!SisUtil.canManageSchema(schema)) {
-                    return $location.path("/schemas");
+                    return $scope.$state.go("app.schemas.list");
                 }
                 $scope.action = action;
                 $scope.title = "Modify schema " + schemaName;
                 // clone it
                 init(angular.copy(schema));
             }, function(err) {
-                return $location.path("/schemas");
+                return $scope.$state.go("app.schemas.list");
             });
         } else {
-            return $location.path("/schemas");
+            return $scope.$state.go("app.schemas.list");
         }
     };
 
@@ -156,7 +178,7 @@ angular.module('sisui')
         }
         func($scope.schema).then(function(res) {
             SisSession.setSchemas(null);
-            return $location.path("/schemas");
+            return $scope.$state.go("app.schemas.list");
         });
     };
 

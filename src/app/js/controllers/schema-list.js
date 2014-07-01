@@ -1,6 +1,6 @@
 angular.module('sisui')
-.controller("SchemaListController", function($scope, $location, SisSession,
-                                          SisDialogs, SisUtil, SisApi) {
+.controller("SchemaListController", function($scope, SisSession,
+                                             SisDialogs, SisUtil, SisApi) {
     "use strict";
 
     var query = {
@@ -19,11 +19,11 @@ angular.module('sisui')
 
     $scope.edit = function(schema) {
         SisSession.setCurrentSchema(schema);
-        $location.path("/schemas/edit/" + schema.name);
+        $scope.$state.go("^.edit", { schema : schema.name });
     };
 
     $scope.addNew = function() {
-        $location.path("/schemas/add");
+        $scope.$state.go("^.add");
     };
 
     $scope.canAdd = function() {
@@ -39,13 +39,12 @@ angular.module('sisui')
     };
 
     $scope.viewCommits = function(schema) {
-        var path = "/commits/schemas/" + schema.name;
-        $location.path(path);
+        $scope.$state.go("app.commits.sisobj", { type : "schemas", id : schema.name });
     };
 
     $scope.gotoSchema = function(schema) {
         SisSession.setCurrentSchema(schema);
-        $location.path("/entities/" + schema.name);
+        $scope.$state.go("app.entities.list", { schema : schema.name });
     };
 
     var loadSchemas = function() {

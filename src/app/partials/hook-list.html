@@ -31,7 +31,7 @@
             <tr ng-repeat="hook in hooks">
                 <td><a ng-click="view(hook);">{{ hook.name }}</a></td>
                 <td>
-                    <a href="#/entities/{{hook.entity_type}}">{{hook.entity_type}}</a>
+                    <a ui-sref="app.entities.list({ schema : hook.entity_type})">{{hook.entity_type}}</a>
                 </td>
                 <td><span style="margin-right: 1px;" ng-repeat="owner in hook.owner" ng-click="sisDlg.showUsersInGroup(owner)" class="label label-default clickable">{{owner}}</span></td>
                 <td>

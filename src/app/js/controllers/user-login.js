@@ -4,7 +4,7 @@ angular.module('sisui')
     "use strict";
 
     if (SisUser.isLoggedIn()) {
-        $location.path("/schemas");
+        $scope.$state.go("app.schemas.list");
         return;
     }
     $scope.login = function() {
@@ -14,7 +14,7 @@ angular.module('sisui')
             if ($window.history.length) {
                 $window.history.back();
             } else {
-                $location.path("/schemas");
+                $scope.$state.go("app.schemas.list");
             }
         });
     };

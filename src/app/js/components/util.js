@@ -1,6 +1,6 @@
 // Utility methods
 angular.module('sisui')
-.factory('SisUtil', function($window, $location, SisUser,
+.factory('SisUtil', function($window, $state, SisUser,
                              $q, SisQueryParser) {
     "use strict";
 
@@ -434,6 +434,8 @@ angular.module('sisui')
             return [];
         } else if (desc.enum && desc.enum.length) {
             return desc.enum[0];
+        } else if (desc.type == "ObjectId") {
+            return null;
         } else {
             return "";
         }
@@ -508,11 +510,11 @@ angular.module('sisui')
         };
     };
 
-    var _goBack = function(pathIfNotPresent) {
+    var _goBack = function(state) {
         if ($window.history.length) {
             $window.history.back();
         } else {
-            $location.path(pathIfNotPresent);
+            $state.go(state);
         }
     };
 

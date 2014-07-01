@@ -1,10 +1,10 @@
 // modify an entity (or add)
 angular.module('sisui')
-.controller("EntityModController", function($scope, $route, $location,
-                                            SisSession, SisUtil, SisApi) {
+.controller("EntityModController", function($scope, SisSession,
+                                            SisUtil, SisApi) {
     var init = function(orig) {
         if (!SisUtil.canManageEntity(orig, $scope.schema)) {
-            return $location.path("/entities/" + $scope.schema.name);
+            return $scope.$state.go("^.list");
         }
         $scope.showJson = false;
         $scope.descriptors = SisUtil.getDescriptorArray($scope.schema);
@@ -99,17 +99,9 @@ angular.module('sisui')
     };
 
     var parseRoute = function() {
-        if (!($route.current && $route.current.params)) {
-            return $location.path("/schemas");
-        }
-        var params = $route.current.params;
-        var schemaName = params.schema;
-        if (!schemaName) {
-            return $location.path("/schemas");
-        }
-        var action = params.action;
-        var eid = params.eid;
-        var backPath = "/entities/" + schemaName;
+        var eid = $scope.$stateParams.eid;
+        var action = eid ? "edit" : "add";
+        var schemaName = $scope.$stateParams.schema;
         if (action == 'add' && !eid) {
             // adding.. just need the schema
             SisApi.getSchema(schemaName, true).then(function(schema) {
@@ -122,7 +114,7 @@ angular.module('sisui')
                 $scope.entity = obj;
                 $scope.fieldValue = $scope.entity;
             }, function(err) {
-                return $location.path(backPath);
+                return $scope.$state.go("^.list");
             });
         } else if (action == 'edit' && eid) {
             SisApi.getEntityWithSchema(eid, schemaName, true).then(function(res) {
@@ -132,10 +124,10 @@ angular.module('sisui')
                 $scope.title = "Modify entity of type " + schemaName + " - " + res[1][idField];
                 init(angular.copy(res[1]));
             }, function(err) {
-                return $location.path(backPath);
+                return $scope.$state.go("^.list");
             });
         } else {
-            return $location.path(backPath);
+            return $scope.$state.go("^.list");
         }
     };
 
@@ -148,12 +140,12 @@ angular.module('sisui')
         }
         func($scope.entity).then(function(res) {
             SisSession.setCurrentEntity($scope.schema, null);
-            $location.path("/entities/" + $scope.schema.name);
+            $scope.$state.go("^.list");
         });
     };
 
     $scope.cancel = function() {
-        SisUtil.goBack("/entities/" + $scope.schema.name);
+        SisUtil.goBack("^.list");
     };
 
     parseRoute();

@@ -426,4 +426,12 @@ angular.module('sisui')
         }
     }
 
+    if ($scope.descriptor.name == "locked_fields" &&
+        !$scope.descriptor.parent) {
+        // handle the lock all msg
+        $scope.$on("locked_fields_updated", function() {
+            $scope.value = $scope.schema.locked_fields.join(", ");
+        });
+    }
+
 });

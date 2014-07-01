@@ -148,7 +148,7 @@ angular.module('sisui')
             var d = $q.defer();
             var currentHook = SisSession.getCurrentHook();
             if (currentHook && currentHook.name == name) {
-                d.resolve(currentSchema);
+                d.resolve(currentHook);
                 return d.promise;
             }
             // need to query
