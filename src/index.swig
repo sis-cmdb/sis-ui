@@ -3,13 +3,13 @@
   <head>
     <title>SIS</title>
     {% for script in scripts -%}
-    <script src="{{ script }}"></script>
+    <script src="{{ script }}?v={{version}}"></script>
     {% endfor %}
-    <link rel="stylesheet" ng-href="{{ theme }}">
+    <link rel="stylesheet" ng-href="{{ theme }}?v={{version}}">
     {%- for css_file in css -%}
-    <link rel="stylesheet" href="{{ css_file }}">
+    <link rel="stylesheet" href="{{ css_file }}?v={{version}}">
     {% endfor -%}
-    <link rel="icon" href="./common/images/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="./common/images/favicon.ico?v={{version}}" type="image/x-icon" />
   </head>
   <body>
     <header class="navbar navbar-default navbar-static-top">

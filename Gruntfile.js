@@ -311,11 +311,7 @@ module.exports = function(grunt) {
         dest : "<%= build_dirs.dist %>/app/docs/" + (conf.out || doc),
         // data
         context : {
-            scripts : ['./js/vendor-libs.js', './js/sisdocs.min.js'],
-            css : ['../common/css/bootswatch/3.1.1/flatly/bootstrap.min.css',
-                   './css/docs.css'],
-            contentFile : path.resolve("<%= build_dirs.build %>/docs/" + doc),
-            title : conf.title
+            contentFile : path.resolve("<%= build_dirs.build %>/docs/" + doc)
         }
     });
   });
