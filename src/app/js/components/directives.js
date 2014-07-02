@@ -321,6 +321,14 @@ angular.module('sisui')
                     a.click(function() {
                         scope.$state.go("docs", { doc : page });
                     });
+                } else if (ref[0] == "#") {
+                    a.removeAttr("href");
+                    ref = ref.substring(1);
+                    a.click(function() {
+                        scope.$apply(function() {
+                            $location.hash(ref);
+                        });
+                    });
                 }
             });
 
