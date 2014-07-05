@@ -20,9 +20,9 @@ angular.module('sisui')
             attrs.push('ng-change="valueChanged(fieldValue)"');
         } else {
             // input
-            attrs.push('type="' + SisUtil.getInputType(descriptor.type) + '"');
+            var inputType = SisUtil.getInputType(descriptor.type);
+            attrs.push('type="' + inputType + '"');
             attrs.push('class="form-control input-sm"');
-            attrs.push('placeholder="' + (descriptor.comment || descriptor.type) + '"');
             if ('min' in descriptor) {
                 attrs.push('min="' + descriptor.min + '"');
             }
@@ -32,8 +32,13 @@ angular.module('sisui')
             // refs are special
             if (descriptor.type == 'ObjectId' && descriptor.ref) {
                 attrs.push('disabled="disabled"');
+                attrs.push('placeholder="ObjectId (' + descriptor.ref + ')"');
             } else {
+                attrs.push('placeholder="' + (descriptor.comment || descriptor.type) + '"');
                 attrs.push('ng-change="valueChanged(fieldValue)"');
+                // if (inputType != 'checkbox') {
+                //     attrs.push('ng-style="getInputWidth()"');
+                // }
             }
         }
         var template = "<" + elem + " " + attrs.join(" ") + " >";
@@ -51,6 +56,24 @@ angular.module('sisui')
         if (!ctrl || !ctrl[path]) {
             return;
         }
+        var elementOffset = element.offset().left;
+        scope.getInputWidth = function() {
+            var li = element.closest('li');
+            var result = { };
+            // if (li) {
+            //     console.log("----");
+            //     var elementX = elementOffset - li.offset().left;
+            //     console.log(elementX);
+            //     console.log(li.width());
+            //     console.log(li.width() - elementX);
+            //     var width = li.width() - elementX;
+            //     // var width = li.width() - offset;
+            //     if (width > 10) {
+            //         result.width = (width - 10) + "px";
+            //     }
+            // }
+            return result;
+        };
         ctrl = ctrl[path];
         if (descriptor.match) {
             var regex = SisUtil.toRegex(descriptor.match);
