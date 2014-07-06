@@ -27,6 +27,7 @@
                 </ul>
             </li>
           </ul>
+          <sis-userstatus></sis-userstatus>
         </div>
       </div>
     </header>

@@ -365,4 +365,12 @@ angular.module('sisui')
         link : setup,
         restrict : "E",
     };
+})
+.directive("sisUserstatus", function() {
+    return {
+        restrict : "E",
+        replace : true,
+        templateUrl : "app/partials/user-dropdown.html",
+        controller : "UserDropdownController"
+    };
 });

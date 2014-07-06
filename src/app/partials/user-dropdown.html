@@ -1,0 +1,29 @@
+<ul class="nav navbar-nav navbar-right">
+    <li ng-if="!loggedIn">
+        <a ui-sref="app.login">Login</a>
+    </li>
+    <li ng-if="loggedIn" class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" ng-if="loggedIn">{{ currentUser.username }} <span class="caret"></span></a>
+        <ul ng-if="loggedIn" class="dropdown-menu" role="menu">
+            <li class="disabled" ng-if="currentUser.super_user"><a>Super User</a></li>
+            <li ng-if="roles.admin.length" class="disabled">
+                <a>Admin of:</a>
+                <ul>
+                    <li ng-repeat="group in roles.admin" class="disabled"><a ng-click="sisDlg.showUsersInGroup(group);">{{group}}</a></li>
+                </ul>
+            </li>
+            <li ng-if="roles.user.length" class="disabled">
+                <a>User of:</a>
+                <ul>
+                    <li ng-repeat="group in roles.user" class="disabled"><a ng-click="sisDlg.showUsersInGroup(group);">{{group}}</a></li>
+                </ul>
+            </li>
+            <li class="divider"></li>
+            <li>
+                <a ui-sref="app.tokens">Manage Tokens</a>
+            </li>
+            <li class="divider"></li>
+            <li><a ng-click="logout()">Logout</a></li>
+        </ul>
+    </li>
+</ul>

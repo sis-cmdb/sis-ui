@@ -1,22 +1,5 @@
-<div class="col-md-3 nav-toc" ng-controller="SidebarController">
+<div class="col-md-2 nav-toc" ng-controller="SidebarController">
     <ul class="nav affix" role="complementary">
-        <li ng-if="!loggedIn" ui-sref-active="active"><a ui-sref="app.login">Login</a></li>
-        <li ng-if="loggedIn">
-            <a style="pointer-events: none">{{ currentUser.username }}</a>
-            <ul>
-                <li ng-if="currentUser.super_user"><span class="label label-success">Super User</span></li>
-                <li ng-if="roles.admin.length">
-                    <span class="label label-primary" title="admin" ng-repeat="group in roles.admin">{{group}}</span>
-                </li>
-                <li ng-if="roles.user.length">
-                    <span class="label label-default" title="user" ng-repeat="group in roles.user">{{group}}</span>
-                </li>
-                <li><a ng-click="logout()"><label class="label label-default add-pointer">Logout</label></a></li>
-            </ul>
-        </li>
-        <li ng-if="loggedIn" ui-sref-active="active">
-            <a ui-sref="app.tokens">Manage Tokens</a>
-        </li>
         <li ui-sref-active="active" ng-class="{ 'active' : $state.includes('app.entities.*') }">
             <a ui-sref="app.schemas.list">Schemas</a>
         </li>
