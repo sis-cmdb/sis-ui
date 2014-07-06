@@ -101,7 +101,7 @@ angular.module('sisui', ['ui.router', 'ui.bootstrap', 'sisconfig'])
         .state("app.hooks.view", {
             url : "/view/:id",
             templateUrl : "app/partials/entity-view.html",
-            controller : "HookViewController"
+            controller : "EntityViewController"
         })
 
         // tokens

@@ -1,10 +1,10 @@
 angular.module('sisui')
-.directive('sisEntityInput', function($compile, SisUtil) {
+.directive('sisEntityInput', function($compile, SisUtil, $state) {
     "use strict";
     // returns a select or input element
     // based on descriptor
     // will setup valueChanged and the model
-    var getTemplate = function(descriptor, path) {
+    var getTemplate = function(descriptor, path, action) {
         var attrs = [
             'ng-model="fieldValue"',
             'name="' + path.replace(/\./g, '_') + '"'
@@ -13,6 +13,7 @@ angular.module('sisui')
             attrs.push("required");
         }
         var elem = "input";
+        var isObjectRef = (descriptor.type == 'ObjectId' && descriptor.ref);
         if (descriptor.enum) {
             // select
             elem = "select";
@@ -30,20 +31,20 @@ angular.module('sisui')
                 attrs.push('max="' + descriptor.max + '"');
             }
             // refs are special
-            if (descriptor.type == 'ObjectId' && descriptor.ref) {
+            if (isObjectRef) {
                 attrs.push('disabled="disabled"');
                 attrs.push('placeholder="ObjectId (' + descriptor.ref + ')"');
             } else {
                 attrs.push('placeholder="' + (descriptor.comment || descriptor.type) + '"');
                 attrs.push('ng-change="valueChanged(fieldValue)"');
-                // if (inputType != 'checkbox') {
-                //     attrs.push('ng-style="getInputWidth()"');
-                // }
             }
         }
         var template = "<" + elem + " " + attrs.join(" ") + " >";
         if (elem == "select") {
             template += "</select>";
+        }
+        if (isObjectRef && action === 'view') {
+            template += '<a ng-if="fieldValue" ng-click="goToObject()">View</a>';
         }
         return template;
 
@@ -51,28 +52,24 @@ angular.module('sisui')
     var linker = function(scope, element, attrs, ctrl) {
         var descriptor = scope.fieldDescriptor();
         var path = scope.path;
-        element.html(getTemplate(descriptor, path)).show();
+        element.html(getTemplate(descriptor, path, scope.action)).show();
         $compile(element.contents())(scope);
         if (!ctrl || !ctrl[path]) {
             return;
         }
+        scope.$state = $state;
         var elementOffset = element.offset().left;
-        scope.getInputWidth = function() {
-            var li = element.closest('li');
-            var result = { };
-            // if (li) {
-            //     console.log("----");
-            //     var elementX = elementOffset - li.offset().left;
-            //     console.log(elementX);
-            //     console.log(li.width());
-            //     console.log(li.width() - elementX);
-            //     var width = li.width() - elementX;
-            //     // var width = li.width() - offset;
-            //     if (width > 10) {
-            //         result.width = (width - 10) + "px";
-            //     }
-            // }
-            return result;
+        // only called on view
+        scope.goToObject = function() {
+            var schema = descriptor.ref;
+            var value = scope.fieldValue;
+            var params = { schema : schema };
+            if (typeof value === 'object') {
+                params.eid = value._id;
+            } else {
+                params.eid = value;
+            }
+            $state.go("app.entities.view", params);
         };
         ctrl = ctrl[path];
         if (descriptor.match) {
@@ -120,7 +117,8 @@ angular.module('sisui')
             path : '@',
             fieldDescriptor : '&',
             fieldValue : "=ngModel",
-            valueChanged : '='
+            valueChanged : '=',
+            action : "="
         }
     };
 })

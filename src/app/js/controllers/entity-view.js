@@ -1,5 +1,5 @@
 angular.module('sisui')
-.controller("EntityViewController", function($scope, $state,
+.controller("EntityViewController", function($scope, $state, $stateParams,
                                              SisUtil, SisApi) {
     var init = function() {
         $scope.descriptors = SisUtil.getDescriptorArray($scope.schema);
@@ -58,6 +58,14 @@ angular.module('sisui')
         };
     };
 
+    $scope.canManage = function() {
+        return SisUtil.canManageEntity($scope.obj, { owner : [] });
+    };
+
+    $scope.editObject = function() {
+        $state.go("^.edit", $stateParams);
+    };
+
     $scope.action = 'view';
     if ($scope.obj && $scope.schema) {
         init();
@@ -81,9 +89,9 @@ angular.module('sisui')
         var params = $scope.$stateParams;
         if (state.is("app.hooks.view")) {
             $scope.schema = SisUtil.getHookSchema();
-            SisApi.getHook(params.hid, true)
+            SisApi.getHook(params.id, true)
             .then(function(hook) {
-                $scope.title = "View hook " + params.id;
+                $scope.title = "View hook " + hook.name;
                 $scope.obj = hook || { };
                 init();
             });

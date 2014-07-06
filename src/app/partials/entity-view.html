@@ -2,6 +2,7 @@
     <h3><strong>{{ title }}</strong></h3>
 </div>
 <div class="row sisui-bottom-buffer">
+    <button ng-if="canManage()" class="btn btn-primary btn-sm" ng-click="editObject();">Edit</button>
     <button type="button" class="btn btn-info btn-sm" ng-model="showJson" btn-checkbox btn-checkbox-true="1" btn-checkbox-false="0">Toggle JSON</button>
 </div>
 <div class="row no-item-display">

@@ -140,7 +140,7 @@ angular.module('sisui')
         }
         func($scope.entity).then(function(res) {
             SisSession.setCurrentEntity($scope.schema, null);
-            $scope.$state.go("^.list");
+            SisUtil.goBack("^.list");
         });
     };
 
