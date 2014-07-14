@@ -98,10 +98,10 @@ angular.module('sisui')
                         $scope.valueChanged($scope.fieldValue);
                         SisApi.entities(schema.name).get($scope.fieldValue).then(function(entity) {
                             $scope.fieldValue = entity[idField];
-                            $scope.valueChanged($scope.fieldValue);
+                            $scope.valueChanged(entity);
                         }, function(err) {
                             $scope.fieldValue = null;
-                            $scope.valueChanged($scope.fieldValue);
+                            $scope.valueChanged(null);
                         });
                     }
                 });
