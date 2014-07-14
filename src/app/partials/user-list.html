@@ -7,7 +7,7 @@
     <form class="form-inline" role="form">
       <div class="form-group">
         <label class="sr-only" for="filter">Filter</label>
-        <input ng-model="filterText" type="text" class="form-control input-sm" placeholder="Filter">
+        <input ng-model="filterText" type="text" class="form-control input-sm" placeholder="Filter" ng-enter="filter(filterText);">
         <button type="button" class="btn btn-primary btn-sm" ng-click="filter(filterText);">Filter</button>
         <span class="glyphicon glyphicon-question-sign" ng-click="sisDlg.showFilterHelp();"></span>
         <small ng-if="filterError">{{ filterError }}</small>
@@ -27,8 +27,13 @@
             <tr ng-repeat="user in users">
                 <td>{{user.name}}</td>
                 <td>
-                    <span ng-if="!user.super_user" style="margin-right: 1px;" ng-repeat="(group, role) in user.roles" class="label clickable" ng-class="{ 'label-default' : role == 'user', 'label-primary' : role == 'admin' }" title="{{ role }}" ng-click="sisDlg.showUsersInGroup(group);">{{group}}</span>
-                    <span ng-click="sisDlg.showSuperUsers();" ng-if="user.super_user" class="clickable label label-success">Super User</span>
+                    <span ng-if="!user.super_user" style="margin-right: 1px;"
+                          ng-repeat="(group, role) in user.roles"
+                          class="label clickable"
+                          ng-class="{ 'label-default' : role == 'user', 'label-primary' : role == 'admin' }"
+                          title="{{ role }}" ng-click="sisDlg.showUsersInGroup(group);">{{group}}</span>
+                    <span ng-click="sisDlg.showSuperUsers();" ng-if="user.super_user"
+                          class="clickable label label-success">Super User</span>
                 </td>
                 <td>
                     <a ng-show="!canManage(user)" class="btn btn-xs btn-default" disabled="disabled">

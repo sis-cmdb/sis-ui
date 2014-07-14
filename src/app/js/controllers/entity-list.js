@@ -36,9 +36,11 @@ angular.module('sisui')
     };
 
     $scope.viewEntity = function(entity) {
-        var title = "Entity information " + schemaName;
-        SisDialogs.showViewObjectDialog(entity, $scope.schema,
-                                        title);
+        // var title = "Entity information " + schemaName;
+        // SisDialogs.showViewObjectDialog(entity, $scope.schema,
+        //                                 title);
+        var params = { schema : schemaName, eid : entity._id };
+        $scope.$state.go("app.entities.view", params);
     };
 
     $scope.viewCommits = function(entity) {

@@ -70,6 +70,11 @@ angular.module('sisui', ['ui.router', 'ui.bootstrap', 'sisconfig'])
             templateUrl : "app/partials/entity-mod.html",
             controller : "EntityModController"
         })
+        .state("app.entities.view", {
+            url : "/view/:eid",
+            templateUrl : "app/partials/entity-view.html",
+            controller : "EntityViewController"
+        })
 
         // hooks
         .state("app.hooks", {
@@ -92,6 +97,11 @@ angular.module('sisui', ['ui.router', 'ui.bootstrap', 'sisconfig'])
             url : "/edit/:hid",
             templateUrl : "app/partials/entity-mod.html",
             controller : "HookModController"
+        })
+        .state("app.hooks.view", {
+            url : "/view/:id",
+            templateUrl : "app/partials/entity-view.html",
+            controller : "EntityViewController"
         })
 
         // tokens

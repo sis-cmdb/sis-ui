@@ -3,7 +3,7 @@ angular.module('sisui')
 
     "use strict";
 
-    var OBJECT_TEMPLATE = "app/partials/entity-view.html";
+    var OBJECT_TEMPLATE = "app/partials/entity-view-dlg.html";
     var OBJECT_CONTROLLER = "EntityViewController";
 
     var USER_TEMPLATE = "app/partials/user-mod-dlg.html";

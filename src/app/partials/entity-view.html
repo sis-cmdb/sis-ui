@@ -1,15 +1,19 @@
-<div>
-    <div class="modal-header">
-        <h3>{{ modalTitle }}</h3>
-    </div>
-    <div class="modal-body no-item-display">
-        <form class="form-inline css-form" role="form" novalidate>
+<div class="row sisui-bottom-buffer">
+    <h3><strong>{{ title }}</strong></h3>
+</div>
+<div class="row sisui-bottom-buffer">
+    <button ng-if="canManage()" class="btn btn-primary btn-sm" ng-click="editObject();">Edit</button>
+    <button type="button" class="btn btn-info btn-sm" ng-model="showJson" btn-checkbox btn-checkbox-true="1" btn-checkbox-false="0">Toggle JSON</button>
+</div>
+<div class="row no-item-display">
+    <div ng-class="{ 'col-md-12' : !showJson, 'col-md-6' : showJson }">
+        <form class="form-inline css-form" role="form" name="entityView" novalidate>
             <li ng-controller="EntityDescriptorController" ng-repeat="descriptor in descriptors" ng-init="init(obj, descriptor);">
                 <div ng-include="'app/partials/entity-descriptor.html'"></div>
             </li>
         </form>
     </div>
-    <div class="modal-footer">
-        <button class="btn btn-warning" ng-click="$dismiss('Close');">Close</button>
+    <div ng-if="showJson" class="col-md-6">
+        <pre>{{ obj | json }}</pre>
     </div>
 </div>

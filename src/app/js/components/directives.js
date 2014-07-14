@@ -1,10 +1,10 @@
 angular.module('sisui')
-.directive('sisEntityInput', function($compile, SisUtil) {
+.directive('sisEntityInput', function($compile, SisUtil, $state) {
     "use strict";
     // returns a select or input element
     // based on descriptor
     // will setup valueChanged and the model
-    var getTemplate = function(descriptor, path) {
+    var getTemplate = function(descriptor, path, action) {
         var attrs = [
             'ng-model="fieldValue"',
             'name="' + path.replace(/\./g, '_') + '"'
@@ -13,6 +13,7 @@ angular.module('sisui')
             attrs.push("required");
         }
         var elem = "input";
+        var isObjectRef = (descriptor.type == 'ObjectId' && descriptor.ref);
         if (descriptor.enum) {
             // select
             elem = "select";
@@ -20,9 +21,9 @@ angular.module('sisui')
             attrs.push('ng-change="valueChanged(fieldValue)"');
         } else {
             // input
-            attrs.push('type="' + SisUtil.getInputType(descriptor.type) + '"');
+            var inputType = SisUtil.getInputType(descriptor.type);
+            attrs.push('type="' + inputType + '"');
             attrs.push('class="form-control input-sm"');
-            attrs.push('placeholder="' + (descriptor.comment || descriptor.type) + '"');
             if ('min' in descriptor) {
                 attrs.push('min="' + descriptor.min + '"');
             }
@@ -30,9 +31,11 @@ angular.module('sisui')
                 attrs.push('max="' + descriptor.max + '"');
             }
             // refs are special
-            if (descriptor.type == 'ObjectId' && descriptor.ref) {
+            if (isObjectRef) {
                 attrs.push('disabled="disabled"');
+                attrs.push('placeholder="ObjectId (' + descriptor.ref + ')"');
             } else {
+                attrs.push('placeholder="' + (descriptor.comment || descriptor.type) + '"');
                 attrs.push('ng-change="valueChanged(fieldValue)"');
             }
         }
@@ -40,17 +43,34 @@ angular.module('sisui')
         if (elem == "select") {
             template += "</select>";
         }
+        if (isObjectRef && action === 'view') {
+            template += '<a ng-if="fieldValue" ng-click="goToObject()">View</a>';
+        }
         return template;
 
     };
     var linker = function(scope, element, attrs, ctrl) {
         var descriptor = scope.fieldDescriptor();
         var path = scope.path;
-        element.html(getTemplate(descriptor, path)).show();
+        element.html(getTemplate(descriptor, path, scope.action)).show();
         $compile(element.contents())(scope);
         if (!ctrl || !ctrl[path]) {
             return;
         }
+        scope.$state = $state;
+        var elementOffset = element.offset().left;
+        // only called on view
+        scope.goToObject = function() {
+            var schema = descriptor.ref;
+            var value = scope.fieldValue;
+            var params = { schema : schema };
+            if (typeof value === 'object') {
+                params.eid = value._id;
+            } else {
+                params.eid = value;
+            }
+            $state.go("app.entities.view", params);
+        };
         ctrl = ctrl[path];
         if (descriptor.match) {
             var regex = SisUtil.toRegex(descriptor.match);
@@ -97,7 +117,8 @@ angular.module('sisui')
             path : '@',
             fieldDescriptor : '&',
             fieldValue : "=ngModel",
-            valueChanged : '='
+            valueChanged : '=',
+            action : "="
         }
     };
 })
@@ -343,5 +364,13 @@ angular.module('sisui')
     return {
         link : setup,
         restrict : "E",
+    };
+})
+.directive("sisUserstatus", function() {
+    return {
+        restrict : "E",
+        replace : true,
+        templateUrl : "app/partials/user-dropdown.html",
+        controller : "UserDropdownController"
     };
 });

@@ -28,9 +28,11 @@ angular.module('sisui')
     };
 
     $scope.view = function(hook) {
-        var title = "View hook " + hook.name;
-        SisDialogs.showViewObjectDialog(hook, hookSchema,
-                                        title);
+        // var title = "View hook " + hook.name;
+        // SisDialogs.showViewObjectDialog(hook, hookSchema,
+        //                                 title);
+        var params = { id : hook.name };
+        $scope.$state.go("app.hooks.view", params);
     };
 
     $scope.viewCommits = function(hook) {
