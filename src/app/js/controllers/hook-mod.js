@@ -95,7 +95,7 @@ angular.module('sisui')
 
     var parseRoute = function() {
         var params = $scope.$stateParams;
-        var hookId = params.hid;
+        var hookId = params.id;
         var action = hookId ? "edit" : "add";
         var schema = SisUtil.getHookSchema();
         if (action == 'add' && !hookId) {
@@ -142,6 +142,3 @@ angular.module('sisui')
     parseRoute();
 
 });
-
-
-

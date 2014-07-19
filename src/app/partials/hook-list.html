@@ -13,7 +13,9 @@
         <small ng-if="filterError">{{ filterError }}</small>
       </div>
       <div class="form-group pull-right">
-        <button type="button" class="btn btn-primary btn-sm" ng-click="addNew();">Add New</button>
+          <a ng-show="canAdd();" ui-sref="^.add" ng-click="cacheHook(null, null)">
+              <button type="button" class="btn btn-primary btn-sm">Add New</button>
+          </a>
       </div>
     </form>
 </div>
@@ -29,7 +31,7 @@
         </thead>
         <tbody>
             <tr ng-repeat="hook in hooks">
-                <td><a ng-click="view(hook);">{{ hook.name }}</a></td>
+                <td><a ng-click="cacheHook(hook);" ui-sref="^.view({id : hook.name})">{{ hook.name }}</a></td>
                 <td>
                     <a ui-sref="app.entities.list({ schema : hook.entity_type})">{{hook.entity_type}}</a>
                 </td>
@@ -38,16 +40,16 @@
                     <a ng-show="!canManage(hook)" class="btn btn-xs btn-default" disabled="disabled">
                         <span class="glyphicon glyphicon-lock"></span>
                     </a>
-                    <a ng-show="canManage(hook)" class="btn btn-xs btn-primary" ng-click="edit(hook);">
+                    <a ng-show="canManage(hook)" class="btn btn-xs btn-primary" ng-click="cacheHook(hook);" ui-sref="^.edit({id : hook.name})">
                         <span class="glyphicon glyphicon-edit">Edit</span>
                     </a>
                     <a ng-show="canRemove(hook)" class="btn btn-xs btn-danger" ng-click="remove(hook)">
                         <span class="glyphicon glyphicon-trash">Remove</span>
                     </a>
-                    <a type="button" class="btn btn-info btn-xs" ng-click="addNew(hook);">
+                    <a type="button" class="btn btn-info btn-xs" ng-click="cacheHook(null, hook)" ui-sref="^.add">
                         <span class="glyphicon glyphicon-retweet">Clone</span>
                     </a>
-                    <a type="buton" class="btn btn-info btn-xs" ng-click="viewCommits(hook)">
+                    <a type="buton" class="btn btn-info btn-xs" ui-sref="app.commits.sisobj({ type : 'hooks', id : hook.name })">
                         <span class="glyphicon glyphicon-list">History</span>
                     </a>
                 </td>

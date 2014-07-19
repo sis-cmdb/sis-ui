@@ -19,32 +19,16 @@ angular.module('sisui')
 
     var schemaName = $scope.$stateParams.schema;
 
-    $scope.addNew = function(entity) {
-        SisSession.setCurrentEntity($scope.schema, null);
-        SisSession.setObjectToCopy(schemaName, entity);
-        $scope.$state.go("^.add");
-    };
-
     $scope.canAdd = function() {
         return $scope.schema &&
                SisUtil.canAddEntity($scope.schema);
     };
 
-    $scope.editEntity = function(entity) {
+    $scope.cacheEntity = function(entity, clone) {
         SisSession.setCurrentEntity($scope.schema, entity);
-        $scope.$state.go("^.edit", { eid : entity._id });
-    };
-
-    $scope.viewEntity = function(entity) {
-        // var title = "Entity information " + schemaName;
-        // SisDialogs.showViewObjectDialog(entity, $scope.schema,
-        //                                 title);
-        var params = { schema : schemaName, eid : entity._id };
-        $scope.$state.go("app.entities.view", params);
-    };
-
-    $scope.viewCommits = function(entity) {
-        $scope.$state.go("app.commits.entities", { schema : schemaName, id : entity._id });
+        if (!entity) {
+            SisSession.setObjectToCopy(schemaName, clone);
+        }
     };
 
     $scope.canManage = function(entity) {

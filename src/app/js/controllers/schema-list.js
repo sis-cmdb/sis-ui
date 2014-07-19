@@ -10,20 +10,10 @@ angular.module('sisui')
 
     $scope.remove = function(schema) {
         var name = schema.name;
-        // TODO: show confirm
         SisApi.schemas.delete(schema).then(function(res) {
             SisSession.setSchemas(null);
             loadSchemas();
         });
-    };
-
-    $scope.edit = function(schema) {
-        SisSession.setCurrentSchema(schema);
-        $scope.$state.go("^.edit", { schema : schema.name });
-    };
-
-    $scope.addNew = function() {
-        $scope.$state.go("^.add");
     };
 
     $scope.canAdd = function() {
@@ -38,13 +28,8 @@ angular.module('sisui')
         return $scope.canManage(schema) && SisUtil.canDelete(schema);
     };
 
-    $scope.viewCommits = function(schema) {
-        $scope.$state.go("app.commits.sisobj", { type : "schemas", id : schema.name });
-    };
-
-    $scope.gotoSchema = function(schema) {
+    $scope.cacheSchema = function(schema) {
         SisSession.setCurrentSchema(schema);
-        $scope.$state.go("app.entities.list", { schema : schema.name });
     };
 
     var loadSchemas = function() {

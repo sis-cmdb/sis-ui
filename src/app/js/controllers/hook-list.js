@@ -1,5 +1,5 @@
 angular.module('sisui')
-.controller("HookListController", function($scope, SisSession,
+.controller("HookListController", function($scope, SisSession, SisUser,
                                            SisDialogs, SisUtil, SisApi) {
     "use strict";
 
@@ -16,31 +16,25 @@ angular.module('sisui')
         pager.remove(hook);
     };
 
-    $scope.edit = function(hook) {
+    $scope.cacheHook = function(hook, clone) {
         SisSession.setCurrentHook(hook);
-        $scope.$state.go("^.edit", { hid : hook.name });
-    };
-
-    $scope.addNew = function(hook) {
-        SisSession.setObjectToCopy(hookSchema.name, hook);
-        SisSession.setCurrentHook(null);
-        $scope.$state.go("^.add");
-    };
-
-    $scope.view = function(hook) {
-        // var title = "View hook " + hook.name;
-        // SisDialogs.showViewObjectDialog(hook, hookSchema,
-        //                                 title);
-        var params = { id : hook.name };
-        $scope.$state.go("app.hooks.view", params);
-    };
-
-    $scope.viewCommits = function(hook) {
-        $scope.$state.go("app.commits.sisobj", { type : "hooks", id : hook.name });
+        if (!hook) {
+            SisSession.setObjectToCopy(hookSchema.name, clone);
+        }
     };
 
     $scope.canManage = function(hook) {
         return SisUtil.canManageEntity(hook, { owner : [] });
+    };
+
+    $scope.canAdd = function() {
+        var user = SisUser.getCurrentUser();
+        if (!user) {
+            return false;
+        }
+        if (user.super_user) { return true; }
+        var roles = user.roles || { };
+        return Object.keys(roles).length > 0;
     };
 
     $scope.canRemove = function(hook) {

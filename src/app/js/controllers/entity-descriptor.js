@@ -202,6 +202,7 @@ angular.module('sisui')
             } else if (typeof value === 'object') {
                 value = value._id;
             }
+            $scope.refId = value;
         } else if ($scope.fieldDescriptor.type == "Mixed" &&
             typeof value === "object") {
             value = angular.toJson(value);

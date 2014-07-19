@@ -94,7 +94,7 @@ angular.module('sisui', ['ui.router', 'ui.bootstrap', 'sisconfig'])
             controller : "HookModController"
         })
         .state("app.hooks.edit", {
-            url : "/edit/:hid",
+            url : "/edit/:id",
             templateUrl : "app/partials/entity-mod.html",
             controller : "HookModController"
         })

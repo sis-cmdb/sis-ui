@@ -10,7 +10,9 @@
         <input ng-model="filterText" type="text" class="form-control input-sm" id="filter" placeholder="Filter">
       </div>
       <div class="form-group pull-right">
-        <button ng-show="canAdd()" type="button" class="btn btn-primary btn-sm" ng-click="addNew();">Add New</button>
+          <a ng-show="canAdd()" ng-click="cacheSchema(null);" ui-sref="^.add">
+              <button type="button" class="btn btn-primary btn-sm">Add New</button>
+          </a>
       </div>
     </form>
 </div>
@@ -26,7 +28,7 @@
         <tbody>
             <tr ng-repeat="schema in schemas | filter:filterText">
                 <td>
-                    <a ng-click="gotoSchema(schema)">{{schema.name}}</a>
+                    <a ng-click="cacheSchema(schema)" ui-sref="app.entities.list({ schema : schema.name })">{{schema.name}}</a>
                 </td>
                 <td>
                     <span style="margin-right: 1px;" ng-repeat="owner in schema.owner" class="label label-default clickable" ng-click="sisDlg.showUsersInGroup(owner)">{{owner}}</span>
@@ -35,13 +37,13 @@
                     <a ng-show="!canManage(schema)" class="btn btn-xs btn-default" disabled="disabled">
                         <span class="glyphicon glyphicon-lock"></span>
                     </a>
-                    <a ng-show="canManage(schema)" class="btn btn-xs btn-primary" ng-click="edit(schema);">
+                    <a ng-show="canManage(schema)" class="btn btn-xs btn-primary" ng-click="cacheSchema(schema);" ui-sref="^.edit({ schema : schema.name })">
                         <span class="glyphicon glyphicon-edit">Edit</span>
                     </a>
                     <a ng-show="canRemove(schema)" class="btn btn-xs btn-danger" ng-click="remove(schema)">
                         <span class="glyphicon glyphicon-trash">Remove</span>
                     </a>
-                    <a type="buton" class="btn btn-info btn-xs" ng-click="viewCommits(schema)">
+                    <a type="buton" class="btn btn-info btn-xs" ui-sref="app.commits.sisobj({ type : 'schemas', id : schema.name })">
                         <span class="glyphicon glyphicon-list">History</span>
                     </a>
                 </td>
