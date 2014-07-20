@@ -43,9 +43,6 @@ angular.module('sisui')
         if (elem == "select") {
             template += "</select>";
         }
-        if (isObjectRef && action === 'view') {
-            template += '<a ng-if="fieldValue" ng-click="goToObject()">View</a>';
-        }
         return template;
 
     };
@@ -59,18 +56,7 @@ angular.module('sisui')
         }
         scope.$state = $state;
         var elementOffset = element.offset().left;
-        // only called on view
-        scope.goToObject = function() {
-            var schema = descriptor.ref;
-            var value = scope.fieldValue;
-            var params = { schema : schema };
-            if (typeof value === 'object') {
-                params.eid = value._id;
-            } else {
-                params.eid = value;
-            }
-            $state.go("app.entities.view", params);
-        };
+
         ctrl = ctrl[path];
         if (descriptor.match) {
             var regex = SisUtil.toRegex(descriptor.match);
