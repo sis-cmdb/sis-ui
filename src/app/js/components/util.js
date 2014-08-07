@@ -7,8 +7,6 @@ angular.module('sisui')
     // Pager class
     function EndpointPager(endpoint, scope, opts) {
 
-        var numberRegex = /[-+]?[0-9]*\.?[0-9]+/;
-
         var convertParsedToQueryObj = function(parsed) {
             var left = parsed[0];
             var right = parsed[2];
@@ -23,7 +21,7 @@ angular.module('sisui')
                 result[op] = [left, right];
             } else {
                 // at a leaf
-                if (numberRegex.test(right)) {
+                if (!isNaN(right)) {
                     right = parseFloat(right);
                 }
                 var opMap = {
@@ -40,7 +38,7 @@ angular.module('sisui')
                 } else if (op == "nin" || op == "in") {
                     right = right.split(",").map(function(s) {
                         s = s.trim();
-                        if (numberRegex.test(s)) {
+                        if (!isNaN(s)) {
                             s = parseFloat(s);
                         }
                         return s;
