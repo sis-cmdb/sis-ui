@@ -108,6 +108,36 @@ angular.module('sisui')
                     self.logout();
                 });
             }
+        },
+        loginWithToken : function(username, token) {
+            var d = $q.defer();
+            this.logout().then(function() {
+                // ensure the token is valid
+                SisApi.setAuthToken(token);
+                SisApi.tokens(username).get(token).then(function(result) {
+                    if (!result) {
+                        SisApi.setAuthToken(null);
+                        return d.reject("Token is invalid.");
+                    }
+                    return SisApi.users.get(username).then(function(user) {
+                        // login
+                        var data = {
+                            username : username,
+                            super_user : user.super_user,
+                            roles : user.roles,
+                            expirationTime : Date.now() + result.expires,
+                            token : token
+                        };
+                        setUser(data);
+                        d.resolve(data);
+                        $rootScope.$broadcast("loggedIn", true);
+                    });
+                }, function(err) {
+                    SisApi.setAuthToken(null);
+                    d.reject(err);
+                });
+            });
+            return d.promise;
         }
     };
 });

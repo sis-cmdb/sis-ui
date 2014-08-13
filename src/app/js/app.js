@@ -11,7 +11,27 @@ angular.module('sisui', ['ui.router', 'ui.bootstrap', 'sisconfig'])
         .state("app", {
             url : "",
             templateUrl : "app/partials/app-root-state.html",
-            abstract : true
+            abstract : true,
+            resolve : {
+                authData : function($location, $q, SisUser) {
+                    // check for the search / login info
+                    var d = $q.defer();
+                    var searchObj = $location.search();
+                    if (searchObj.username && searchObj.token) {
+                        SisUser.loginWithToken(searchObj.username, searchObj.token)
+                        .then(function(user) {
+                            d.resolve(true);
+                        }, function(err) {
+                            d.resolve(false);
+                        });
+                        $location.search('username', null);
+                        $location.search('token', null);
+                    } else {
+                        d.resolve(false);
+                    }
+                    return d.promise;
+                }
+            }
         })
         // user stuff
         .state("app.login", {
@@ -152,7 +172,7 @@ angular.module('sisui', ['ui.router', 'ui.bootstrap', 'sisconfig'])
         });
     };
 })
-.run(function ($rootScope,   $state,   $stateParams) {
+.run(function ($rootScope, $state, $stateParams) {
     $rootScope.$state = $state;
     $rootScope.$stateParams = $stateParams;
 });
