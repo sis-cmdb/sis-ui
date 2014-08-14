@@ -12,7 +12,7 @@
     <link rel="icon" href="./common/images/favicon.ico?v={{version}}" type="image/x-icon" />
   </head>
   <body>
-    <header class="navbar navbar-default navbar-static-top">
+    <header ng-hide="embedded" class="navbar navbar-default navbar-static-top">
       <div class="container">
         <div class="navbar-header"><a ui-sref="app.schemas.list" class="navbar-brand">SIS</a></div>
         <div class="collapse navbar-collapse">
@@ -34,7 +34,7 @@
     <div class="container">
       <ui-view></ui-view>
     </div>
-    <div class="footer">
+    <div ng-hide="embedded" class="footer">
         <div class="container">
             <ng-include src="'app/partials/footer.html'"></ng-include>
         </div>

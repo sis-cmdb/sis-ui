@@ -227,7 +227,7 @@ angular.module('sisui')
     };
 })
 .directive("sisDocumentation", function($compile, $http, $templateCache,
-                                        $location, $window) {
+                                        $location, $window, $rootScope) {
     // Shoutout to https://gist.github.com/alxhill/6886760
     // for the scroll spy sim
     var setup = function(scope, element) {
@@ -281,6 +281,10 @@ angular.module('sisui')
                     }
                 }
             };
+
+            if ($rootScope.embedded) {
+                rightCol.hide();
+            }
 
             var jqWindow = $($window);
             var highlightSpy = null;

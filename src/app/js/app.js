@@ -172,7 +172,12 @@ angular.module('sisui', ['ui.router', 'ui.bootstrap', 'sisconfig'])
         });
     };
 })
-.run(function ($rootScope, $state, $stateParams) {
+.run(function ($rootScope, $state, $stateParams, $location) {
     $rootScope.$state = $state;
     $rootScope.$stateParams = $stateParams;
+    var searchObj = $location.search();
+    if (searchObj.embed == 'true') {
+        $rootScope.embedded = true;
+        $location.search('embed', null);
+    }
 });

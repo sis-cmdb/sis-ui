@@ -1,4 +1,4 @@
-<div class="col-md-2 nav-toc" ng-controller="SidebarController">
+<div ng-hide="embedded" class="col-md-2 nav-toc" ng-controller="SidebarController">
     <ul class="nav affix" role="complementary">
         <li ui-sref-active="active" ng-class="{ 'active' : $state.includes('app.entities.*') }">
             <a ui-sref="app.schemas.list">Schemas</a>
