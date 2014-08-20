@@ -3,9 +3,16 @@ angular.module('sisui')
 .controller("EntityModController", function($scope, SisSession,
                                             SisUtil, SisApi) {
     var init = function(orig) {
-        if (!SisUtil.canManageEntity(orig, $scope.schema)) {
-            return $scope.$state.go("^.list");
+        if (action == 'add') {
+            if (!SisUtil.canAddEntity($scope.schema)) {
+                return $scope.$state.go("^.list");
+            }
+        } else {
+            if (!SisUtil.canManageEntity(orig, $scope.schema)) {
+                return $scope.$state.go("^.list");
+            }
         }
+
         $scope.showJson = false;
         $scope.descriptors = SisUtil.getDescriptorArray($scope.schema);
         // need to tweak this so owner and sis_locked show up..
@@ -109,7 +116,7 @@ angular.module('sisui')
                 $scope.action = action;
                 $scope.title = "Add a new entity of type " + schemaName;
                 var obj = SisSession.getObjectToCopy(schemaName);
-                init({ });
+                init({ }, action);
                 obj.owner = [];
                 $scope.entity = obj;
                 $scope.fieldValue = $scope.entity;
@@ -122,7 +129,7 @@ angular.module('sisui')
                 var idField = SisUtil.getIdField(res[0]);
                 $scope.action = action;
                 $scope.title = "Modify entity of type " + schemaName + " - " + res[1][idField];
-                init(angular.copy(res[1]));
+                init(angular.copy(res[1]), action);
             }, function(err) {
                 return $scope.$state.go("^.list");
             });
