@@ -2,7 +2,7 @@
 angular.module('sisui')
 .controller("EntityModController", function($scope, SisSession,
                                             SisUtil, SisApi) {
-    var init = function(orig) {
+    var init = function(orig, action) {
         if (action == 'add') {
             if (!SisUtil.canAddEntity($scope.schema)) {
                 return $scope.$state.go("^.list");

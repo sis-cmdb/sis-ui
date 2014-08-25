@@ -45,7 +45,7 @@
         </div>
         <div ng-if="!fieldDescriptor.enum">
             <ul collapse="isCollapsed">
-                <li ng-controller="EntityDescriptorController" ng-init="init($parent.fieldValue, $parent.children[0], $index);" ng-repeat="value in fieldValue track by $index">
+                <li ng-controller="EntityDescriptorController" ng-init="init($parent.fieldValue, $parent.children[0], $index);" ng-repeat="value in fieldValue track by [value, $index]">
                     <div ng-include="'app/partials/entity-descriptor.html'"></div>
                 </li>
                 <li>
