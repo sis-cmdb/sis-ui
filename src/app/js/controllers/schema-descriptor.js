@@ -52,6 +52,9 @@ angular.module('sisui')
 
     $scope.canAddChildren = function() {
         var descriptor = $scope.descriptor;
+        if (descriptor.type === "Document") {
+            return true;
+        }
         if (!descriptor.name) {
             return false;
         }
@@ -59,7 +62,7 @@ angular.module('sisui')
             return !descriptor.children ||
                     descriptor.children.length === 0;
         }
-        return descriptor.type === "Document";
+        return true;
     };
 
     $scope.canModifyDescriptorName = function() {
