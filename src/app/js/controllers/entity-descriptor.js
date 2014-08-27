@@ -145,6 +145,7 @@ angular.module('sisui')
         }
     };
 
+    // called on the array itself
     $scope.addItem = function() {
         var fieldDescriptor = $scope.fieldDescriptor;
         var itemDesc = fieldDescriptor.children[0];
@@ -152,6 +153,7 @@ angular.module('sisui')
         $scope.fieldValue.push(item);
     };
 
+    // called on an item within an array
     $scope.delItem = function(idx) {
         if (!$scope.isItem()) {
             return;
@@ -162,6 +164,7 @@ angular.module('sisui')
         }
     };
 
+    // called on an item to see if it is in an array
     $scope.isItem = function() {
         var container = $scope.container;
         var arrIdx = $scope.arrIdx;
@@ -240,6 +243,13 @@ angular.module('sisui')
         $scope.isCollapsed = false;
         initializeFieldValue();
         setupScope();
+        if ($scope.fieldValue instanceof Array) {
+            $scope.lastModTime = Date.now();
+            // watch it
+            $scope.$watch("fieldValue.length", function() {
+                $scope.lastModTime = Date.now();
+            });
+        }
     };
 
 });
