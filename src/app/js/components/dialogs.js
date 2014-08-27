@@ -60,8 +60,6 @@ angular.module('sisui')
         return _showUserGroupDialog(title, search);
     };
 
-    $rootScope.sisDlg = this;
-
     this.openConfirmDialog = function(title, body) {
         var modalScope = $rootScope.$new(true);
         modalScope.title = title;

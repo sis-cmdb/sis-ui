@@ -156,6 +156,9 @@ angular.module('sisui')
     };
 
     var textToArray = function(text) {
+        if (text instanceof Array) {
+            return text;
+        }
         return text.split(",").map(function(s) {
             return s.trim();
         });

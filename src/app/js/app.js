@@ -172,9 +172,11 @@ angular.module('sisui', ['ui.router', 'ui.bootstrap', 'sisconfig'])
         });
     };
 })
-.run(function ($rootScope, $state, $stateParams, $location) {
+.run(function ($rootScope, $state, $stateParams, $location,
+               SisDialogs) {
     $rootScope.$state = $state;
     $rootScope.$stateParams = $stateParams;
+    $rootScope.sisDlg = SisDialogs;
     var searchObj = $location.search();
     if (searchObj.embed == 'true') {
         $rootScope.embedded = true;

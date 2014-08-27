@@ -2,7 +2,7 @@
   "name": "SIS-ui",
   "private": true,
   "description": "SIS reference UI",
-  "version": "0.1.16",
+  "version": "0.1.17",
   "devDependencies": {
     "grunt": "~0.4.2",
     "grunt-angular-templates": "^0.5.4",
