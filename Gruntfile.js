@@ -248,7 +248,8 @@ module.exports = function(grunt) {
                     // jquery
                     ['<%= build_dirs.src %>/common/js/vendor/jquery/1.11.0/jquery-1.11.0.min.js',
                     // angular
-                     '<%= build_dirs.src %>/common/js/vendor/angularjs/1.2.17/angular.min.js',
+                    //  '<%= build_dirs.src %>/common/js/vendor/angularjs/1.2.17/angular.min.js',
+                     '<%= build_dirs.src %>/common/js/vendor/angularjs/1.2.23/angular.min.js',
                      '<%= build_dirs.src %>/common/js/vendor/ui.router/0.2.10/angular-ui-router.min.js',
                      // angular bootstrap
                      '<%= build_dirs.src %>/common/js/vendor/ui.bootstrap/0.10.0/ui-bootstrap-tpls-0.10.0.min.js',

@@ -215,7 +215,6 @@ angular.module('sisui')
                 if (desc.type == "ObjectId" && desc.ref) {
                     result.type = desc.type;
                     result.ref = desc.ref;
-                    result.url = "#/entities/" + result.ref;
                 }
                 return result;
             } else {
@@ -287,6 +286,17 @@ angular.module('sisui')
         return paths;
     }
 
+    function getDescriptorToJSON(desc) {
+        return function() {
+            var result = { };
+            for (var k in desc) {
+                if (k != 'toJSON' && k != '_parent_') {
+                    result[k] = desc[k];
+                }
+            }
+            return result;
+        };
+    }
 
     function getDescriptors(defn) {
         if (!defn) { return []; }
@@ -294,6 +304,7 @@ angular.module('sisui')
         for (var k in defn) {
             var desc = defn[k];
             var normalized = normalizeDescriptor(desc, k);
+            normalized.toJSON = getDescriptorToJSON(desc);
             result.push(normalized);
         }
         result.sort(function(c1, c2) {

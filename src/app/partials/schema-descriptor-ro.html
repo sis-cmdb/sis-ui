@@ -1,6 +1,6 @@
 <label class="label label-default">{{descriptor.name}}</label>
 <label class="label label-success">{{descriptor.type}}</label>
-<a ng-if="descriptor.url" href="{{ descriptor.url }}">
+<a ng-if="descriptor.ref" ui-sref="app.entities('schema' : descriptor.ref)">
     <label class="label label-warning add-pointer">{{descriptor.ref}}</label>
 </a>
 <label class="label label-primary" ng-show="descriptor.required">required</label>

@@ -1,6 +1,9 @@
 angular.module('sisui', ['ui.router', 'ui.bootstrap', 'sisconfig'])
-.config(function($stateProvider, $urlRouterProvider) {
+.config(function($stateProvider, $urlRouterProvider, $rootScopeProvider) {
     "use strict";
+
+    // HACKY - http://stackoverflow.com/questions/21958856/template-recursion-limitation-digest-loop-in-angularjs
+    $rootScopeProvider.digestTtl(200);
 
     $urlRouterProvider
         .when("/docs", "/docs/index")
