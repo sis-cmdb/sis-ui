@@ -138,6 +138,16 @@ angular.module('sisui')
             }
             return ret;
         }, { });
+        // such a dirty dirty hack - see util.js and how it deletes
+        // enum from the child if it's an array (getArrayDescriptor)
+        var isArrayEnum = (descriptor._parent_ &&
+            descriptor._parent_.type == "Array" &&
+            descriptor._parent_.enum);
+
+        if (isArrayEnum) {
+            // actually the enum belongs to us
+            modalScope.descriptor.enum = descriptor._parent_.enum;
+        }
         return $modal.open({
             templateUrl : "app/partials/schema-descriptor-attrs.html",
             scope : modalScope,
@@ -152,6 +162,10 @@ angular.module('sisui')
                 }
             });
             setSchemaField(descriptor, convertToSchemaField(descriptor));
+            if (isArrayEnum) {
+                // update the parent too
+                descriptor._parent_.enum = descriptor.enum;
+            }
         });
     };
 

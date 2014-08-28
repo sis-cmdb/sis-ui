@@ -137,6 +137,9 @@ angular.module('sisui')
                 classes.push("input-sm");
             }
             attrs.push('class="' + classes.join(" ") + '"');
+            if (type == 'textArray') {
+                attrs.push("ng-list");
+            }
         }
         var template = "<" + elem + " " + attrs.join(" ") + " >";
         if (elem == "select") {
