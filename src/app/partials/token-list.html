@@ -33,7 +33,7 @@
     <h4>Persistent Tokens</h4>
 </div>
 <div class="row" ng-if="!canAdd()">
-    <strong>Super users cannot create tokens yet.</strong>
+    <strong>Super users or users without any roles cannot create persistent tokens yet.</strong>
 </div>
 <div class="row sisui-bottom-buffer" ng-if="canAdd()">
     <form class="form-inline" role="form">
@@ -43,7 +43,7 @@
       </div>
     </form>
 </div>
-<div class="row" ng-if="canAdd()">
+<div class="row" ng-if="persistent.length">
     <table class="table table-bordered table-condensed table-striped">
         <thead>
             <tr>
