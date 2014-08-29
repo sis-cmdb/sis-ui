@@ -2,6 +2,34 @@ module.exports = function(grunt) {
 
   grunt.file.defaultEncoding = 'utf8';
 
+  if (!grunt.option("sisjspath")) {
+      return grunt.fail.fatal("sisjspath is required to point to sis-js.js");
+  }
+
+  var docs = [];
+  if (grunt.option('docpath')) {
+    var docpath = grunt.option('docpath');
+    if (!grunt.file.isDir(docpath)) {
+        return grunt.fail.fatal("docpath must be a valid directory.");
+    }
+    var homeTuple = null;
+    grunt.file.recurse(docpath, function(abs, root, subdir, filename) {
+        if (filename.indexOf('.md') == filename.length - 3) {
+            var noExt = filename.substring(0, filename.length - 3);
+            var title = noExt[0].toUpperCase() + noExt.substring(1);
+            if (noExt == 'rbac') {
+                title = "RBAC";
+            }
+            if (noExt == 'index') {
+                homeTuple = [noExt, abs, title];
+                return;
+            }
+            docs.push([noExt, abs, title]);
+        }
+    });
+    docs.unshift(homeTuple);
+  }
+
   require('load-grunt-tasks')(grunt);
   grunt.loadTasks('tasks');
 
@@ -11,21 +39,13 @@ module.exports = function(grunt) {
         dist : "dist",
         src : "src",
         build : "build",
-        sisjs : "../SIS-js",
-        sisweb : "../SIS-web"
+    },
+    build_libs : {
+        sisjs : grunt.option("sisjspath")
     },
     buildjson : {
         options : {
             dest : '<%= build_dirs.dist %>'
-        }
-    },
-    sismd : {
-        docs : {
-            files : {
-                "<%= build_dirs.build %>/docs/index" : ["<%= build_dirs.sisweb %>/README.md"],
-                "<%= build_dirs.build %>/docs/rbac" : ["<%= build_dirs.sisweb %>/docs/rbac.md"],
-                "<%= build_dirs.build %>/docs/sharing" : ["<%= build_dirs.sisweb %>/docs/sharing.md"],
-            }
         }
     },
     peg: {
@@ -57,8 +77,8 @@ module.exports = function(grunt) {
           base: 'dist',
           middleware : function(connect, options, middlewares) {
             var func = function(req, res, next) {
-              var docs = ['index', 'rbac', 'sharing'];
-              docs.forEach(function(d) {
+              var docNames = docs.map(function(d) { return d[0]; });
+              docNames.forEach(function(d) {
                 if (req.url.indexOf('/docs/' + d) != -1) {
                     res.setHeader('Content-Type', 'text/html');
                 }
@@ -104,13 +124,6 @@ module.exports = function(grunt) {
             cwd : '<%= build_dirs.build %>',
             src: ['sisui.min.*', 'app/vendor-libs.js'],
             dest: '<%= build_dirs.dist %>/app/js/',
-          },
-          {
-            expand : true,
-            flatten : true,
-            cwd : '<%= build_dirs.build %>',
-            src: ['sisdocs.min.*', 'docs/vendor-libs.js'],
-            dest: '<%= build_dirs.dist %>/docs/js/',
           }
         ]
       },
@@ -139,6 +152,10 @@ module.exports = function(grunt) {
         }
       }
     },
+    // place holder for docs
+    sismd : {
+        docs : { }
+    },
     // Swig
     sisswig : {
         options : {
@@ -158,7 +175,8 @@ module.exports = function(grunt) {
                 css : ['./common/css/jsondiffpatch/html.css',
                        './common/css/jsondiffpatch/annotated.css',
                        './app/css/style.css'],
-                version : ( Math.round(Date.now() / 1000) )
+                version : ( Math.round(Date.now() / 1000) ),
+                docs : docs
             }
         }
     },
@@ -181,7 +199,7 @@ module.exports = function(grunt) {
         tasks: ['newer:jshint', 'uglify', 'copy:dist_js', 'copy:localconfig']
       },
       libs : {
-        files: ['<%= build_dirs.sisjs %>/lib/sis-js.js'],
+        files: ['<%= build_libs.sisjs %>'],
         tasks: ['concat', 'copy:dist_js']
       },
       templates : {
@@ -262,12 +280,6 @@ module.exports = function(grunt) {
                      '<%= build_dirs.src %>/common/js/vendor/ipv6/jsbn-combined.js',
                      '<%= build_dirs.src %>/common/js/vendor/ipv6/sprintf.js',
                      '<%= build_dirs.src %>/common/js/vendor/ipv6/ipv6.js'
-                    ],
-                // libs for docs
-                '<%= build_dirs.build %>/docs/vendor-libs.js' :
-                    // order matters
-                    ['<%= build_dirs.src %>/common/js/vendor/jquery/1.11.0/jquery-1.11.0.min.js',
-                     '<%= build_dirs.src %>/common/js/vendor/bootstrap/3.1.1/bootstrap-3.1.1.min.js'
                     ]
             }
         }
@@ -282,40 +294,44 @@ module.exports = function(grunt) {
         files : {
             // sis-ui
             '<%= build_dirs.build %>/sisui.min.js' :
-                ['<%= build_dirs.sisjs %>/lib/sis-js.js',
+                ['<%= build_libs.sisjs %>',
                  '<%= build_dirs.src %>/app/js/app.js',
                  '<%= build_dirs.src %>/app/js/components/*.js',
                  '<%= build_dirs.build %>/pegjs/query.js',
                  '<%= build_dirs.build %>/templates/partials.js',
                  '<%= build_dirs.src %>/app/js/controllers/*.js'
-                ],
-            // sis-docs
-            '<%= build_dirs.build %>/sisdocs.min.js' :
-                ['<%= build_dirs.src %>/docs/js/doc.js']
+                ]
         }
       }
     }
   });
 
-  // dynamic config the docs for swig
-  var docs = [
-    { path : 'index', title : "SIS" },
-    { path : 'rbac', title : "SIS RBAC" },
-    { path : 'sharing', title : "SIS Data Sharing" }
-  ];
-  docs.forEach(function(conf) {
-    var path = require('path');
-    var doc = conf.path;
-    grunt.config.set('sisswig.docs_' + doc, {
-        // src -> dest
-        src: ["<%= build_dirs.src %>/docs/docs.swig"],
-        dest : "<%= build_dirs.dist %>/app/docs/" + (conf.out || doc),
-        // data
-        context : {
-            contentFile : path.resolve("<%= build_dirs.build %>/docs/" + doc)
-        }
+  if (docs.length) {
+    // dynamic config the docs for swig
+    grunt.config.set('sismd.docs', {
+        files : docs.reduce(function(ret, docTuple) {
+            var src = [docTuple[1]];
+            var dst = "<%= build_dirs.build %>/docs/" + docTuple[0];
+            ret[dst] = src;
+            return ret;
+        }, { })
     });
-  });
+
+    docs.forEach(function(docTuple) {
+      var path = require('path');
+      var doc = docTuple[0];
+      grunt.config.set('sisswig.docs_' + doc, {
+          // src -> dest
+          src: ["<%= build_dirs.src %>/docs/docs.swig"],
+          dest : "<%= build_dirs.dist %>/app/docs/" + doc,
+          // data
+          context : {
+              contentFile : path.resolve("<%= build_dirs.build %>/docs/" + doc)
+          }
+      });
+    });
+  }
+
 
   grunt.registerTask('serve', function () {
     grunt.task.run(['build', 'copy:localconfig', 'connect:dist', 'watch']);

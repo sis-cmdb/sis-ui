@@ -17,7 +17,15 @@
         <div class="navbar-header"><a ui-sref="app.schemas.list" class="navbar-brand">SIS</a></div>
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
-            <li ng-class="{'active':$state.is('docs')}"><a ui-sref="docs({doc:'index'})">API</a></li>
+            {% if docs.length %}
+            <li class="dropdown" ng-class="{'active':$state.is('docs')}">
+                <a class="dropdown-toggle" data-toggle="dropdown">Docs <span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+                    {%- for doc in docs -%}
+                    <li><a ui-sref="docs({doc:'{{ doc[0] }}'})">{{ doc[2] }}</a></li>
+                    {% endfor -%}
+                </ul>
+            {% endif %}
             <li class="dropdown">
                 <a class="dropdown-toggle" data-toggle="dropdown">Theme <span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu" ng-controller="ThemeController" ng-init="setTheme('{{ themes[0] }}')">
