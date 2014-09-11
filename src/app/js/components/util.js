@@ -322,6 +322,12 @@ angular.module('sisui')
         }
         if (user.super_user) { return true; }
         var roles = user.roles || { };
+        if (!Object.keys(roles).length) {
+            return false;
+        }
+        if (schema.is_open || schema.is_public) {
+            return true;
+        }
         var owner = schema.owner;
         for (var i = 0; i < owner.length; ++i) {
             if (owner[i] in roles) {
@@ -403,14 +409,17 @@ angular.module('sisui')
             return false;
         }
         if (user.super_user) { return true; }
+        if (schema.is_open) { return true; }
         var roles = user.roles || { };
+        var numAdminRoles = 0;
         for (var i = 0; i < schema.owner.length; ++i) {
             var group = schema.owner[i];
-            if (roles[group] != 'admin') {
-                return false;
+            if (roles[group] == 'admin') {
+                numAdminRoles++;
             }
         }
-        return true;
+        return (numAdminRoles == schema.owner.length ||
+                numAdminRoles > 0 && schema.any_owner_can_modify);
     };
 
     var _getIdField = function(schema) {

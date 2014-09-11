@@ -37,6 +37,22 @@ angular.module('sisui')
             }
         }
 
+        if (!metaDescriptors.length) {
+            var ownerDesc = {
+                name : "owner"
+            };
+            var ownerSubset = SisUtil.getOwnerSubset($scope.schema);
+            if (ownerSubset instanceof Array) {
+                ownerDesc.enum = ownerSubset;
+                ownerDesc.type = "Array";
+            } else {
+                ownerDesc.type = "String";
+                ownerDesc.required = true;
+                delete ownerDesc.enum;
+            }
+            metaDescriptors.push(ownerDesc);
+        }
+
         metaDescriptors = metaDescriptors.concat(SisUtil.getSisDescriptors());
 
         $scope.descriptors = descriptors;
