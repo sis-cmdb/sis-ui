@@ -124,6 +124,13 @@ module.exports = function(grunt) {
             cwd : '<%= build_dirs.build %>',
             src: ['sisui.min.*', 'app/vendor-libs.js'],
             dest: '<%= build_dirs.dist %>/app/js/',
+          },
+          {
+            // ace
+            expand : true,
+            cwd : '<%= build_dirs.src %>/common/js/vendor/ace/1.1.6',
+            src : ['**'],
+            dest : '<%= build_dirs.dist %>/app/js/vendor/ace'
           }
         ]
       },
@@ -186,7 +193,7 @@ module.exports = function(grunt) {
         files: [{
           dot: true,
           src: [
-            'dist'
+            'dist/**/*'
           ]
         }]
       },

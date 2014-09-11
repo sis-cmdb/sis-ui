@@ -14,11 +14,12 @@ angular.module('sisui')
         }
 
         $scope.showJson = false;
-        $scope.descriptors = SisUtil.getDescriptorArray($scope.schema);
+        var descriptors = [];
+        var metaDescriptors = [];
+        var schemaDescriptors = SisUtil.getDescriptorArray($scope.schema);
         // need to tweak this so owner and sis_locked show up..
-        var foundLocked = false;
-        for (var i = 0; i < $scope.descriptors.length; ++i) {
-            var desc = $scope.descriptors[i];
+        for (var i = 0; i < schemaDescriptors.length; ++i) {
+            var desc = schemaDescriptors[i];
             if (desc.name == 'owner') {
                 // convert owner into an enum
                 var subset = SisUtil.getOwnerSubset($scope.schema);
@@ -30,16 +31,17 @@ angular.module('sisui')
                     desc.required = true;
                     delete desc.enum;
                 }
-            } else if (desc.name == 'sis_locked') {
-                foundLocked = true;
+                metaDescriptors.push(desc);
+            } else {
+                descriptors.push(desc);
             }
         }
-        if (!foundLocked) {
-            $scope.descriptors.push({
-                name : "sis_locked",
-                type : "Boolean"
-            });
-        }
+
+        metaDescriptors = metaDescriptors.concat(SisUtil.getSisDescriptors());
+
+        $scope.descriptors = descriptors;
+        $scope.metaDescriptors = metaDescriptors;
+
         orig.sis_locked = orig.sis_locked || false;
         $scope.entity = angular.copy(orig);
         // for the valueChanged recursion
@@ -66,7 +68,7 @@ angular.module('sisui')
             }, 0);
         };
 
-        var maxFieldLen = getMaxFieldName($scope.descriptors);
+        var maxFieldLen = getMaxFieldName(descriptors.concat(metaDescriptors));
 
         $scope.maxFieldNameLength = function(descriptor, isItem) {
             if (!descriptor) {

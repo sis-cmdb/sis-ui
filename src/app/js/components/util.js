@@ -486,6 +486,7 @@ angular.module('sisui')
                 result.push({ name : "uppercase", type : "checkbox" });
                 result.push({ name : "enum", type : "textArray" });
                 result.push({ name : "match", type : "regex" });
+                result.push({ name : "code", type : "text" });
                 break;
             case "ObjectId":
                 result.push({ name : "ref", type : "select", values : "schemaList" });
@@ -551,6 +552,21 @@ angular.module('sisui')
         return null;
     };
 
+    var _getTagsDescriptor = function() {
+        var result = { name : "sis_tags", type : "Array" };
+        var children = [{ "type" : "Mixed", _parent_ : result }];
+        result.children = children;
+        return result;
+    };
+
+    var _getSisDescriptors = function() {
+        return [
+            { name : "sis_locked", type : "Boolean" },
+            { name : "sis_immutable", type : "Boolean" },
+            _getTagsDescriptor()
+        ];
+    };
+
     return {
         getDescriptorArray : function(schema) {
             return getDescriptors(schema.definition);
@@ -571,6 +587,7 @@ angular.module('sisui')
         getHookSchema : _getHookSchema,
         EndpointPager : EndpointPager,
         goBack : _goBack,
-        toRegex : _toRegex
+        toRegex : _toRegex,
+        getSisDescriptors : _getSisDescriptors
     };
 });

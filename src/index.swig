@@ -5,6 +5,7 @@
     {% for script in scripts -%}
     <script src="{{ script }}?v={{version}}"></script>
     {% endfor %}
+    <script src="./app/js/vendor/ace/ace.js"></script>
     <link rel="stylesheet" ng-href="{{ theme }}?v={{version}}">
     {%- for css_file in css -%}
     <link rel="stylesheet" href="{{ css_file }}?v={{version}}">

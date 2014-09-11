@@ -226,7 +226,10 @@ angular.module('sisui')
     };
 
     $scope.isReadOnly = function() {
-        return $scope.action == 'view';
+        var descriptor = $scope.fieldDescriptor;
+        var isCode = (descriptor.type == "Mixed" ||
+            (descriptor.code && descriptor.type == "String"));
+        return $scope.action == 'view' && !isCode;
     };
 
     $scope.fieldValue = "<NOT_SET>";

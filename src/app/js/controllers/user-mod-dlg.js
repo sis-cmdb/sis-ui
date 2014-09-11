@@ -2,7 +2,7 @@
 // controller for editing a user
 angular.module('sisui')
 .controller("UserModDlgController", function($scope, $modalInstance,
-                                          SisUtil, SisApi) {
+                                             SisUtil, SisApi) {
     "use strict";
 
     var adminGroups = SisUtil.getAdminRoles();
@@ -52,5 +52,3 @@ angular.module('sisui')
     };
 
 });
-
-

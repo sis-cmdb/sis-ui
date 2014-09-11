@@ -26,6 +26,11 @@ ul {
     width : 500px;
 }
 
+.aceEditor {
+    width : 700px;
+    height: 700px;
+}
+
 .entity-label {
     width: 120px;
     text-align: right;

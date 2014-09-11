@@ -13,9 +13,15 @@
                 <div ng-include="'app/partials/entity-descriptor.html'"></div>
             </li>
         </form>
+        <hr/>
+        <h4>SIS fields</h4>
+        <form class="form-inline" role="form" novalidate name="metaMod">
+            <li ng-controller="SchemaDescriptorController" ng-repeat="descriptor in metaDescriptors">
+                <div ng-include="'app/partials/schema-descriptor.html'"></div>
+            </li>
+        </form>
     </div>
     <div ng-if="showJson" class="col-md-6">
         <pre>{{ entity | json }}</pre>
     </div>
 </div>
-

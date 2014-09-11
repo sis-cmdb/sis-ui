@@ -13,12 +13,16 @@ angular.module('sisui')
                 name : "owner",
                 type : "String"
             };
-            var adminGroups = SisUtil.getAdminRoles();
-            if (adminGroups instanceof Array) {
-                ownerDescriptor.enum = adminGroups;
-                ownerDescriptor.type = "Array";
-            } else {
+            if (schema.is_public || schema.is_open) {
                 ownerDescriptor.required = true;
+            } else {
+                var adminGroups = SisUtil.getAdminRoles();
+                if (adminGroups instanceof Array) {
+                    ownerDescriptor.enum = adminGroups;
+                    ownerDescriptor.type = "Array";
+                } else {
+                    ownerDescriptor.required = true;
+                }
             }
 
             $scope.schema = schema;
@@ -42,14 +46,20 @@ angular.module('sisui')
             var descriptors = [
                 { name : "name", type : "String", required : true, readonly : $scope.action == 'edit', match : '/^[0-9a-z_]+$/' },
                 { name : "description", type : "String" },
-                ownerDescriptor,
-                { name : "sis_locked", type : "Boolean" },
                 { name : "locked_fields", type : "String" },
+                { name : "is_open", type : "Boolean" },
+                { name : "is_public", type : "Boolean" },
+                { name : "id_field", type : "String" },
+                { name : "any_owner_can_modify", type : "Boolean" },
                 schemaDefinitionDescriptor
             ];
 
+            var metaDescriptors = SisUtil.getSisDescriptors();
+            metaDescriptors.push(ownerDescriptor);
+
             var orig = angular.copy($scope.schema);
             $scope.descriptors = descriptors;
+            $scope.metaDescriptors = metaDescriptors;
             $scope.originalLockedFields = orig.locked_fields || [];
 
             // assumes all descriptors have a name
@@ -68,7 +78,7 @@ angular.module('sisui')
                 }, 0);
             };
 
-            var maxFieldLen = getMaxFieldName(descriptors);
+            var maxFieldLen = getMaxFieldName(descriptors.concat(metaDescriptors));
 
             $scope.maxFieldNameLength = function(descriptor) {
                 if (!descriptor) {
@@ -187,5 +197,3 @@ angular.module('sisui')
     };
 
 });
-
-

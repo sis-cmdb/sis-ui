@@ -1,5 +1,21 @@
 angular.module('sisui')
-.directive('sisEntityInput', function($compile, SisUtil, $state) {
+.directive('sisCodeEditor', function() {
+    "use strict";
+    var linker = function(scope, element, attrs, ctrl) {
+        var editor = ace.edit("editor");
+        scope.setter(editor);
+    };
+    return {
+        link : linker,
+        restrict : 'E',
+        template : '<div id="editor" class="aceEditor"></div>',
+        scope : {
+            setter : "=",
+            code : "&"
+        }
+    };
+})
+.directive('sisEntityInput', function($compile, SisUtil, $state, $modal) {
     "use strict";
     // returns a select or input element
     // based on descriptor
@@ -13,6 +29,8 @@ angular.module('sisui')
             attrs.push("required");
         }
         var elem = "input";
+        var isCode = (descriptor.code && descriptor.type === "String") ||
+                      descriptor.type == "Mixed";
         var isObjectRef = (descriptor.type == 'ObjectId' && descriptor.ref);
         if (descriptor.enum) {
             // select
@@ -22,6 +40,9 @@ angular.module('sisui')
         } else {
             // input
             var inputType = SisUtil.getInputType(descriptor.type);
+            if (isCode) {
+                inputType = 'hidden';
+            }
             attrs.push('type="' + inputType + '"');
             attrs.push('class="form-control input-sm"');
             if ('min' in descriptor) {
@@ -36,12 +57,16 @@ angular.module('sisui')
                 attrs.push('placeholder="ObjectId (' + descriptor.ref + ')"');
             } else {
                 attrs.push('placeholder="' + (descriptor.comment || descriptor.type) + '"');
-                attrs.push('ng-change="valueChanged(fieldValue)"');
+                if (!isCode) {
+                    attrs.push('ng-change="valueChanged(fieldValue)"');
+                }
             }
         }
         var template = "<" + elem + " " + attrs.join(" ") + " >";
         if (elem == "select") {
             template += "</select>";
+        } else if (isCode) {
+            template += "<a class='btn btn-sm btn-primary' ng-click='openEditor()'>Open Editor</a>";
         }
         return template;
 
@@ -56,6 +81,24 @@ angular.module('sisui')
         }
         scope.$state = $state;
         var elementOffset = element.offset().left;
+
+        scope.openEditor = function() {
+            var modalScope = scope.$new(true);
+            modalScope.code = scope.fieldValue;
+            modalScope.descriptor = descriptor;
+            modalScope.readOnly = scope.action == 'view';
+            $modal.open({
+                templateUrl : "app/partials/code-editor-dlg.html",
+                scope : modalScope,
+                controller : "CodeEditorController",
+                windowClass : "wide-modal-window",
+                keyboard : false,
+                backdrop : 'static'
+            }).result.then(function(code) {
+                scope.fieldValue = code;
+                scope.valueChanged(code);
+            });
+        };
 
         ctrl = ctrl[path];
         if (descriptor.match) {
