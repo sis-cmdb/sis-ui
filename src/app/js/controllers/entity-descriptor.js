@@ -207,8 +207,12 @@ angular.module('sisui')
             }
             $scope.refId = value;
         } else if ($scope.fieldDescriptor.type == "Mixed" &&
-            typeof value === "object") {
-            value = angular.toJson(value);
+            typeof value === "string") {
+                try {
+                    value = angular.fromJson(value);
+                } catch (ex) {
+                    value = null;
+                }
         } else if ($scope.path == "owner" &&
             $scope.fieldDescriptor.type == "String") {
             value = value.split(",").map(function(str) {
