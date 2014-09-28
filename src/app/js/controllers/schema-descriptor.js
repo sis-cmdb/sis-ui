@@ -169,15 +169,6 @@ angular.module('sisui')
         });
     };
 
-    var textToArray = function(text) {
-        if (text instanceof Array) {
-            return text;
-        }
-        return text.split(",").map(function(s) {
-            return s.trim();
-        });
-    };
-
     var convertToSchemaField = function(descriptor) {
         var result = {
             type : descriptor.type
@@ -211,7 +202,7 @@ angular.module('sisui')
                 delete result[fieldName];
             } else {
                 if (field.type == 'textArray') {
-                    var values = textToArray(descriptor[fieldName]);
+                    var values = SisUtil.toStringArray(descriptor[fieldName]);
                     result[fieldName] = values;
                 } else if (field.type == 'select' && fieldName == "ref") {
                     result[fieldName] = descriptor[fieldName].name;
@@ -320,13 +311,16 @@ angular.module('sisui')
         var descriptor = $scope.descriptor;
         if (descriptor.name == 'owner') {
             if (typeof value === 'string') {
-                value = textToArray(value);
+                value = SisUtil.toStringArray(value);
             }
             value = value.sort();
             $scope.schema.owner = value;
+        } else if (descriptor.name === "sis_tags") {
+            value = SisUtil.toStringArray(value);
+            $scope.schema.sis_tags = value;
         } else if (descriptor.name == "locked_fields") {
             if (typeof value === 'string') {
-                value = textToArray(value);
+                value = SisUtil.toStringArray(value);
             }
             $scope.schema.locked_fields = value;
         } else {

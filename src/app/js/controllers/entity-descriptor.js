@@ -215,9 +215,9 @@ angular.module('sisui')
                 }
         } else if ($scope.path == "owner" &&
             $scope.fieldDescriptor.type == "String") {
-            value = value.split(",").map(function(str) {
-                return str.trim();
-            });
+            value = SisUtil.toStringArray(value);
+        } else if ($scope.path == "sis_tags") {
+            value = SisUtil.toStringArray(value);
         }
         if ($scope.isItem()) {
             $scope.$parent.fieldValue[$scope.arrIdx] = value;

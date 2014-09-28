@@ -562,9 +562,7 @@ angular.module('sisui')
     };
 
     var _getTagsDescriptor = function() {
-        var result = { name : "sis_tags", type : "Array" };
-        var children = [{ "type" : "Mixed", _parent_ : result }];
-        result.children = children;
+        var result = { name : "sis_tags", type : "String" };
         return result;
     };
 
@@ -574,6 +572,17 @@ angular.module('sisui')
             { name : "sis_immutable", type : "Boolean" },
             _getTagsDescriptor()
         ];
+    };
+
+    var _toStringArray = function(text) {
+        if (text instanceof Array) {
+            return text;
+        }
+        return text.split(",").map(function(str) {
+            return str.trim();
+        }).filter(function(str) {
+            return str !== "";
+        });
     };
 
     return {
@@ -597,6 +606,7 @@ angular.module('sisui')
         EndpointPager : EndpointPager,
         goBack : _goBack,
         toRegex : _toRegex,
-        getSisDescriptors : _getSisDescriptors
+        getSisDescriptors : _getSisDescriptors,
+        toStringArray : _toStringArray
     };
 });
