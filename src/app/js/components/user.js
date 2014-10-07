@@ -121,6 +121,11 @@ angular.module('sisui')
                     }
                     return SisApi.users.get(username).then(function(user) {
                         // login
+                        if (!result.expires) {
+                            // persistent token
+                            // set it to 8 hours
+                            result.expires = (8 * 1000 * 60);
+                        }
                         var data = {
                             username : username,
                             super_user : user.super_user,

@@ -51,6 +51,7 @@ angular.module('sisui')
                 { name : "is_public", type : "Boolean" },
                 { name : "id_field", type : "String" },
                 { name : "any_owner_can_modify", type : "Boolean" },
+                { name : "track_history", type : "Boolean" },
                 schemaDefinitionDescriptor
             ];
 
