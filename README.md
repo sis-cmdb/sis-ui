@@ -5,6 +5,7 @@ Table of Contents
 - [Requirements](#requirements)
 - [Building](#building)
 - [Configuration](#configuration)
+- [LICENSE](#license)
 
 # Description
 
@@ -38,3 +39,7 @@ the API documentation found in `../SIS-web/docs`.
 Configuration for the SIS UI is specified via the angular `sisconfig` module
 defined in `src/app/js/config.js`.  The only configuration required is the
 SIS backend URL.  See `src/app/js/config.js.sample` for an example.
+
+# LICENSE
+
+This software is licensed under the BSD 3-Clause license.  Please refer to the [LICENSE](./LICENSE) for more information.
