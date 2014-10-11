@@ -9,7 +9,7 @@ Table of Contents
 
 # Description
 
-The SIS-ui is a generic UI that lets users create schemas, hooks, and entities.
+The sis-ui is a generic UI that lets users create schemas, hooks, and entities.
 It is built with angular.js and is a completely standalone application that
 uses only HTTP to communicate with the backend.  There is no server side
 rendering component.
@@ -23,16 +23,16 @@ via `npm install -g grunt-cli`.
 
 The default target produces a UI distribution in the `dist` directory.
 
-The UI requires SIS-js to build.  This can be specified via the `--sisjspath`
+The UI requires sis-client to build.  This can be specified via the `--sisjspath`
 option.  Additionally, SIS API Documentation can be built into the UI by
 specifying the `--docpath` option.
 
 A live reload server can be started via the `serve` target.  For example:
 
-`grunt serve --sisjspath=../SIS-js/lib/sis-js.js --docpath=../SIS-web/docs`
+`grunt serve --sisjspath=../sis-js/lib/sis-client.js --docpath=../sis-api/docs`
 
 will start a live reload server on port 9000 that serves up the UI and renders
-the API documentation found in `../SIS-web/docs`.
+the API documentation found in `../sis-api/docs`.
 
 # Configuration
 

@@ -3,7 +3,7 @@ module.exports = function(grunt) {
   grunt.file.defaultEncoding = 'utf8';
 
   if (!grunt.option("sisjspath")) {
-      return grunt.fail.fatal("sisjspath is required to point to sis-js.js");
+      return grunt.fail.fatal("sisjspath is required to point to sis-client.js");
   }
 
   var docs = [];
