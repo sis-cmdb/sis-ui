@@ -2,10 +2,6 @@ module.exports = function(grunt) {
 
   grunt.file.defaultEncoding = 'utf8';
 
-  if (!grunt.option("sisjspath")) {
-      return grunt.fail.fatal("sisjspath is required to point to sis-client.js");
-  }
-
   var docs = [];
   if (grunt.option('docpath')) {
     var docpath = grunt.option('docpath');
@@ -39,9 +35,7 @@ module.exports = function(grunt) {
         dist : "dist",
         src : "src",
         build : "build",
-    },
-    build_libs : {
-        sisjs : grunt.option("sisjspath")
+        bower : "bower_components"
     },
     buildjson : {
         options : {
@@ -97,21 +91,21 @@ module.exports = function(grunt) {
           {
             expand : true,
             cwd : '<%= build_dirs.src %>',
-            src: ['app/**/*.css'],
+            src: ['app/**/*.css', 'docs/**/*.css', 'common/images/**'],
             dest: '<%= build_dirs.dist %>/',
           },
-          // docs
+          // bootswatch
           {
-            cwd : '<%= build_dirs.src %>',
+            cwd : '<%= build_dirs.bower %>/bootswatch',
             expand : true,
-            src: ['docs/**/*.css'],
-            dest: '<%= build_dirs.dist %>/',
+            src: ['**/*.css'],
+            dest: '<%= build_dirs.dist %>/common/css/bootswatch',
           },
+          // jsondiff patch
           {
-            cwd : '<%= build_dirs.src %>',
-            expand : true,
-            src: ['common/css/**', 'common/images/**'],
-            dest: '<%= build_dirs.dist %>/',
+            cwd : '<%= build_dirs.bower %>/jsondiffpatch/public/formatters-styles',
+            src: ['*.css'],
+            dest: '<%= build_dirs.dist %>/common/css/jsondiffpatch',
           }
         ]
       },
@@ -128,7 +122,7 @@ module.exports = function(grunt) {
           {
             // ace
             expand : true,
-            cwd : '<%= build_dirs.src %>/common/js/vendor/ace/1.1.6',
+            cwd : '<%= build_dirs.bower %>/ace-builds/src-min-noconflict',
             src : ['**'],
             dest : '<%= build_dirs.dist %>/app/js/vendor/ace'
           }
@@ -146,7 +140,12 @@ module.exports = function(grunt) {
       }
     },
     jshint: {
-      files: ['Gruntfile.js', '<%= build_dirs.src %>/app/**/*.js', '<%= build_dirs.src %>/app/js/**/*.js', '<%= build_dirs.src %>/docs/js/*.js', 'test/**/*.js', '!<%= build_dirs.src %>/common/vendor/**/*.js'],
+      files: ['Gruntfile.js',
+              '<%= build_dirs.src %>/app/**/*.js',
+              '<%= build_dirs.src %>/app/js/**/*.js',
+              '<%= build_dirs.src %>/docs/js/*.js',
+              'test/**/*.js'
+              ],
       options: {
         // options here to override JSHint defaults
         globals: {
@@ -177,7 +176,8 @@ module.exports = function(grunt) {
             // data
             context : {
                 scripts : ['./app/js/vendor-libs.js', './app/js/config.js', './app/js/sisui.min.js'],
-                theme : './common/css/bootswatch/3.1.1/{{ bootstrap_theme }}/bootstrap.min.css',
+                theme : './common/css/bootswatch/{{ bootstrap_theme }}/bootstrap.min.css',
+                // can make this more dynamic, but might clutter things
                 themes : ['flatly', 'darkly', 'slate'],
                 css : ['./common/css/jsondiffpatch/html.css',
                        './common/css/jsondiffpatch/annotated.css',
@@ -204,10 +204,6 @@ module.exports = function(grunt) {
       js: {
         files: ['<%= build_dirs.src %>/app/js/**/*.js'],
         tasks: ['newer:jshint', 'uglify', 'copy:dist_js', 'copy:localconfig']
-      },
-      libs : {
-        files: ['<%= build_libs.sisjs %>'],
-        tasks: ['concat', 'copy:dist_js']
       },
       templates : {
         files: ['<%= build_dirs.src %>/app/partials/*.html'],
@@ -271,22 +267,24 @@ module.exports = function(grunt) {
                 '<%= build_dirs.build %>/app/vendor-libs.js' :
                     // order matters
                     // jquery
-                    ['<%= build_dirs.src %>/common/js/vendor/jquery/1.11.0/jquery-1.11.0.min.js',
-                    // angular
-                    //  '<%= build_dirs.src %>/common/js/vendor/angularjs/1.2.17/angular.min.js',
-                     '<%= build_dirs.src %>/common/js/vendor/angularjs/1.2.23/angular.min.js',
-                     '<%= build_dirs.src %>/common/js/vendor/ui.router/0.2.10/angular-ui-router.min.js',
+                    ['<%= build_dirs.bower %>/jquery/dist/jquery.min.js',
+                     // angular
+                     '<%= build_dirs.bower %>/angular/angular.min.js',
+                     // angular router
+                     '<%= build_dirs.bower %>/angular-ui-router/release/angular-ui-router.min.js',
                      // angular bootstrap
-                     '<%= build_dirs.src %>/common/js/vendor/ui.bootstrap/0.10.0/ui-bootstrap-tpls-0.10.0.min.js',
+                     '<%= build_dirs.bower %>/angular-bootstrap/ui-bootstrap-tpls.min.js',
                      // moment
-                     '<%= build_dirs.src %>/common/js/vendor/moment.min.js',
+                     '<%= build_dirs.bower %>/moment/min/moment.min.js',
                      // jsondiff -
-                     '<%= build_dirs.src %>/common/js/vendor/jsondiffpatch/bundle-full.min.js',
-                     '<%= build_dirs.src %>/common/js/vendor/jsondiffpatch/formatters.min.js',
+                     '<%= build_dirs.bower %>/jsondiffpatch/public/build/jsondiffpatch-full.min.js',
                      // ipv6 - https://github.com/beaugunderson/javascript-ipv6
-                     '<%= build_dirs.src %>/common/js/vendor/ipv6/jsbn-combined.js',
-                     '<%= build_dirs.src %>/common/js/vendor/ipv6/sprintf.js',
-                     '<%= build_dirs.src %>/common/js/vendor/ipv6/ipv6.js'
+                     '<%= build_dirs.bower %>/ipv6/lib/browser/jsbn-combined.js',
+                     '<%= build_dirs.bower %>/ipv6/lib/browser/sprintf.js',
+                     '<%= build_dirs.bower %>/ipv6/ipv6.js',
+                     // sis client
+                     '<%= build_dirs.bower %>/sis/lib/sis-client.js'
+
                     ]
             }
         }
@@ -301,8 +299,7 @@ module.exports = function(grunt) {
         files : {
             // sis-ui
             '<%= build_dirs.build %>/sisui.min.js' :
-                ['<%= build_libs.sisjs %>',
-                 '<%= build_dirs.src %>/app/js/app.js',
+                ['<%= build_dirs.src %>/app/js/app.js',
                  '<%= build_dirs.src %>/app/js/components/*.js',
                  '<%= build_dirs.build %>/pegjs/query.js',
                  '<%= build_dirs.build %>/templates/partials.js',

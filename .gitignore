@@ -1,8 +1,8 @@
 .DS_Store
 src/app/js/config.js
-src/app/lib/sis-js.js
 node_modules
 dist
 build
+bower_components
 dev_dist
 .gitreview
