@@ -3,12 +3,23 @@ module.exports = function(grunt) {
     'use strict';
     var marked = require('marked');
     var hljs = require('highlight.js');
+    var renderer = new marked.Renderer();
+
+    var oldLink = renderer.link;
+    renderer.link = function(href, title, text) {
+        if (href[0] === '#' && text.indexOf('.') !== -1) {
+            href = '#' + text.replace(/[^\w:]/g, '-').toLowerCase();
+        }
+        return oldLink.call(this, href, title, text);
+    };
+
     marked.setOptions({
         breaks : true,
         highlight: function(code, lang) {
             var result =  hljs.highlight(lang, code).value;
             return result;
-        }
+        },
+        renderer : renderer
     });
 
     grunt.registerMultiTask('sismd', "Converts SIS-web markdown to html", function() {
