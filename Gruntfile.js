@@ -104,8 +104,9 @@ module.exports = function(grunt) {
           // jsondiff patch
           {
             cwd : '<%= build_dirs.bower %>/jsondiffpatch/public/formatters-styles',
+            expand : true,
             src: ['*.css'],
-            dest: '<%= build_dirs.dist %>/common/css/jsondiffpatch',
+            dest: '<%= build_dirs.dist %>/common/css/jsondiffpatch/',
           }
         ]
       },
@@ -123,7 +124,7 @@ module.exports = function(grunt) {
             // ace
             expand : true,
             cwd : '<%= build_dirs.bower %>/ace-builds/src-min-noconflict',
-            src : ['**'],
+            src : ['**/*.js'],
             dest : '<%= build_dirs.dist %>/app/js/vendor/ace'
           }
         ]
@@ -269,11 +270,11 @@ module.exports = function(grunt) {
                     // jquery
                     ['<%= build_dirs.bower %>/jquery/dist/jquery.min.js',
                      // angular
-                     '<%= build_dirs.bower %>/angular/angular.min.js',
+                     '<%= build_dirs.bower %>/angular/angular.js',
                      // angular router
-                     '<%= build_dirs.bower %>/angular-ui-router/release/angular-ui-router.min.js',
+                     '<%= build_dirs.bower %>/angular-ui-router/release/angular-ui-router.js',
                      // angular bootstrap
-                     '<%= build_dirs.bower %>/angular-bootstrap/ui-bootstrap-tpls.min.js',
+                     '<%= build_dirs.bower %>/angular-bootstrap/ui-bootstrap-tpls.js',
                      // moment
                      '<%= build_dirs.bower %>/moment/min/moment.min.js',
                      // jsondiff -
@@ -338,6 +339,9 @@ module.exports = function(grunt) {
 
 
   grunt.registerTask('serve', function () {
+    if (!grunt.file.isFile('./src/app/js/config.js')) {
+        return grunt.fail.fatal("src/app/js/config.js does not exist.");
+    }
     grunt.task.run(['build', 'copy:localconfig', 'connect:dist', 'watch']);
   });
 

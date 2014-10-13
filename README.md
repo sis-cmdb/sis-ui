@@ -21,10 +21,11 @@ via `npm install -g grunt-cli`.
 
 # Building
 
+Prior to building, run `npm install`.
+
 The default target produces a UI distribution in the `dist` directory.
 
-The UI requires sis-client to build.  This can be specified via the `--sisjspath`
-option.  Additionally, SIS API Documentation can be built into the UI by
+SIS API Documentation can be built into the UI by
 specifying the `--docpath` option.
 
 A live reload server can be started via the `serve` target.  For example:
