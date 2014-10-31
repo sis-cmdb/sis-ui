@@ -8,14 +8,12 @@ angular.module('sisui')
     $scope.path = $scope.paths.join(".");
 
     $scope.isEntityDescriptor = function() {
-        return $scope.paths.length > 1;
+        return $scope.paths.length > 1 &&
+               $scope.paths[0] === 'definition';
     };
 
     $scope.canModifyDescriptor = function() {
-        var path = $scope.path;
-        return $scope.isEntityDescriptor() &&
-               path !== "definition.owner" &&
-               path !== "definition.sis_locked";
+        return $scope.isEntityDescriptor();
     };
 
     $scope.inputType = function() {
@@ -24,18 +22,22 @@ angular.module('sisui')
 
     // returns a boolean if the descriptor represents a value
     // that needs to be set on the schema object.
-    // basically any key in the root object (name, sis_locked, etc.)
+    // basically any key in the root object (name, _sis.*, etc.)
     // fields within the definition object do not apply
     $scope.isSchemaValue = function() {
-        return $scope.paths.length == 1 &&
-               $scope.path != "definition";
+        return ($scope.paths.length == 1 &&
+                $scope.path != "definition" &&
+                $scope.path != '_sis') ||
+                $scope.path.indexOf('_sis.') === 0;
     };
 
     $scope.canModifyChildren = function() {
         var path = $scope.path;
         var type = $scope.descriptor.type;
+        if (path === '_sis') {
+            return true;
+        }
         var result = (type === "Array" || type === "Document") &&
-               path !== "definition.owner" &&
                (path === "definition" ||
                 // ensure it's within the definition
                $scope.isEntityDescriptor());
@@ -51,6 +53,9 @@ angular.module('sisui')
     };
 
     $scope.canAddChildren = function() {
+        if ($scope.path === "_sis") {
+            return false;
+        }
         var descriptor = $scope.descriptor;
         if (descriptor.type === "Document") {
             return true;
@@ -212,7 +217,12 @@ angular.module('sisui')
             }
         }
         if (Object.keys(result).length == 1) {
-            result = result.type;
+            if (descriptor.name === "type") {
+                // a field named type.  This can cause problems
+                result = { type : result.type };
+            } else {
+                result = result.type;
+            }
         }
 
         return result;
@@ -309,15 +319,20 @@ angular.module('sisui')
 
     $scope.schemaValueChanged = function(value) {
         var descriptor = $scope.descriptor;
-        if (descriptor.name == 'owner') {
-            if (typeof value === 'string') {
+        var paths = $scope.paths;
+        if (paths[0] === '_sis') {
+            if (descriptor.name === "owner") {
+                if (typeof value === 'string') {
+                    value = SisUtil.toStringArray(value);
+                }
+                value = value.sort();
+                $scope.schema._sis.owner = value;
+            } else if (descriptor.name === "tags") {
                 value = SisUtil.toStringArray(value);
+                $scope.schema._sis.tags = value;
+            } else {
+                $scope.schema._sis[descriptor.name] = value;
             }
-            value = value.sort();
-            $scope.schema.owner = value;
-        } else if (descriptor.name === "sis_tags") {
-            value = SisUtil.toStringArray(value);
-            $scope.schema.sis_tags = value;
         } else if (descriptor.name == "locked_fields") {
             if (typeof value === 'string') {
                 value = SisUtil.toStringArray(value);
@@ -402,11 +417,15 @@ angular.module('sisui')
 
     $scope.value = "<not set>";
     if ($scope.isSchemaValue()) {
-        $scope.value = $scope.schema[$scope.descriptor.name];
-        if ($scope.descriptor.name == "owner" &&
-            !$scope.descriptor.enum &&
-            !$scope.value.length) {
-            $scope.value = "";
+        if ($scope.paths[0] === '_sis') {
+            $scope.value = $scope.schema._sis[$scope.descriptor.name];
+            if ($scope.descriptor.name == "owner" &&
+                !$scope.descriptor.enum &&
+                !$scope.value.length) {
+                $scope.value = "";
+            }
+        } else {
+            $scope.value = $scope.schema[$scope.descriptor.name];
         }
     }
 

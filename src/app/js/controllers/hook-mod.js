@@ -6,33 +6,27 @@ angular.module('sisui')
         if (!SisUtil.canManageEntity(orig, $scope.schema)) {
             return $scope.$state.go("^.list");
         }
-        $scope.descriptors = SisUtil.getDescriptorArray($scope.schema);
-        // need to tweak this so owner and sis_locked show up..
-        var foundLocked = false;
-        for (var i = 0; i < $scope.descriptors.length; ++i) {
-            var desc = $scope.descriptors[i];
-            if (desc.name == 'owner') {
-                // convert owner into an enum
-                var subset = SisUtil.getOwnerSubset($scope.schema);
-                if (subset instanceof Array) {
-                    desc.enum = subset;
-                    desc.type = "Array";
-                } else {
-                    desc.type = "String";
-                    desc.required = true;
-                    delete desc.enum;
-                }
-            } else if (desc.name == 'sis_locked') {
-                foundLocked = true;
-            }
+
+        var descriptors = SisUtil.getDescriptorArray($scope.schema);
+        // sis meta for v1.1
+        var metaDescriptor = SisUtil.getSisMetaDescriptor();
+        // need to tweak the owner
+        var ownerDesc = metaDescriptor.children.filter(function(desc) {
+            return desc.name === 'owner';
+        })[0];
+        var ownerSubset = SisUtil.getOwnerSubset($scope.schema);
+        if (ownerSubset instanceof Array) {
+            ownerDesc.enum = ownerSubset;
+            ownerDesc.type = "Array";
+        } else {
+            ownerDesc.type = "String";
+            ownerDesc.required = true;
+            delete ownerDesc.enum;
         }
-        if (!foundLocked) {
-            $scope.descriptors.push({
-                name : "sis_locked",
-                type : "Boolean"
-            });
-        }
-        orig.sis_locked = orig.sis_locked || false;
+
+        $scope.descriptors = descriptors;
+        $scope.metaDescriptors = [metaDescriptor];
+
         $scope.entity = angular.copy(orig);
         // for the valueChanged recursion
         $scope.fieldValue = $scope.entity;
@@ -62,7 +56,7 @@ angular.module('sisui')
             }, 0);
         };
 
-        var maxFieldLen = getMaxFieldName($scope.descriptors);
+        var maxFieldLen = getMaxFieldName(descriptors.concat($scope.metaDescriptors));
 
         $scope.maxFieldNameLength = function(descriptor, isItem) {
             if (!descriptor) {
@@ -103,11 +97,9 @@ angular.module('sisui')
             $scope.schema = schema;
             $scope.action = action;
             $scope.title = "Add a new hook";
-            var obj = SisSession.getObjectToCopy(schema.name);
-            init({ });
-            obj.owner = [];
-            $scope.entity = obj;
-            $scope.fieldValue = $scope.entity;
+            var obj = SisSession.getObjectToCopy(schema.name) || { };
+            obj._sis = { owner : [], tags : [] };
+            init(obj);
         } else if (action == 'edit' && hookId) {
             SisApi.getHook(hookId).then(function(res) {
                 $scope.schema = schema;

@@ -26,12 +26,12 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="schema in schemas | filter:filterText">
+            <tr ng-repeat="schema in schemas track by schema.name | filter:filterText">
                 <td>
                     <a ng-click="cacheSchema(schema)" ui-sref="app.entities.list({ schema : schema.name })">{{schema.name}}</a>
                 </td>
                 <td>
-                    <span style="margin-right: 1px;" ng-repeat="owner in schema.owner" class="label label-default clickable" ng-click="sisDlg.showUsersInGroup(owner)">{{owner}}</span>
+                    <span style="margin-right: 1px;" ng-repeat="owner in schema._sis.owner" class="label label-default clickable" ng-click="sisDlg.showUsersInGroup(owner)">{{owner}}</span>
                 </td>
                 <td>
                     <a ng-show="!canManage(schema)" class="btn btn-xs btn-default" disabled="disabled">

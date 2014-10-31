@@ -13,52 +13,26 @@ angular.module('sisui')
             }
         }
 
-        $scope.showJson = false;
-        var descriptors = [];
-        var metaDescriptors = [];
-        var schemaDescriptors = SisUtil.getDescriptorArray($scope.schema);
-        // need to tweak this so owner and sis_locked show up..
-        for (var i = 0; i < schemaDescriptors.length; ++i) {
-            var desc = schemaDescriptors[i];
-            if (desc.name == 'owner') {
-                // convert owner into an enum
-                var subset = SisUtil.getOwnerSubset($scope.schema);
-                if (subset instanceof Array) {
-                    desc.enum = subset;
-                    desc.type = "Array";
-                } else {
-                    desc.type = "String";
-                    desc.required = true;
-                    delete desc.enum;
-                }
-                metaDescriptors.push(desc);
-            } else {
-                descriptors.push(desc);
-            }
+        var descriptors = SisUtil.getDescriptorArray($scope.schema);
+        // sis meta for v1.1
+        var metaDescriptor = SisUtil.getSisMetaDescriptor();
+        // need to tweak the owner
+        var ownerDesc = metaDescriptor.children.filter(function(desc) {
+            return desc.name === 'owner';
+        })[0];
+        var ownerSubset = SisUtil.getOwnerSubset($scope.schema);
+        if (ownerSubset instanceof Array) {
+            ownerDesc.enum = ownerSubset;
+            ownerDesc.type = "Array";
+        } else {
+            ownerDesc.type = "String";
+            ownerDesc.required = true;
+            delete ownerDesc.enum;
         }
-
-        if (!metaDescriptors.length) {
-            var ownerDesc = {
-                name : "owner"
-            };
-            var ownerSubset = SisUtil.getOwnerSubset($scope.schema);
-            if (ownerSubset instanceof Array) {
-                ownerDesc.enum = ownerSubset;
-                ownerDesc.type = "Array";
-            } else {
-                ownerDesc.type = "String";
-                ownerDesc.required = true;
-                delete ownerDesc.enum;
-            }
-            metaDescriptors.push(ownerDesc);
-        }
-
-        metaDescriptors = metaDescriptors.concat(SisUtil.getSisDescriptors());
 
         $scope.descriptors = descriptors;
-        $scope.metaDescriptors = metaDescriptors;
+        $scope.metaDescriptors = [metaDescriptor];
 
-        orig.sis_locked = orig.sis_locked || false;
         $scope.entity = angular.copy(orig);
         // for the valueChanged recursion
         $scope.fieldValue = $scope.entity;
@@ -84,7 +58,7 @@ angular.module('sisui')
             }, 0);
         };
 
-        var maxFieldLen = getMaxFieldName(descriptors.concat(metaDescriptors));
+        var maxFieldLen = getMaxFieldName(descriptors.concat([metaDescriptor]));
 
         $scope.maxFieldNameLength = function(descriptor, isItem) {
             if (!descriptor) {
@@ -133,11 +107,9 @@ angular.module('sisui')
                 $scope.schema = schema;
                 $scope.action = action;
                 $scope.title = "Add a new entity of type " + schemaName;
-                var obj = SisSession.getObjectToCopy(schemaName);
-                init({ }, action);
-                obj.owner = [];
-                $scope.entity = obj;
-                $scope.fieldValue = $scope.entity;
+                var obj = SisSession.getObjectToCopy(schemaName) || { };
+                obj._sis = { owner : [], tags : [] };
+                init(obj, action);
             }, function(err) {
                 return $scope.$state.go("^.list");
             });

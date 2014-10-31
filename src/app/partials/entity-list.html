@@ -36,7 +36,7 @@
         <tbody>
             <tr ng-repeat="entity in entities">
                 <td><a ng-click="cachEntity(entity)" ui-sref="^.view({ eid : entity._id })">{{entity[$parent.idField]}}</a></td>
-                <td><span style="margin-right: 1px;" ng-repeat="owner in entity.owner" ng-click="sisDlg.showUsersInGroup(owner)" class="label label-default clickable">{{owner}}</span></td>
+                <td><span style="margin-right: 1px;" ng-repeat="owner in entity._sis.owner" ng-click="sisDlg.showUsersInGroup(owner)" class="label label-default clickable">{{owner}}</span></td>
                 <td>
                     <a ng-show="!canManage(entity)" class="btn btn-xs btn-default" disabled="disabled">
                         <span class="glyphicon glyphicon-lock"></span>
@@ -57,5 +57,5 @@
             </tr>
         </tbody>
     </table>
-    <pagination direction-links="false" boundary-links="true" total-items="totalItems" page="currentPage" items-per-page="20" class="pagination-sm" max-size="10" rotate="false"></pagination>
+    <pagination direction-links="false" boundary-links="true" total-items="totalItems" ng-model="currentPage" items-per-page="20" class="pagination-sm" max-size="10" rotate="false"></pagination>
 </div>

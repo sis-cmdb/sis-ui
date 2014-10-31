@@ -9,24 +9,25 @@ angular.module('sisui')
         SisApi.getAllSchemas().then(function(schemas) {
             $scope.schemaList = schemas;
 
-            var ownerDescriptor = {
-                name : "owner",
-                type : "String"
-            };
+            var metaDescriptor = SisUtil.getSisMetaDescriptor();
+            var ownerDesc = metaDescriptor.children.filter(function(desc) {
+                return desc.name === 'owner';
+            })[0];
+
             if (schema.is_public || schema.is_open) {
-                ownerDescriptor.required = true;
+                ownerDesc.required = true;
             } else {
                 var adminGroups = SisUtil.getAdminRoles();
                 if (adminGroups instanceof Array) {
-                    ownerDescriptor.enum = adminGroups;
-                    ownerDescriptor.type = "Array";
+                    ownerDesc.enum = adminGroups;
+                    ownerDesc.type = "Array";
                 } else {
-                    ownerDescriptor.required = true;
+                    ownerDesc.required = true;
                 }
             }
 
             $scope.schema = schema;
-            $scope.schema.owner.sort();
+            $scope.schema._sis.owner.sort();
 
             var schemaDefinitionDescriptor = { name : "definition", type : "Document" };
             var entityDescriptors = SisUtil.getDescriptorArray($scope.schema);
@@ -37,8 +38,6 @@ angular.module('sisui')
                     ed._isNew_ = true;
                 }
                 return ed;
-            }).filter(function(ed) {
-                return ed.name !== "owner";
             });
 
             schemaDefinitionDescriptor.children = entityDescriptors;
@@ -55,12 +54,10 @@ angular.module('sisui')
                 schemaDefinitionDescriptor
             ];
 
-            var metaDescriptors = SisUtil.getSisDescriptors();
-            metaDescriptors.push(ownerDescriptor);
 
             var orig = angular.copy($scope.schema);
             $scope.descriptors = descriptors;
-            $scope.metaDescriptors = metaDescriptors;
+            $scope.metaDescriptors = [metaDescriptor];
             $scope.originalLockedFields = orig.locked_fields || [];
 
             // assumes all descriptors have a name
@@ -79,7 +76,7 @@ angular.module('sisui')
                 }, 0);
             };
 
-            var maxFieldLen = getMaxFieldName(descriptors.concat(metaDescriptors));
+            var maxFieldLen = getMaxFieldName(descriptors.concat($scope.metaDescriptors));
 
             $scope.maxFieldNameLength = function(descriptor) {
                 if (!descriptor) {
@@ -140,12 +137,20 @@ angular.module('sisui')
     var createEmptySchema = function() {
         return {
             name : "",
-            owner : [],
             definition : {
                 name : "String"
             },
-            sis_locked : false,
-            locked_fields : []
+            locked_fields : [],
+            is_open : false,
+            is_public : false,
+            track_history : true,
+            id_field : '_id',
+            any_owner_can_modify : false,
+            _sis : {
+                owner : [],
+                locked : false,
+                tags : []
+            }
         };
     };
 
@@ -153,6 +158,7 @@ angular.module('sisui')
         var params = $scope.$stateParams;
         var schemaName = params.schema;
         var action = schemaName ? 'edit' : 'add';
+        var empty = createEmptySchema();
         if (action == 'add' && !schemaName) {
             if (!(SisUtil.getAdminRoles())) {
                 return $scope.$state.go("app.schemas.list");
@@ -160,7 +166,7 @@ angular.module('sisui')
             // adding a schema
             $scope.action = action;
             $scope.title = "Add a new schema";
-            init(createEmptySchema());
+            init(empty);
         } else if (action == 'edit' && schemaName) {
             SisApi.getSchema(schemaName, true).then(function(schema) {
                 if (!SisUtil.canManageSchema(schema)) {
@@ -169,7 +175,9 @@ angular.module('sisui')
                 $scope.action = action;
                 $scope.title = "Modify schema " + schemaName;
                 // clone it
-                init(angular.copy(schema));
+                var cloned = angular.copy(schema);
+                cloned = angular.extend(empty, cloned);
+                init(angular.copy(cloned));
             }, function(err) {
                 return $scope.$state.go("app.schemas.list");
             });

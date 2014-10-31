@@ -5,7 +5,7 @@ angular.module('sisui')
     $scope.$on('schema', function(event, schema) {
         $scope.schema = schema;
         $scope.descriptors = SisUtil.getDescriptorArray(schema);
-        var expression = $scope.schema.owner.reduce(function(q, owner) {
+        var expression = $scope.schema._sis.owner.reduce(function(q, owner) {
             q['roles.' + owner] = 'admin';
             return q;
         }, { });

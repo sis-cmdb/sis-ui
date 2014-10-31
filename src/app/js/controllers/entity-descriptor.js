@@ -59,7 +59,7 @@ angular.module('sisui')
             $scope.fieldValue = addrString;
         }
         // special owner handling
-        if (fieldDescriptor.name == "owner" && !fieldDescriptor._parent_ &&
+        if (fieldDescriptor.path == "_sis.owner" &&
             fieldDescriptor.type == "String" && !$scope.fieldValue.length) {
             $scope.fieldValue = "";
         }
@@ -213,10 +213,10 @@ angular.module('sisui')
                 } catch (ex) {
                     value = null;
                 }
-        } else if ($scope.path == "owner" &&
+        } else if ($scope.path == "_sis.owner" &&
             $scope.fieldDescriptor.type == "String") {
             value = SisUtil.toStringArray(value);
-        } else if ($scope.path == "sis_tags") {
+        } else if ($scope.path == "_sis.tags") {
             value = SisUtil.toStringArray(value);
         }
         if ($scope.isItem()) {

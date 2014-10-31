@@ -3,23 +3,7 @@ angular.module('sisui')
                                              SisUtil, SisApi) {
     var init = function() {
         $scope.descriptors = SisUtil.getDescriptorArray($scope.schema);
-        // need to tweak this so owner and sis_locked show up..
-        var foundLocked = false;
-        for (var i = 0; i < $scope.descriptors.length; ++i) {
-            var desc = $scope.descriptors[i];
-            if (desc.name == 'owner') {
-                // convert owner into an enum
-                desc.enum = SisUtil.getOwnerSubset($scope.schema);
-            } else if (desc.name == 'sis_locked') {
-                foundLocked = true;
-            }
-        }
-        if (!foundLocked) {
-            $scope.descriptors.push({
-                name : "sis_locked",
-                type : "Boolean"
-            });
-        }
+        $scope.metaDescriptors = [SisUtil.getSisMetaDescriptor()];
 
         // for the valueChanged recursion
         $scope.fieldValue = $scope.obj;
@@ -27,14 +11,25 @@ angular.module('sisui')
         // assumes all descriptors have a name
         var getMaxFieldName = function(descriptors) {
             return descriptors.reduce(function(max, desc) {
-                if (max < desc.name.length) {
-                    max = desc.name.length;
+                // either a name or a number label for an array
+                var len = desc.name ? desc.name.length : 4;
+                if (desc.children && desc.children.length) {
+                    // is a container
+                    if ($scope.action != 'view') {
+                        // two buttons - dleete and collaps
+                        len += 5;
+                    } else {
+                        len += 3;
+                    }
+                }
+                if (max < len) {
+                    max = len;
                 }
                 return max;
             }, 0);
         };
 
-        var maxFieldLen = getMaxFieldName($scope.descriptors);
+        var maxFieldLen = getMaxFieldName($scope.descriptors.concat($scope.metaDescriptors));
 
         $scope.maxFieldNameLength = function(descriptor) {
             if (!descriptor) {

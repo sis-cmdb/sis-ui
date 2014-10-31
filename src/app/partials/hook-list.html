@@ -35,7 +35,7 @@
                 <td>
                     <a ui-sref="app.entities.list({ schema : hook.entity_type})">{{hook.entity_type}}</a>
                 </td>
-                <td><span style="margin-right: 1px;" ng-repeat="owner in hook.owner" ng-click="sisDlg.showUsersInGroup(owner)" class="label label-default clickable">{{owner}}</span></td>
+                <td><span style="margin-right: 1px;" ng-repeat="owner in hook._sis.owner" ng-click="sisDlg.showUsersInGroup(owner)" class="label label-default clickable">{{owner}}</span></td>
                 <td>
                     <a ng-show="!canManage(hook)" class="btn btn-xs btn-default" disabled="disabled">
                         <span class="glyphicon glyphicon-lock"></span>
@@ -56,5 +56,5 @@
             </tr>
         </tbody>
     </table>
-    <pagination direction-links="false" boundary-links="true" total-items="totalItems" page="currentPage" items-per-page="20" class="pagination-sm" max-size="10" rotate="false"></pagination>
+    <pagination direction-links="false" boundary-links="true" total-items="totalItems" ng-model="currentPage" items-per-page="20" class="pagination-sm" max-size="10" rotate="false"></pagination>
 </div>

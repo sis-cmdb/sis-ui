@@ -1,4 +1,4 @@
-// Utility methods
+// Utility methods - TODO refactor
 angular.module('sisui')
 .factory('SisUtil', function($window, $state, SisUser,
                              $q, SisQueryParser) {
@@ -181,14 +181,14 @@ angular.module('sisui')
         if (name) {
             res.name = name;
         }
-        res.children.map(function(c) {
+        res.children.forEach(function(c) {
             c._parent_ = res;
         });
         return res;
     }
 
     function fixChildren(desc) {
-        desc.children.map(function(c) {
+        desc.children.forEach(function(c) {
             c._parent_ = desc;
         });
         desc.children.sort(function(c1, c2) {
@@ -328,7 +328,7 @@ angular.module('sisui')
         if (schema.is_open || schema.is_public) {
             return true;
         }
-        var owner = schema.owner;
+        var owner = schema._sis.owner;
         for (var i = 0; i < owner.length; ++i) {
             if (owner[i] in roles) {
                 return true;
@@ -373,17 +373,17 @@ angular.module('sisui')
             return [];
         }
         if (user.super_user) {
-            return schema.owner;
+            return schema._sis.owner;
         }
         var roles = user.roles || { };
-        var subset = schema.owner.filter(function(o) {
+        var subset = schema._sis.owner.filter(function(o) {
             return o in roles;
         });
         return subset;
     };
 
     var _canDelete = function(obj) {
-        return obj && !obj.sis_locked;
+        return obj && !(obj._sis && obj._sis.locked);
     };
 
     var _canManageEntity = function(entity, schema) {
@@ -393,7 +393,7 @@ angular.module('sisui')
         }
         if (user.super_user) { return true; }
         var roles = user.roles || { };
-        var owner = entity.owner || schema.owner;
+        var owner = entity._sis ? entity._sis.owner : schema._sis.owner;
         for (var i = 0; i < owner.length; ++i) {
             var group = owner[i];
             if (!roles[group]) {
@@ -412,13 +412,14 @@ angular.module('sisui')
         if (schema.is_open) { return true; }
         var roles = user.roles || { };
         var numAdminRoles = 0;
-        for (var i = 0; i < schema.owner.length; ++i) {
-            var group = schema.owner[i];
+        var owners = schema._sis.owner;
+        for (var i = 0; i < owners.length; ++i) {
+            var group = owners[i];
             if (roles[group] == 'admin') {
                 numAdminRoles++;
             }
         }
-        return (numAdminRoles == schema.owner.length ||
+        return (numAdminRoles == owners.length ||
                 numAdminRoles > 0 && schema.any_owner_can_modify);
     };
 
@@ -510,7 +511,9 @@ angular.module('sisui')
     var _getHookSchema = function() {
         return {
             name : "sis_hooks",
-            owner : _getAllRoles(),
+            _sis : {
+                owner : _getAllRoles()
+            },
             definition : {
                 name : { type : "String", required : true, unique : true, match : '/^[0-9a-z_]+$/' },
                 target : {
@@ -523,7 +526,6 @@ angular.module('sisui')
                 retry_count : { type : "Number", min : 0, max : 20, "default" : 0 },
                 retry_delay : { type : "Number", min : 1, max : 60, "default" : 1 },
                 events : { type : [{ type : "String", enum : ["insert", "update", "delete"] }], required : true },
-                owner : { type : ["String"] },
                 entity_type : { type : "String", required : true }
             }
         };
@@ -561,17 +563,20 @@ angular.module('sisui')
         return null;
     };
 
-    var _getTagsDescriptor = function() {
-        var result = { name : "sis_tags", type : "String" };
-        return result;
-    };
-
-    var _getSisDescriptors = function() {
-        return [
-            { name : "sis_locked", type : "Boolean" },
-            { name : "sis_immutable", type : "Boolean" },
-            _getTagsDescriptor()
+    var _getSisMetaDescriptor = function() {
+        var children = [
+            { name : "locked", type : "Boolean" },
+            { name : "immutable", type : "Boolean" },
+            { name : "tags", type : "String" },
+            { name : "owner", type : ["String"] }
         ];
+        var meta = {
+            name : '_sis', type : 'Document', children : children
+        };
+        meta.children.forEach(function(c) {
+            c._parent_ = meta;
+        });
+        return meta;
     };
 
     var _toStringArray = function(text) {
@@ -606,7 +611,7 @@ angular.module('sisui')
         EndpointPager : EndpointPager,
         goBack : _goBack,
         toRegex : _toRegex,
-        getSisDescriptors : _getSisDescriptors,
+        getSisMetaDescriptor : _getSisMetaDescriptor,
         toStringArray : _toStringArray
     };
 });

@@ -5,7 +5,7 @@ angular.module('sisui')
 
     var query = {
         sort : "name",
-        fields : "name,owner,entity_type,sis_locked"
+        fields : "name,entity_type,_sis"
     };
 
     var hookSchema = SisUtil.getHookSchema();
@@ -24,7 +24,7 @@ angular.module('sisui')
     };
 
     $scope.canManage = function(hook) {
-        return SisUtil.canManageEntity(hook, { owner : [] });
+        return SisUtil.canManageEntity(hook, { _sis : { owner : [] }});
     };
 
     $scope.canAdd = function() {

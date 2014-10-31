@@ -5,7 +5,7 @@ angular.module('sisui')
 
     var query = {
         sort : "name",
-        fields : "name,owner,sis_locked"
+        fields : "name,_sis"
     };
 
     $scope.remove = function(schema) {

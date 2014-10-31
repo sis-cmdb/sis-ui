@@ -13,7 +13,7 @@ angular.module('sisui')
 
         API_URL = absUrl;
     }
-    var client = SIS.client({'url' : API_URL });
+    var client = SIS.client({'url' : API_URL, 'version' : 'v1.1' });
 
     var createCallback = function(d) {
         return function(err, result) {

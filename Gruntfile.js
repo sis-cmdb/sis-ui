@@ -98,7 +98,7 @@ module.exports = function(grunt) {
           {
             cwd : '<%= build_dirs.bower %>/bootswatch',
             expand : true,
-            src: ['**/*.css'],
+            src: ['**/*.css', '**/glyphicons*'],
             dest: '<%= build_dirs.dist %>/common/css/bootswatch',
           },
           // jsondiff patch
