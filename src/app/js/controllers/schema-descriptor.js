@@ -263,10 +263,15 @@ angular.module('sisui')
                 // it's an object
                 doc = doc[paths[i]];
             }
+            // check if the document has a type
+            // field and if that is an embedded schema
+            // or a field named "type"
             if (doc.type &&
                 typeof doc.type === 'object') {
-                // inner document
-                doc = doc.type;
+                if (typeof doc.type.type !== "string") {
+                    // inner document
+                    doc = doc.type;
+                }
             }
         }
         if (doc instanceof Array) {
