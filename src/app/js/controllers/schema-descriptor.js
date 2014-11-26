@@ -281,15 +281,35 @@ angular.module('sisui')
         }
     };
 
-    $scope.toggleChoice = function(choice) {
-        var descriptor = $scope.descriptor;
+    function getSchemaValue(schema, paths) {
+        var result = schema;
+        paths.forEach(function(p) {
+            result = result[p];
+        });
+        return result;
+    }
+
+    $scope.isSelected = function(choice) {
+        var paths = $scope.paths;
         var schema = $scope.schema;
-        var value = schema[descriptor.name];
-        var idx = value.indexOf(choice);
-        if (idx == -1) {
-            value.push(choice);
-        } else {
-            value.splice(idx, 1);
+        var arrayValue = getSchemaValue(schema, paths);
+        if (arrayValue instanceof Array) {
+            return arrayValue.indexOf(choice) >= 0;
+        }
+        return false;
+    };
+
+    $scope.toggleChoice = function(choice) {
+        var paths = $scope.paths;
+        var schema = $scope.schema;
+        var arrayValue = getSchemaValue(schema, paths);
+        if (arrayValue instanceof Array) {
+            var idx = arrayValue.indexOf(choice);
+            if (idx == -1) {
+                arrayValue.push(choice);
+            } else {
+                arrayValue.splice(idx, 1);
+            }
         }
     };
 
