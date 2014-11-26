@@ -21,7 +21,7 @@
                         <fieldset>
                         <label ng-repeat="choice in descriptor.enum">
                             <input type="checkbox"
-                               ng-checked="schema[descriptor.name].indexOf(choice) >= 0"
+                               ng-checked="isSelected(choice)"
                                ng-click="toggleChoice(choice)"> {{ choice }}
                         </label>
                         </fieldset>
