@@ -1,6 +1,7 @@
 angular.module('sisui')
 .controller("UserListController", function($scope, SisUser,
-                                        SisDialogs, SisUtil, SisApi) {
+                                        SisDialogs, SisUtil, SisApi,
+                                        EndpointPager) {
     "use strict";
 
     $scope.edit = function(user) {
@@ -44,7 +45,7 @@ angular.module('sisui')
     };
 
     var opts = { sortField : 'name', itemsField : 'users' };
-    var pager = new SisUtil.EndpointPager(SisApi.users, $scope, opts);
+    var pager = EndpointPager.create(SisApi.users, $scope, opts);
     if ($scope.search) {
         pager.setSearch($scope.search);
     }

@@ -279,6 +279,7 @@ module.exports = function(grunt) {
                      '<%= build_dirs.bower %>/moment/min/moment.min.js',
                      // jsondiff -
                      '<%= build_dirs.bower %>/jsondiffpatch/public/build/jsondiffpatch-full.min.js',
+                     '<%= build_dirs.bower %>/jsondiffpatch/public/build/jsondiffpatch-formatters.min.js',
                      // ipv6 - https://github.com/beaugunderson/javascript-ipv6
                      '<%= build_dirs.bower %>/ipv6/lib/browser/jsbn-combined.js',
                      '<%= build_dirs.bower %>/ipv6/lib/browser/sprintf.js',

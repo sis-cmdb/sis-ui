@@ -1,6 +1,7 @@
 angular.module('sisui')
 .controller("HookListController", function($scope, SisSession, SisUser,
-                                           SisDialogs, SisUtil, SisApi) {
+                                           SisDialogs, SisUtil, SisApi,
+                                           EndpointPager) {
     "use strict";
 
     var query = {
@@ -44,7 +45,7 @@ angular.module('sisui')
     // setup pager
     var opts = { sortField : 'name', itemsField : 'hooks' };
     var endpoint = SisApi.hooks;
-    pager = new SisUtil.EndpointPager(endpoint, $scope, opts);
+    pager = EndpointPager.create(endpoint, $scope, opts);
     pager.setPage(1);
 
     // patch scope

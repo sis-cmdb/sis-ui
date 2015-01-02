@@ -1,7 +1,7 @@
 angular.module('sisui')
 .controller("EntityListController", function($scope,
                                              SisSession, SisDialogs, SisUtil,
-                                             SisApi) {
+                                             SisApi, EndpointPager) {
     "use strict";
     if (!($scope.$stateParams.schema)) {
         $scope.$state.go("app.schemas.list");
@@ -55,7 +55,7 @@ angular.module('sisui')
         var opts = { sortField : $scope.idField,
                      itemsField : 'entities',
                      idField : '_id' };
-        pager = new SisUtil.EndpointPager(SisApi.entities(schemaName),
+        pager = EndpointPager.create(SisApi.entities(schemaName),
                                           $scope, opts);
         pager.setPage(1);
 

@@ -1,6 +1,6 @@
 angular.module('sisui')
 .controller("CommitListController", function($scope, SisApi,
-                                             SisUtil, $sce) {
+                                             SisUtil, EndpointPager, $sce) {
     "use strict";
     var type = $scope.$stateParams.type || "entities";
     var id = $scope.$stateParams.id;
@@ -38,7 +38,7 @@ angular.module('sisui')
         var opts = { sortField : 'date_modified',
                      itemsField : 'commits',
                      idField : '_id' };
-        var pager = new SisUtil.EndpointPager(endpoint, $scope, opts);
+        var pager = EndpointPager.create(endpoint, $scope, opts);
         pager.setPage(1);
     };
 
