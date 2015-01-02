@@ -29,6 +29,7 @@
             <tr ng-repeat="schema in schemas track by schema.name | filter:filterText">
                 <td>
                     <a ng-click="cacheSchema(schema)" ui-sref="app.entities.list({ schema : schema.name })">{{schema.name}}</a>
+                    <span class="badge pull-right">{{ schema.entity_count }}</span>
                 </td>
                 <td>
                     <span style="margin-right: 1px;" ng-repeat="owner in schema._sis.owner" class="label label-default clickable" ng-click="sisDlg.showUsersInGroup(owner)">{{owner}}</span>

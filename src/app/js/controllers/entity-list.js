@@ -39,6 +39,13 @@ angular.module('sisui')
         return $scope.canManage(entity) && SisUtil.canDelete(entity);
     };
 
+    $scope.canManageSchema = function() {
+        if (!$scope.schema) {
+            return false;
+        }
+        return SisUtil.canManageSchema($scope.schema);
+    };
+
     SisApi.getSchema(schemaName, true).then(function(schema) {
         $scope.schema = schema;
         $scope.$broadcast('schema', schema);

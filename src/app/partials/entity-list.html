@@ -18,6 +18,9 @@
         <small ng-if="filterError">{{ filterError }}</small>
       </div>
       <div class="form-group pull-right">
+        <a ng-show="canManageSchema()" ui-sref="app.schemas.edit({ schema : schema.name })">
+            <button type="button" class="btn btn-primary btn-sm">Edit Schema</button>
+        </a>
         <a ng-show="canAdd()" ui-sref="^.add" ng-click="cacheEntity(null, null)">
             <button type="button" class="btn btn-primary btn-sm">Add New</button>
         </a>

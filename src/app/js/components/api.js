@@ -84,14 +84,13 @@ angular.module('sisui')
         // convenience methods that hit the session first
         // Get all the schemas sorted by name
         this.getAllSchemas = function() {
-            var d = $q.defer();
             var schemas = SisSession.getSchemas();
             if (schemas) {
-                d.resolve(schemas);
-                return d.promise;
+                return $q.when(schemas);
             }
             // need to query
-            this.schemas.listAll({ sort : 'name' }).then(function(schemas) {
+            var d = $q.defer();
+            this.schemas.listAll({ sort : 'name', with_counts : true }).then(function(schemas) {
                 // set the schemas
                 SisSession.setSchemas(schemas);
                 d.resolve(schemas);
@@ -102,13 +101,13 @@ angular.module('sisui')
         };
 
         this.getSchema = function(name, setToCurrent) {
-            var d = $q.defer();
+
             var currentSchema = SisSession.getCurrentSchema();
             if (currentSchema && currentSchema.name == name) {
-                d.resolve(currentSchema);
-                return d.promise;
+                return $q.when(currentSchema);
             }
             // need to query
+            var d = $q.defer();
             this.schemas.get(name).then(function(schema) {
                 d.resolve(schema);
                 if (setToCurrent) {
@@ -121,13 +120,12 @@ angular.module('sisui')
         };
 
         this.getEntityWithSchema = function(entityId, schemaName, setToCurrent) {
-            var d = $q.defer();
             var result = SisSession.getCurrentEntityAndSchemaIfMatches(schemaName, entityId);
             if (result) {
-                d.resolve(result);
-                return d.promise;
+                return $q.when(result);
             }
             // need the schema first
+            var d = $q.defer();
             var self = this;
             this.getSchema(schemaName, setToCurrent).then(function(schema) {
                 self.entities(schemaName).get(entityId).then(function(entity) {
@@ -145,13 +143,12 @@ angular.module('sisui')
         };
 
         this.getHook = function(name, setToCurrent) {
-            var d = $q.defer();
             var currentHook = SisSession.getCurrentHook();
             if (currentHook && currentHook.name == name) {
-                d.resolve(currentHook);
-                return d.promise;
+                return $q.when(currentHook);
             }
             // need to query
+            var d = $q.defer();
             this.hooks.get(name).then(function(hook) {
                 d.resolve(hook);
                 if (setToCurrent) {
