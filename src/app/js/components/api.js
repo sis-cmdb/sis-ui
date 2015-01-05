@@ -160,7 +160,7 @@ angular.module('sisui')
             return d.promise;
         };
 
-        this.apiInfo = $http.get(API_URL + "/api/v1/info");
+        this.apiInfo = $http.get(API_URL + "/api/v1.1/info");
         this.uiInfo = $http.get("build.json");
 
     };

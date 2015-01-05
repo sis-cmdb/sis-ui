@@ -285,8 +285,9 @@ module.exports = function(grunt) {
                      '<%= build_dirs.bower %>/ipv6/lib/browser/sprintf.js',
                      '<%= build_dirs.bower %>/ipv6/ipv6.js',
                      // sis client
-                     '<%= build_dirs.bower %>/sis/lib/sis-client.js'
-
+                     '<%= build_dirs.bower %>/sis/lib/sis-client.js',
+                     // angular smart table
+                     '<%= build_dirs.bower %>/angular-smart-table/dist/smart-table.debug.js',
                     ]
             }
         }

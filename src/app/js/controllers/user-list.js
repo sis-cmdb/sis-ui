@@ -45,9 +45,5 @@ angular.module('sisui')
     };
 
     var opts = { sortField : 'name', itemsField : 'users' };
-    var pager = EndpointPager.create(SisApi.users, $scope, opts);
-    if ($scope.search) {
-        pager.setSearch($scope.search);
-    }
-    pager.setPage(1);
+    EndpointPager.create(SisApi.users, $scope, opts);
 });

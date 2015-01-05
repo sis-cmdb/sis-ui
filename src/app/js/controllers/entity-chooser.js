@@ -5,9 +5,8 @@ angular.module('sisui')
 
     var schema = $scope.schema;
     // set up pager
-    var opts = { sortField : $scope.idField, itemsField : 'entities' };
+    var opts = { sortField : $scope.idField, itemsField : 'entities',
+                 ignoreLoc : true };
     var endpoint = SisApi.entities(schema.name);
-    var pager = EndpointPager.create(endpoint, $scope, opts);
-    pager.setPage(1);
-
+    EndpointPager.create(endpoint, $scope, opts);
 });

@@ -1,4 +1,4 @@
-angular.module('sisui', ['ui.router', 'ui.bootstrap', 'sisconfig'])
+angular.module('sisui', ['ui.router', 'ui.bootstrap', 'sisconfig', 'smart-table'])
 .config(function($stateProvider, $urlRouterProvider, $rootScopeProvider) {
     "use strict";
 

@@ -1,7 +1,6 @@
 // Utility methods - TODO refactor
 angular.module('sisui')
-.factory('SisUtil', function($window, $state, SisUser,
-                             $q, SisQueryParser) {
+.factory('SisUtil', function($window, $state, SisUser, $q) {
     "use strict";
 
     // add some utilities to the client

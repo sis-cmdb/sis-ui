@@ -46,6 +46,14 @@ angular.module('sisui')
         return SisUtil.canManageSchema($scope.schema);
     };
 
+    $scope.loadPage = function(state, controller) {
+        $scope.stController = controller;
+        if (pager) {
+            console.log(JSON.stringify(state));
+            pager.loadFromState(controller.tableState());
+        }
+    };
+
     SisApi.getSchema(schemaName, true).then(function(schema) {
         $scope.schema = schema;
         $scope.$broadcast('schema', schema);
@@ -55,9 +63,8 @@ angular.module('sisui')
         var opts = { sortField : $scope.idField,
                      itemsField : 'entities',
                      idField : '_id' };
-        pager = EndpointPager.create(SisApi.entities(schemaName),
-                                          $scope, opts);
-        pager.setPage(1);
+        pager = EndpointPager.createStPager(SisApi.entities(schemaName),
+                                            $scope, opts);
 
         // patch scope
         SisDialogs.addRemoveDialog($scope, $scope.schema.name,
