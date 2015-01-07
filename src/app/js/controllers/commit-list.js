@@ -17,6 +17,13 @@ angular.module('sisui')
             return;
     }
 
+    // setup a pager
+    var opts = { sortField : 'date_modified',
+                 itemsField : 'commits',
+                 idField : '_id',
+                 ignoreLoc : true };
+    var pager = EndpointPager.createStPager($scope, opts);
+
     var setup = function(endpoint, itemType, itemId) {
         // set page title
         $scope.title = "Commits for " + itemType + " " + itemId;
@@ -41,13 +48,11 @@ angular.module('sisui')
             return $sce.trustAsHtml(html);
         };
 
-        // setup a pager
-        var opts = { sortField : 'date_modified',
-                     itemsField : 'commits',
-                     idField : '_id',
-                     ignoreLoc : true };
-        EndpointPager.create(endpoint, $scope, opts);
+        pager.setEndpoint(endpoint);
+    };
 
+    $scope.loadPage = function(state, controller) {
+        pager.loadPage(state, controller);
     };
 
     if (type != 'entities') {

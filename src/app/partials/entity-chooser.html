@@ -3,7 +3,7 @@
         <h3>Choose an entity of type {{ schema.name }}</h3>
     </div>
     <div class="modal-body no-item-display">
-        <div class="row sisui-bottom-buffer">
+        <div class="row sisui-bottom-buffer"  st-table="entities" st-pipe="loadPage">
             <table class="table table-bordered table-condensed table-striped">
                 <thead>
                     <tr>
@@ -24,7 +24,9 @@
                     </tr>
                 </tbody>
             </table>
-            <pagination direction-links="false" boundary-links="true" total-items="totalItems" ng-model="currentPage" items-per-page="{{ pageSize }}" class="pagination-sm" max-size="10" rotate="false"></pagination>
+            <div class="row text-center">
+                <div st-pagination="" st-items-by-page="20" st-displayed-pages="7"></div>
+            </div>
         </div>
         <div class="row">
             <button class="btn btn-info btn-sm" ng-click="$close(null);">Clear Choice</button>

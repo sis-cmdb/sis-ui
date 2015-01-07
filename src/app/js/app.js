@@ -1,5 +1,6 @@
 angular.module('sisui', ['ui.router', 'ui.bootstrap', 'sisconfig', 'smart-table'])
-.config(function($stateProvider, $urlRouterProvider, $rootScopeProvider) {
+.config(function($stateProvider, $urlRouterProvider,
+                 $rootScopeProvider) {
     "use strict";
 
     // HACKY - http://stackoverflow.com/questions/21958856/template-recursion-limitation-digest-loop-in-angularjs
@@ -176,7 +177,7 @@ angular.module('sisui', ['ui.router', 'ui.bootstrap', 'sisconfig', 'smart-table'
     };
 })
 .run(function ($rootScope, $state, $stateParams, $location,
-               SisDialogs) {
+               $templateCache, SisDialogs) {
     $rootScope.$state = $state;
     $rootScope.$stateParams = $stateParams;
     $rootScope.sisDlg = SisDialogs;
@@ -185,4 +186,16 @@ angular.module('sisui', ['ui.router', 'ui.bootstrap', 'sisconfig', 'smart-table'
         $rootScope.embedded = true;
         $location.search('embed', null);
     }
+
+    // modify the st pagination template
+    var template = [
+        '<div class="pagination" ng-if="pages.length >= 2"><ul class="pagination">',
+        '<li><a ng-click="selectPage(1)">First</a></li>',
+        '<li><a ng-click="selectPage(pages[0] - stDisplayedPages)" ng-if="pages[0] > stDisplayedPages">...</a></li>',
+        '<li ng-repeat="page in pages" ng-class="{active: page==currentPage}"><a ng-click="selectPage(page)">{{page}}</a></li>',
+        '<li><a ng-click="selectPage(pages[pages.length - 1] + 1)" ng-if="pages[pages.length - 1] < numPages">...</a></li>',
+        '<li><a ng-click="selectPage(numPages)">Last</a></li>',
+        '</ul></div>'
+    ].join("");
+    $templateCache.put('template/smart-table/pagination.html', template);
 });

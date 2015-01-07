@@ -27,8 +27,8 @@
       </div>
     </form>
 </div>
-<div class="row">
-    <table class="table table-bordered table-condensed table-striped" st-table="entities" st-pipe="loadPage">
+<div class="row" st-table="entities" st-pipe="loadPage">
+    <table class="table table-bordered table-condensed table-striped">
         <thead>
             <tr>
                 <th>{{ idField }}</th>
@@ -61,13 +61,9 @@
                 </td>
             </tr>
         </tbody>
-        <tfoot>
-            <tr>
-                <td colspan="5" class="text-center">
-                    <div st-pagination="" st-items-by-page="20" st-displayed-pages="7"></div>
-                </td>
-            </tr>
-        </tfoot>
     </table>
+    <div class="row text-center">
+        <div st-pagination="" st-items-by-page="20" st-displayed-pages="7"></div>
+    </div>
     <!-- <pagination direction-links="false" boundary-links="true" total-items="totalItems" ng-model="currentPage" items-per-page="itemsPerPage" class="pagination-sm" max-size="10" rotate="false"></pagination> -->
 </div>

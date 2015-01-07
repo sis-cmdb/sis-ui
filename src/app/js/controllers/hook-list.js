@@ -45,7 +45,11 @@ angular.module('sisui')
     // setup pager
     var opts = { sortField : 'name', itemsField : 'hooks' };
     var endpoint = SisApi.hooks;
-    pager = EndpointPager.create(endpoint, $scope, opts);
+    pager = EndpointPager.createStPager($scope, opts);
+    pager.setEndpoint(endpoint);
+    $scope.loadPage = function(state, controller) {
+        pager.loadPage(state, controller);
+    };
 
     // patch scope
     SisDialogs.addRemoveDialog($scope, 'hook');

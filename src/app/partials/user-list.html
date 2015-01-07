@@ -14,7 +14,7 @@
       </div>
     </form>
 </div>
-<div class="row">
+<div class="row" st-table="entities" st-pipe="loadPage">
     <table class="table table-bordered table-condensed table-striped">
         <thead>
             <tr>
@@ -46,5 +46,7 @@
             </tr>
         </tbody>
     </table>
-    <pagination direction-links="false" boundary-links="true" total-items="totalItems" ng-model="currentPage" items-per-page="20" class="pagination-sm" max-size="10" rotate="false"></pagination>
+    <div class="row text-center">
+        <div st-pagination="" st-items-by-page="20" st-displayed-pages="7"></div>
+    </div>
 </div>

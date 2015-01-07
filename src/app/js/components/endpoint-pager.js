@@ -1,5 +1,5 @@
 angular.module('sisui')
-.service('EndpointPager', function(SisQueryParser, $location) {
+.service('EndpointPager', function(SisQueryParser, $location, $q) {
 
     function convertParsedToQueryObj(parsed) {
         var left = parsed[0];
@@ -63,78 +63,42 @@ angular.module('sisui')
         return null;
     }
 
-
-    // Pager class
-    function EndpointPager(endpoint, scope, opts) {
-        this.parseSearch = function(search) {
-            return parseSearch(search);
-        };
-
-        var self = this;
+    function SmartTableSetup(scope, opts) {
         // init
         // opts/defaults
         opts = opts || { };
-        scope.pageSize = opts.pageSize || 20;
-        var sortField = opts.sortField || null;
+        var pageSize = opts.pageSize || 20;
         var fields = opts.fields || null;
-        var searchQuery = parseSearch(opts.search);
         var itemsField = opts.itemsField || 'items';
         var idField = opts.idField || 'name';
+        var searchText = "";
+        var parsedSearch = null;
 
-        this.endpoint = endpoint;
+        this.stController = null;
+        this.endpoint = null;
+        var self = this;
 
-        this.setSearch = function(search) {
-            searchQuery = this.parseSearch(search);
-            if (searchQuery) {
-                // set page to 1
-                this.setPage(1);
-            }
-            this.loadPage();
-        };
+        var loading = false;
 
-        this.setSort = function(sort) {
-            sortField = sort;
-            this.loadPage();
-        };
-
-        this.loadPage = function() {
-            var query = {
-                limit : scope.pageSize,
-                offset: (scope.currentPage - 1) * scope.pageSize
-            };
-            if (sortField) {
-                query.sort = sortField;
+        // called from the parent scope to do page
+        // loads
+        this.loadPage = function(state, controller) {
+            if (!this.stController) {
+                this._setStController(controller);
+            } else {
+                // table state change triggered
+                // after initialization
+                // ensure the page is set
+                var page = state.pagination.start / pageSize;
+                page++;
+                this._changeLocation('p', page);
+                this._loadFromState(state);
             }
-            if (fields) {
-                query.fields = fields;
-            }
-            if (searchQuery) {
-                query.q = searchQuery;
-            }
-            // console.log("LP: " + JSON.stringify($location.search()));
-            // console.log("LPQ: " + JSON.stringify(query));
-            // console.log(new Error().stack);
-            endpoint.list(query).then(function(items) {
-                // console.log("CB: " + JSON.stringify($location.search()));
-                scope.totalItems = items.total_count;
-                scope.itemsPerPage = 20;
-                scope[itemsField] = items.results;
-            });
-        };
-
-        // attach some scope methods
-        this.setPage = function(pageNum) {
-            console.log("Set page " + pageNum);
-            scope.currentPage = pageNum;
-            if (!opts.ignoreLoc) {
-                $location.search('p', pageNum);
-            }
-            self.loadPage();
         };
 
         this.remove = function(item) {
             var d = $q.defer();
-            endpoint.delete(item).then(function(res) {
+            this.endpoint.delete(item).then(function(res) {
                 var items = scope[itemsField];
                 var itemId = item[idField];
                 for (var i = 0; i < items.length; ++i) {
@@ -150,120 +114,145 @@ angular.module('sisui')
             return d.promise;
         };
 
-        scope.$watch('currentPage', function(newVal, oldVal) {
-            if (newVal != oldVal || !scope[itemsField]) {
-                console.log("Watch calling.. ");
-                self.setPage(newVal);
-            }
-        });
-        scope.setPage = this.setPage.bind(this);
-
-        // add the filter method
-        scope.filter = function(text) {
-            if (!text) {
-                self.setSearch(text);
-                if (!opts.ignoreLoc) {
-                    $location.search('q', null);
-                }
+        this.setEndpoint = function(endpoint, sort) {
+            if (this.endpoint) {
                 return;
             }
-            if (!opts.ignoreLoc) {
-                $location.search('q', text);
+            this.endpoint = endpoint;
+            opts.sortField = sort ? sort : opts.sortField;
+            this._init();
+        };
+
+        // private api
+        this._setStController = function(controller) {
+            if (this.stController) {
+                // already set
+                return;
             }
-            var parsed = self.parseSearch(text);
-            if (!parsed) {
-                scope.filterError = "invalid query";
-                if (!opts.ignoreLoc) {
-                    $location.search('q', null);
+            this.stController = controller;
+            this._init();
+        };
+
+        this._attachToScope = function() {
+            // when called, resets page number to 1
+            // and issues a query
+            scope.filter = function(text) {
+                var resetPage = false;
+                scope.filterError = "";
+                if (!text && parsedSearch) {
+                    // turn off the query
+                    parsedSearch = null;
+                    searchText = null;
+                    self._changeLocation('q', null);
+                    resetPage = true;
+                } else if (text) {
+                    var parsed = parseSearch(text);
+                    if (!parsed) {
+                        scope.filterError = "Invalid query.";
+                        return;
+                    }
+                    searchText = text;
+                    parsedSearch = parsed;
+                    self._changeLocation('q', text);
+                    resetPage = true;
                 }
-            } else {
-                scope.filterError = null;
-                self.setSearch(parsed);
-            }
-        };
+                if (resetPage) {
+                    var state = self.stController.tableState();
+                    state.pagination.start = 0;
+                    self._changeLocation('p', 1);
+                    self._loadFromState(state);
+                }
+            };
 
-        this.load = function(page, filterText) {
-            $location.search('p', page);
-            $location.search('q', filterText);
-            searchQuery = this.parseSearch(filterText);
-            scope.filterText = filterText;
-            console.log("Load ");
-            this.setPage(page);
-        };
-
-        function loadFromLocation(forced) {
-            var search = $location.search();
-            var q = search.q || "";
-            var p = parseInt(search.p, 10);
-            var changed = false;
-            if (isNaN(p)) {
-                p = 1;
+            if (opts.ignoreLoc) {
+                // done
+                return;
             }
-            if (p != scope.currentPage) {
-                changed = true;
-            }
-            if (q != scope.filterText) {
-                changed = true;
-            }
-            if (changed || forced) {
-                self.load(p, q);
-            }
-        }
-
-        if (!opts.ignoreLoc) {
-            // set the page and filter if available
-            scope.$on('$locationChangeSuccess', function() {
-                loadFromLocation(false);
+            // watch for location changes
+            scope.$on("$locationChangeSuccess", function() {
+                // load from location
+                var controllerState = self.stController.tableState();
+                var search = $location.search();
+                // update state
+                var page = parseInt(search.p, 10);
+                if (isNaN(page) || page < 0) {
+                    page = 1;
+                }
+                var q = search.q || "";
+                var pageStart = (page - 1) * pageSize;
+                var changed = false;
+                if (controllerState.pagination.start !== pageStart ||
+                    q !== searchText) {
+                    changed = true;
+                    controllerState.pagination.start = pageStart;
+                    searchText = q;
+                    parsedSearch = parseSearch(q);
+                    scope.filterText = q;
+                }
+                if (changed) {
+                    self._loadFromState(controllerState);
+                }
             });
-            loadFromLocation(true);
-        } else {
-            self.setPage(1);
-        }
-    }
+        };
 
-    function SmartTableSetup(endpoint, scope, opts) {
-        // init
-        // opts/defaults
-        opts = opts || { };
-        scope.pageSize = opts.pageSize || 20;
-        var sortField = opts.sortField || null;
-        var fields = opts.fields || null;
-        var searchQuery = parseSearch(opts.search);
-        var itemsField = opts.itemsField || 'items';
-        var idField = opts.idField || 'name';
 
-        var loading = false;
+        this._changeLocation = function(key, val) {
+            if (!opts.ignoreLoc) {
+                $location.search(key, val);
+            }
+        };
 
-        this.loadFromState = function(tableState) {
+        this._init = function() {
+            if (!this.endpoint || !this.stController) {
+                return;
+            }
+            // figure out initial state to load
+            var controllerState = this.stController.tableState();
+            if (!opts.ignoreLoc) {
+                var search = $location.search();
+                // update state
+                var page = parseInt(search.p, 10);
+                if (isNaN(page)) {
+                    page = 1;
+                }
+                controllerState.pagination.start = (page - 1) * pageSize;
+                controllerState.pagination.number = pageSize;
+                var q = search.q || "";
+                if (q) {
+                    searchText = q;
+                    parsedSearch = parseSearch(searchText);
+                    // update scope
+                    scope.filterText = searchText;
+                }
+            }
+            // setup scope
+            this._attachToScope();
+            // load initial state
+            this._loadFromState(controllerState);
+        };
+
+        this._loadFromState = function(tableState) {
             var query = {
                 limit : tableState.pagination.number,
                 offset: tableState.pagination.start,
             };
-            if (sortField) {
-                query.sort = sortField;
+            if (opts.sortField) {
+                query.sort = opts.sortField;
             }
             if (fields) {
                 query.fields = fields;
             }
-            if (searchQuery) {
-                query.q = searchQuery;
+            if (parsedSearch) {
+                query.q = parsedSearch;
             }
-            // console.log("LP: " + JSON.stringify($location.search()));
-            // console.log("LPQ: " + JSON.stringify(query));
-            // console.log(new Error().stack);
-            endpoint.list(query).then(function(items) {
-                var numPages = Math.ceil(items.total_count / 20);
+
+            this.endpoint.list(query).then(function(items) {
+                var numPages = Math.ceil(items.total_count / pageSize);
                 // console.log("CB: " + JSON.stringify($location.search()));
                 tableState.pagination.numberOfPages = numPages;
-                scope.itemsPerPage = 20;
                 scope[itemsField] = items.results;
             });
         };
-
-        if (scope.stController) {
-            this.loadFromState(scope.stController.tableState());
-        }
-
     }
 
 
@@ -271,8 +260,8 @@ angular.module('sisui')
         create : function(endpoint, scope, opts) {
             return new EndpointPager(endpoint, scope, opts);
         },
-        createStPager : function(endpoint, scope, opts) {
-            return new SmartTableSetup(endpoint, scope, opts);
+        createStPager : function(scope, opts) {
+            return new SmartTableSetup(scope, opts);
         }
     };
 

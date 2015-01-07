@@ -7,11 +7,12 @@ angular.module('sisui')
         $scope.$state.go("app.schemas.list");
         return;
     }
-
-    var pager = null;
+    // set up pager
+    var pagerOpts = { itemsField : 'entities',
+                      idField : '_id' };
+    var pager = EndpointPager.createStPager($scope, pagerOpts);
 
     $scope.remove = function(entity) {
-        if (!pager) { return; }
         pager.remove(entity).then(function(removed) {
             SisSession.setCurrentEntity($scope.schema, null);
         });
@@ -47,11 +48,7 @@ angular.module('sisui')
     };
 
     $scope.loadPage = function(state, controller) {
-        $scope.stController = controller;
-        if (pager) {
-            console.log(JSON.stringify(state));
-            pager.loadFromState(controller.tableState());
-        }
+        pager.loadPage(state, controller);
     };
 
     SisApi.getSchema(schemaName, true).then(function(schema) {
@@ -59,13 +56,9 @@ angular.module('sisui')
         $scope.$broadcast('schema', schema);
         $scope.idField = SisUtil.getIdField(schema);
 
-        // set up pager
-        var opts = { sortField : $scope.idField,
-                     itemsField : 'entities',
-                     idField : '_id' };
-        pager = EndpointPager.createStPager(SisApi.entities(schemaName),
-                                            $scope, opts);
-
+        var endpoint = SisApi.entities(schemaName);
+        var sort = $scope.idField;
+        pager.setEndpoint(endpoint, sort);
         // patch scope
         SisDialogs.addRemoveDialog($scope, $scope.schema.name,
                                    $scope.idField);

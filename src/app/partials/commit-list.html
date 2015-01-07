@@ -3,7 +3,7 @@
         <strong>{{ title }}</strong>
     </h3>
 </div>
-<div class="row sisui-bottom-buffer">
+<div class="row sisui-bottom-buffer" st-table="commits" st-pipe="loadPage">
     <accordion close-others="true">
         <accordion-group ng-repeat="commit in commits">
             <accordion-heading>
@@ -18,5 +18,7 @@
             </div>
         </accordion-group>
     </accordion>
-    <pagination direction-links="false" boundary-links="true" total-items="totalItems" ng-model="currentPage" items-per-page="20" class="pagination-sm" rotate="false"></pagination>
+    <div class="row text-center">
+        <div st-pagination="" st-items-by-page="20" st-displayed-pages="7"></div>
+    </div>
 </div>

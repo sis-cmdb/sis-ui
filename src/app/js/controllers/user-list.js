@@ -45,5 +45,11 @@ angular.module('sisui')
     };
 
     var opts = { sortField : 'name', itemsField : 'users' };
-    EndpointPager.create(SisApi.users, $scope, opts);
+    var pager = EndpointPager.createStPager($scope, opts);
+    pager.setEndpoint(SisApi.users);
+
+    $scope.loadPage = function(state, controller) {
+        pager.loadPage(state, controller);
+    };
+
 });
