@@ -1,5 +1,5 @@
 angular.module('sisui')
-.service('EndpointPager', function() {
+.service('EndpointPager', function($q) {
 
     // Pager class
     function EndpointPager(endpoint, scope, opts) {
