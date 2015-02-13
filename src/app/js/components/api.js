@@ -39,6 +39,9 @@ angular.module('sisui')
     };
 
     var wrapEndpoint = function(endpoint) {
+        if (!endpoint) {
+            return null;
+        }
         var result = { };
         for (var k in endpoint) {
             if (endpoint.hasOwnProperty(k) &&
@@ -76,7 +79,7 @@ angular.module('sisui')
         this.getAuthToken = function() {
             return client.authToken;
         };
-        var endpoints = ['hooks', 'hiera', 'users', 'schemas'];
+        var endpoints = ['hooks', 'hiera', 'users', 'schemas', 'scripts'];
         for (var i = 0; i < endpoints.length; ++i) {
             this[endpoints[i]] = wrapEndpoint(client[endpoints[i]]);
         }
@@ -153,6 +156,24 @@ angular.module('sisui')
                 d.resolve(hook);
                 if (setToCurrent) {
                     SisSession.setCurrentHook(hook);
+                }
+            }, function(err) {
+                d.reject(err);
+            });
+            return d.promise;
+        };
+
+        this.getScript = function(name, setToCurrent) {
+            var currentScript = SisSession.getCurrentScript();
+            if (currentScript && currentScript.name == name) {
+                return $q.when(currentScript);
+            }
+            // need to query
+            var d = $q.defer();
+            this.scripts.get(name).then(function(script) {
+                d.resolve(script);
+                if (setToCurrent) {
+                    SisSession.setCurrentScript(script);
                 }
             }, function(err) {
                 d.reject(err);

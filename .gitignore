@@ -6,3 +6,4 @@ build
 bower_components
 dev_dist
 .gitreview
+*~

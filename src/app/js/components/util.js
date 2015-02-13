@@ -347,6 +347,21 @@ angular.module('sisui')
         return result;
     };
 
+    var _getScriptSchema = function() {
+        return {
+            name : "sis_scripts",
+            _sis : {
+                owner : _getAllRoles()
+            },
+            definition : {
+                name : { type : "String", required : true,  unique : true, match :  /^[a-z0-9_\-]+$/ },
+                description : { type : "String" },
+                script_type : { type: "String", required : true, enum : ["application/javascript"] },
+                script : { type: "String", code : true, code_type_field : "script_type" }
+            }
+        };
+    };
+
     var _getHookSchema = function() {
         return {
             name : "sis_hooks",
@@ -447,6 +462,7 @@ angular.module('sisui')
         descriptorTypes : _descriptorTypes,
         attributesForType : _getAttributesForType,
         getHookSchema : _getHookSchema,
+        getScriptSchema : _getScriptSchema,
         goBack : _goBack,
         toRegex : _toRegex,
         getSisMetaDescriptor : _getSisMetaDescriptor,

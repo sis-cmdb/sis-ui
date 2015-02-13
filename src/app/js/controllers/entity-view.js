@@ -90,6 +90,14 @@ angular.module('sisui')
                 $scope.obj = hook || { };
                 init();
             });
+        } else if (state.is("app.scripts.view")) {
+            $scope.schema = SisUtil.getScriptSchema();
+            SisApi.getScript(params.id, true)
+            .then(function(script) {
+                $scope.title = "View script " + script.name;
+                $scope.obj = script || { };
+                init();
+            });
         } else if (state.is("app.entities.view")) {
             var eid = params.eid;
             var schema = params.schema;

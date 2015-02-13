@@ -111,7 +111,6 @@ angular.module('sisui', ['ui.router', 'ui.bootstrap', 'sisconfig', 'smart-table'
             templateUrl : "app/partials/hook-list.html",
             controller : "HookListController"
         })
-        // TODO - turn this into optional params
         .state("app.hooks.add", {
             url : "/add",
             templateUrl : "app/partials/entity-mod.html",
@@ -128,6 +127,33 @@ angular.module('sisui', ['ui.router', 'ui.bootstrap', 'sisconfig', 'smart-table'
             controller : "EntityViewController"
         })
 
+        // scripts
+        .state("app.scripts", {
+            url : "/scripts",
+            template : "<ui-view></ui-view>",
+            abstract : true
+        })
+        .state("app.scripts.list", {
+            url : "",
+            templateUrl : "app/partials/script-list.html",
+            controller : "ScriptListController"
+        })
+        .state("app.scripts.add", {
+            url : "/add",
+            templateUrl : "app/partials/entity-mod.html",
+            controller : "ScriptModController"
+        })
+        .state("app.scripts.edit", {
+            url : "/edit/:id",
+            templateUrl : "app/partials/entity-mod.html",
+            controller : "ScriptModController"
+        })
+        .state("app.scripts.view", {
+            url : "/view/:id",
+            templateUrl : "app/partials/entity-view.html",
+            controller : "EntityViewController"
+        })
+    
         // tokens
         .state("app.tokens", {
             url : "/tokens",

@@ -50,6 +50,14 @@ angular.module('sisui')
             return get('current_hook');
         };
 
+        this.setCurrentScript = function(script) {
+            set('current_script', script);
+        };
+
+        this.getCurrentScript = function() {
+            return get('current_script');
+        };
+        
         this.getCurrentSchema = function() {
             return get('current_schema');
         };
