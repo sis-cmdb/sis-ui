@@ -87,6 +87,7 @@ angular.module('sisui')
             modalScope.code = scope.fieldValue;
             modalScope.descriptor = descriptor;
             modalScope.readOnly = scope.action == 'view';
+            modalScope.entity = scope.entity();
             $modal.open({
                 templateUrl : "app/partials/code-editor-dlg.html",
                 scope : modalScope,
@@ -144,6 +145,7 @@ angular.module('sisui')
         require: '^form',
         scope : {
             path : '@',
+            entity : "&",
             fieldDescriptor : '&',
             fieldValue : "=ngModel",
             valueChanged : '=',
