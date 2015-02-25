@@ -262,11 +262,45 @@ angular.module('sisui')
                 numAdminRoles > 0 && schema.any_owner_can_modify);
     };
 
+    var _getObjectField = function(object, field) {
+        if (!object || !field) {
+            return null;
+        }
+        var fields = field.split(".");
+        if (fields.length === 1) {
+            return object[field];
+        }
+        var obj = object;
+        var f = null;
+        while (obj && fields.length > 1) {
+            f = fields.shift();
+            obj = obj[f];
+        }
+        if (!obj) {
+            return null;
+        }
+        f = fields.shift();
+        return obj[f];
+    };
+
     var _getIdField = function(schema) {
         var defn = schema.definition;
+        var descriptor = null;
+        if (schema.id_field !== '_id') {
+            var idField = schema.id_field;
+            if (idField.split(".").length === 1) {
+                // ok - now check the type
+                descriptor = defn[idField];
+                if (descriptor.type === "IpAddress") {
+                    return idField + ".ip_address";
+                } else {
+                    return idField;
+                }
+            } // fall through for now... TODO fix
+        }
         for (var k in defn) {
             if (typeof defn[k] === 'object') {
-                var descriptor = defn[k];
+                descriptor = defn[k];
                 if (typeof(descriptor.type) === "string" &&
                     descriptor.type == "String" &&
                     descriptor.required &&
@@ -449,6 +483,7 @@ angular.module('sisui')
             return getDescriptors(schema.definition);
         },
         getIdField : _getIdField,
+        getObjectField : _getObjectField,
         canManageEntity : _canManageEntity,
         canManageSchema : _canManageSchema,
         canAddEntity : _canAddEntityForSchema,

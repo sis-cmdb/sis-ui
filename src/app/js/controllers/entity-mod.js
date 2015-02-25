@@ -118,7 +118,8 @@ angular.module('sisui')
                 $scope.schema = res[0];
                 var idField = SisUtil.getIdField(res[0]);
                 $scope.action = action;
-                $scope.title = "Modify entity of type " + schemaName + " - " + res[1][idField];
+                var idValue = SisUtil.getObjectField(res[1], idField);
+                $scope.title = "Modify entity of type " + schemaName + " - " + idValue;
                 init(angular.copy(res[1]), action);
             }, function(err) {
                 return $scope.$state.go("^.list");

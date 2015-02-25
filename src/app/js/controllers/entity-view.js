@@ -104,7 +104,8 @@ angular.module('sisui')
             SisApi.getEntityWithSchema(eid, schema, true)
             .then(function(result) {
                 var idField = SisUtil.getIdField(result[0]);
-                $scope.title = "View entity " + result[1][idField] + " of type " + schema;
+                var idValue = SisUtil.getObjectField(result[1], idField);
+                $scope.title = "View entity " + idValue + " of type " + schema;
                 $scope.schema = result[0];
                 $scope.obj = result[1] || { };
                 init();

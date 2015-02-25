@@ -51,6 +51,10 @@ angular.module('sisui')
         pager.loadPage(state, controller);
     };
 
+    $scope.getField = function(entity, field) {
+        return SisUtil.getObjectField(entity, field);
+    };
+
     SisApi.getSchema(schemaName, true).then(function(schema) {
         $scope.schema = schema;
         $scope.$broadcast('schema', schema);
