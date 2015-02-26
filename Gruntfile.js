@@ -287,7 +287,7 @@ module.exports = function(grunt) {
                      // sis client
                      '<%= build_dirs.bower %>/sis/lib/sis-client.js',
                      // angular smart table
-                     '<%= build_dirs.bower %>/angular-smart-table/dist/smart-table.debug.js',
+                     '<%= build_dirs.bower %>/angular-smart-table/dist/smart-table.min.js',
                     ]
             }
         }
