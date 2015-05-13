@@ -14,6 +14,7 @@ angular.module('sisui')
 
     var CONFIRM_DELETE_TEMPLATE = "app/partials/confirm-delete-dlg.html";
     var FILTER_REFERENCE_TEMPLATE = "app/partials/filter-reference-dlg.html";
+    var ERROR_TEMPLATE = "app/partials/error-dlg.html";
 
     var openModal = function(scope, controller, template) {
         return $modal.open({
@@ -66,6 +67,17 @@ angular.module('sisui')
         modalScope.body = body;
         return $modal.open({
             templateUrl : CONFIRM_DELETE_TEMPLATE,
+            scope : modalScope
+        });
+    };
+
+    this.showErrorDialog = function(title, body) {
+        title = title || "An error occurred";
+        var modalScope = $rootScope.$new(true);
+        modalScope.title = title;
+        modalScope.body = body;
+        return $modal.open({
+            templateUrl : ERROR_TEMPLATE,
             scope : modalScope
         });
     };

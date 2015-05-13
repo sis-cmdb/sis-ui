@@ -232,14 +232,18 @@ angular.module('sisui')
         }
         if (user.super_user) { return true; }
         var roles = user.roles || { };
-        var owner = entity._sis ? entity._sis.owner : schema._sis.owner;
+        var meta = entity._sis || { };
+        var owner = meta.owner || schema._sis.owner;
+        var anyOwnerCanModify = meta.any_owner_can_modify;
+        var numGroups = 0;
         for (var i = 0; i < owner.length; ++i) {
             var group = owner[i];
-            if (!roles[group]) {
-                return false;
+            if (roles[group]) {
+                numGroups++;
             }
         }
-        return true;
+        return numGroups === owner.length ||
+            (anyOwnerCanModify && numGroups > 0);
     };
 
     var _canManageSchema = function(schema) {

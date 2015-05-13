@@ -1,7 +1,7 @@
 // modify a hook (or add)
 angular.module('sisui')
 .controller("HookModController", function($scope, SisSession,
-                                          SisUtil, SisApi) {
+                                          SisUtil, SisApi, SisDialogs) {
     var init = function(orig) {
         if (!SisUtil.canManageEntity(orig, $scope.schema)) {
             return $scope.$state.go("^.list");
@@ -124,6 +124,8 @@ angular.module('sisui')
         func($scope.entity).then(function(res) {
             SisSession.setCurrentHook(null);
             $scope.$state.go("^.list");
+        }).catch(function(err) {
+            SisDialogs.showErrorDialog(null, err.error);
         });
     };
 

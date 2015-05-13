@@ -1,7 +1,7 @@
 // modify an entity (or add)
 angular.module('sisui')
 .controller("EntityModController", function($scope, SisSession,
-                                            SisUtil, SisApi) {
+                                            SisUtil, SisApi, SisDialogs) {
     var init = function(orig, action) {
         if (action == 'add') {
             if (!SisUtil.canAddEntity($scope.schema)) {
@@ -139,6 +139,8 @@ angular.module('sisui')
         func($scope.entity).then(function(res) {
             SisSession.setCurrentEntity($scope.schema, null);
             SisUtil.goBack("^.list");
+        }).catch(function(err) {
+            SisDialogs.showErrorDialog(null, err.error);
         });
     };
 

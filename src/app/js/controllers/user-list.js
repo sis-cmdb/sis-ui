@@ -44,12 +44,21 @@ angular.module('sisui')
         $state.go("app.commits.sisobj", { type : "users", id : user.name });
     };
 
-    var opts = { sortField : 'name', itemsField : 'users' };
+    var opts = {
+        sortField : 'name',
+        itemsField : 'users'
+    };
+    if ($scope.search) {
+        opts.parsedSearch = $scope.search;
+        opts.ignoreLoc = true;
+    }
     var pager = EndpointPager.createStPager($scope, opts);
     pager.setEndpoint(SisApi.users);
 
     $scope.loadPage = function(state, controller) {
         pager.loadPage(state, controller);
     };
+
+    console.log($scope.search);
 
 });

@@ -72,7 +72,7 @@ angular.module('sisui')
         var itemsField = opts.itemsField || 'items';
         var idField = opts.idField || 'name';
         var searchText = "";
-        var parsedSearch = null;
+        var parsedSearch = opts.parsedSearch || null;
 
         this.stController = null;
         this.endpoint = null;
@@ -234,7 +234,7 @@ angular.module('sisui')
         this._loadFromState = function(tableState) {
             var query = {
                 limit : tableState.pagination.number,
-                offset: tableState.pagination.start,
+                offset: tableState.pagination.start
             };
             if (opts.sortField) {
                 query.sort = opts.sortField;

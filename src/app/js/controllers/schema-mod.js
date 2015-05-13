@@ -1,7 +1,7 @@
 // controller for editing/creating schemas
 angular.module('sisui')
 .controller("SchemaModController", function($scope, SisSession,
-                                            SisUtil, SisApi) {
+                                            SisUtil, SisApi, SisDialogs) {
     "use strict";
 
     var init = function(schema) {
@@ -198,6 +198,8 @@ angular.module('sisui')
         func($scope.schema).then(function(res) {
             SisSession.setSchemas(null);
             return $scope.$state.go("app.schemas.list");
+        }).catch(function(err) {
+            SisDialogs.showErrorDialog(null, err.error);
         });
     };
 

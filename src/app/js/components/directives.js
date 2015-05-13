@@ -92,7 +92,7 @@ angular.module('sisui')
                 templateUrl : "app/partials/code-editor-dlg.html",
                 scope : modalScope,
                 controller : "CodeEditorController",
-                windowClass : "wide-modal-window",
+                windowClass : "editor-modal-window",
                 keyboard : false,
                 backdrop : 'static'
             }).result.then(function(code) {
