@@ -17,7 +17,8 @@ rendering component.
 # Requirements
 
 [Grunt](http://gruntjs.com) is used to build the UI.  Ensure grunt is installed
-via `sudo npm install -g grunt-cli`.
+via `npm install -g grunt-cli`.  `sudo` might be required depending on your
+installation.
 
 # Building
 
