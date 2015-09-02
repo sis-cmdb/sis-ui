@@ -81,7 +81,7 @@ angular.module('sisui')
                         return d.reject("Authentication failed.");
                     }
                     // get the user details
-                    SisApi.users.get(username).then(function(user) {
+                    return SisApi.users.get(username).then(function(user) {
                         var data = {
                             username : username,
                             super_user : user.super_user,
@@ -93,6 +93,8 @@ angular.module('sisui')
                         d.resolve(data);
                         $rootScope.$broadcast("loggedIn", true);
                     });
+                }, function (err) {
+                    d.reject("An error occurred: " + err);
                 });
             });
             return d.promise;
@@ -100,14 +102,32 @@ angular.module('sisui')
         verify : function() {
             var user = this.getCurrentUser();
             var self = this;
+            var d = $q.defer();
             if (user) {
-                SisApi.tokens(user.username).list({ limit : 1 }).then(function(token) {
+                SisApi.setAuthToken(user.token);
+                return SisApi.tokens(user.username).get(user.token).then(function(token) {
                     // good to go
+                    // let's get the updated user too
+                    return SisApi.users.get(user.username).then(function(user) {
+                        var data = {
+                            username : user.name,
+                            super_user: user.super_user,
+                            roles: user.roles,
+                            expirationTime: Date.now() + token.expires,
+                            token: token.name
+                        };
+                        setUser(data);
+                        d.resolve(data);
+                    });
                 }, function(err) {
                     // logout - something bad
                     self.logout();
+                    d.resolve(null);
                 });
+            } else {
+                d.resolve(null);
             }
+            return d.promise;
         },
         loginWithToken : function(username, token) {
             var d = $q.defer();

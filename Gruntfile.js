@@ -16,6 +16,9 @@ module.exports = function(grunt) {
             if (noExt == 'rbac') {
                 title = "RBAC";
             }
+            if (noExt == 'scripts') {
+                title = "Endpoints and Scripts";
+            }
             if (noExt == 'index') {
                 homeTuple = [noExt, abs, title];
                 return;

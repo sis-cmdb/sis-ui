@@ -136,7 +136,7 @@ angular.module('sisui')
         if ($scope.action == 'edit') {
             func = endpoint.update;
         }
-        func($scope.entity).then(function(res) {
+        func($scope.entity, {forceMixed:'true'}).then(function(res) {
             SisSession.setCurrentEntity($scope.schema, null);
             SisUtil.goBack("^.list");
         }).catch(function(err) {

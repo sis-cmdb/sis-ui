@@ -8,6 +8,7 @@ angular.module('sisui')
         return;
     }
     $scope.login = function() {
+        $scope.error = false;
         var username = $scope.username;
         var pw = $scope.password;
         SisUser.login(username, pw).then(function() {
@@ -16,6 +17,8 @@ angular.module('sisui')
             } else {
                 $scope.$state.go("app.schemas.list");
             }
+        }, function(err) {
+            $scope.error = true;
         });
     };
 });

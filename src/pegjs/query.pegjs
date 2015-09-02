@@ -27,8 +27,8 @@ sep
 
 // part of the expression
 word
- = letters:[a-zA-Z0-9_\+\%\$\@\!\^\&\(\)\[\]\:\;\*\-\.,\^\$]+ { return letters.join(""); }
- / '"' letters:[a-zA-Z0-9_\+\=\%\$\@\!\^\&\(\)\[\]\:\;\*\-\., \?\^\$]+ '"' { return letters.join(""); }
+ = letters:[a-zA-Z0-9_\+\%\$\@\!\^\&\(\)\[\]\:\;\*\-\.,\^\$\/]+ { return letters.join(""); }
+ / '"' letters:[a-zA-Z0-9_\+\=\%\$\@\!\^\&\(\)\[\]\:\;\*\-\., \?\^\$\/]+ '"' { return letters.join(""); }
 
 // word op word i.e.
 //   foo = bar

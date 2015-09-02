@@ -29,7 +29,7 @@ angular.module('sisui')
         $scope.currentUser = SisUser.getCurrentUser();
         $scope.roles = getUserRoles();
     };
-    refresh();
+
     $scope.$on("loggedIn", function() {
         refresh();
     });
@@ -47,6 +47,5 @@ angular.module('sisui')
         });
     };
 
-
-    SisUser.verify();
+    SisUser.verify().then(refresh());
 });

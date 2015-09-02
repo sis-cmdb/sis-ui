@@ -17,7 +17,11 @@ angular.module('sisui')
     };
 
     $scope.canAdd = function() {
-        return !!(SisUtil.getAdminRoles());
+        var adminRoles = SisUtil.getAdminRoles();
+        if (adminRoles === null) {
+            return false;
+        }
+        return adminRoles === true || adminRoles.length;
     };
 
     $scope.canManage = function(schema) {

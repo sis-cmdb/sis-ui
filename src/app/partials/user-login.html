@@ -9,6 +9,9 @@
             <label for="password">Password</label>
             <input type="password" class="form-control" name="password" placeholder="Password" ng-model="password" required ng-enter="login()">
           </div>
+          <div class="has-warning has-feedback" ng-if="error">
+            <label>Authentication failed.  Please try again.</label>
+          </div>
           <button type="button" class="btn btn-default btn-block" ng-click="login()">Login</button>
         </form>
     </div>
