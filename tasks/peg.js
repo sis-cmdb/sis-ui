@@ -11,7 +11,7 @@ module.exports = function(grunt) {
 
   'use strict';
 
-  var PEG  = require('pegjs');
+  var peg  = require('pegjs');
   var path = require('path');
 
   grunt.registerMultiTask('peg', 'Generates parsers from PEG grammars.', function() {
@@ -61,14 +61,14 @@ module.exports = function(grunt) {
 
       // Generate the parser.
       var time = Date.now();
-      var parser = PEG.buildParser(grammar, options);
+      var parser = peg.generate(grammar, options);
       time = Date.now() - time;
 
       // Save the parser.
       if (f.angular){
         var angularModule = "angular.module('"+ f.angular.module+"').factory('"+ f.angular.factory+"',function(){ return ";
         grunt.file.write(f.dest, angularModule + parser + '});');
-      }else {
+      } else {
         grunt.file.write(f.dest, options.exportVar + ' = ' + parser + ';');
       }
 

@@ -22,6 +22,8 @@ installation.
 
 # Building
 
+Bower is required to build.  Be sure to `npm install -g bower`.  Once installed, you can `bower install`, which will pull down the required dependencies for the UI.
+
 Prior to building, run `npm install`.  If the git protocol (9418/tcp) access to
 github.com is blocked, run `git config --global url."https://".insteadOf git://`
 and re-run `npm install`.
