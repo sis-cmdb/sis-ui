@@ -4,6 +4,7 @@
   "description": "SIS reference UI",
   "version": "0.2.5",
   "devDependencies": {
+    "blanket": "1.1.9",
     "bower": "^1.7.9",
     "grunt": "^1.0.1",
     "grunt-angular-templates": "^1.1.0",
