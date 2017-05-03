@@ -63,6 +63,11 @@ module.exports = function(grunt) {
       var time = Date.now();
       var parser = peg.generate(grammar, options);
       time = Date.now() - time;
+      //parser = parser.replace(/^\s*\/\*.+?\*\//,'');
+      var lines = parser.split('\n');
+      lines.splice(0,5);
+      parser = lines.join('\n');
+
 
       // Save the parser.
       if (f.angular){

@@ -2,7 +2,7 @@
   "name": "SIS-ui",
   "private": true,
   "description": "SIS reference UI",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "devDependencies": {
     "blanket": "1.1.9",
     "bower": "^1.7.9",

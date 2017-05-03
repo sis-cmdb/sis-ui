@@ -22,11 +22,13 @@ installation.
 
 # Building
 
-Bower is required to build.  Be sure to `npm install -g bower`.  Once installed, you can `bower install`, which will pull down the required dependencies for the UI.
+Bower is required to build.  
 
-Prior to building, run `npm install`.  If the git protocol (9418/tcp) access to
-github.com is blocked, run `git config --global url."https://".insteadOf git://`
-and re-run `npm install`.
+1. `sudo npm install -g bower`
+2. `npm install`
+  a. If the git protocol (9418/tcp) access to github.com is blocked, run `git config --global url."https://".insteadOf git://` and re-run `npm install`.
+  b. `npm install` does a `bower install` for the UI components
+3. `grunt`
 
 The default target produces a UI distribution in the `dist` directory.
 
