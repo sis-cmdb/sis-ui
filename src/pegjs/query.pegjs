@@ -27,8 +27,15 @@ sep
 
 // part of the expression
 word
- = letters:[a-zA-Z0-9_\+\%\$\@\!\^\&\(\)\[\]\:\;\*\-\.,\^\$\/]+ { return letters.join(""); }
+ = parts:word_part+ { return parts.join(""); }
  / '"' letters:[a-zA-Z0-9_\+\=\%\$\@\!\^\&\(\)\[\]\:\;\*\-\., \?\^\$\/]+ '"' { return letters.join(""); }
+
+// Unquoted words only contain balanced parentheses, so the ")" closing a group
+// is not taken as part of its last word: (a=b) is a group, f(o) is a word.
+// A "!" starting "!=" is the operator, so a!=b is a != b.
+word_part
+ = !"!=" c:[a-zA-Z0-9_\+\%\$\@\!\^\&\[\]\:\;\*\-\.,\^\$\/] { return c; }
+ / "(" inner:word_part* ")" { return "(" + inner.join("") + ")"; }
 
 // word op word i.e.
 //   foo = bar

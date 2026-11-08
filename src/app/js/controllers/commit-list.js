@@ -31,7 +31,7 @@ angular.module('sisui')
         $scope.getDiff = function(commit) {
             var html = null;
             if (commit.action == 'insert' || commit.action == 'delete') {
-                html = '<pre>' + angular.toJson(commit.commit_data, true) + '</pre>';
+                html = '<pre>' + SisUtil.escapeHtml(angular.toJson(commit.commit_data, true)) + '</pre>';
             } else {
                 if (!commit.commit_data) {
                     if (commit.diff) {
@@ -43,7 +43,7 @@ angular.module('sisui')
                 Object.keys(commit.commit_data).forEach(function(k) {
                     if (k[0] == '_') { delete commit.commit_data[k]; }
                 });
-                html = jsondiffpatch.formatters.html.format(commit.commit_data);
+                html = jsondiffpatch.formatters.html.format(SisUtil.escapeDeltaKeys(commit.commit_data));
             }
             return $sce.trustAsHtml(html);
         };

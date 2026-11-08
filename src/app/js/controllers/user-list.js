@@ -5,7 +5,6 @@ angular.module('sisui')
     "use strict";
 
     $scope.edit = function(user) {
-        var title = "Edit user " + user.name;
         var dlg = SisDialogs.showUserDialog(user);
         dlg.result.then(function(user) {
             for (var i = 0; i < $scope.users.length; ++i) {
@@ -38,10 +37,6 @@ angular.module('sisui')
 
     $scope.canAdd = function() {
         return adminRoles === true;
-    };
-
-    $scope.viewCommits = function(user) {
-        $state.go("app.commits.sisobj", { type : "users", id : user.name });
     };
 
     var opts = {

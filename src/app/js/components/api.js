@@ -44,7 +44,7 @@ angular.module('sisui')
         }
         var result = { };
         for (var k in endpoint) {
-            if (endpoint.hasOwnProperty(k) &&
+            if (Object.prototype.hasOwnProperty.call(endpoint, k) &&
                 k != 'commits' &&
                 typeof endpoint[k] == 'function') {
                 var func = endpoint[k];
@@ -78,6 +78,14 @@ angular.module('sisui')
         };
         this.getAuthToken = function() {
             return client.authToken;
+        };
+        // logout: ends the sessions of the user a session token belongs to
+        this.endSession = function(token) {
+            return $http({
+                method : "DELETE",
+                url : API_URL + "/api/v1.1/users/auth_token",
+                headers : { "x-auth-token" : token }
+            });
         };
         var endpoints = ['hooks', 'hiera', 'users', 'schemas', 'scripts'];
         for (var i = 0; i < endpoints.length; ++i) {

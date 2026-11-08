@@ -190,7 +190,6 @@ angular.module('sisui')
 
     $scope.save = function() {
         var endpoint = SisApi.schemas;
-        var name = $scope.schema.name;
         var func = endpoint.create;
         if ($scope.action === 'edit') {
             func = endpoint.update;
@@ -204,7 +203,7 @@ angular.module('sisui')
     };
 
     $scope.cancel = function() {
-        SisUtil.goBack("/schemas");
+        SisUtil.goBack("app.schemas.list");
     };
 
 });

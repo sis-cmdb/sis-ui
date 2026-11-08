@@ -23,9 +23,9 @@
     <table class="table table-bordered table-condensed table-striped">
         <thead>
             <tr>
-                <td>Name</td>
-                <td>Script Type</td>
-                <td>Owners</td>
+                <th>Name</th>
+                <th>Script Type</th>
+                <th>Owners</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -39,16 +39,16 @@
                         <span class="glyphicon glyphicon-lock"></span>
                     </a>
                     <a ng-show="canManage(script)" class="btn btn-xs btn-primary" ng-click="cacheScript(script);" ui-sref="^.edit({id : script.name})">
-                        <span class="glyphicon glyphicon-edit">Edit</span>
+                        <span class="glyphicon glyphicon-edit"></span> Edit
                     </a>
-                    <a ng-show="canRemove(script)" class="btn btn-xs btn-danger" ng-click="remove(script)">
-                        <span class="glyphicon glyphicon-trash">Remove</span>
+                    <a href="" ng-show="canRemove(script)" class="btn btn-xs btn-danger" ng-click="remove(script)">
+                        <span class="glyphicon glyphicon-trash"></span> Remove
                     </a>
                     <a type="button" class="btn btn-info btn-xs" ng-click="cacheScript(null, script)" ui-sref="^.add">
-                        <span class="glyphicon glyphicon-retweet">Clone</span>
+                        <span class="glyphicon glyphicon-retweet"></span> Clone
                     </a>
                     <a type="buton" class="btn btn-info btn-xs" ui-sref="app.commits.sisobj({ type : 'scripts', id : script.name })">
-                        <span class="glyphicon glyphicon-list">History</span>
+                        <span class="glyphicon glyphicon-list"></span> History
                     </a>
                 </td>
             </tr>

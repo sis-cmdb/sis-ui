@@ -3,13 +3,7 @@ angular.module('sisui')
                                              SisDialogs, SisUtil, SisApi) {
     "use strict";
 
-    var query = {
-        sort : "name",
-        fields : "name,_sis"
-    };
-
     $scope.remove = function(schema) {
-        var name = schema.name;
         SisApi.schemas.delete(schema).then(function(res) {
             SisSession.setSchemas(null);
             loadSchemas();

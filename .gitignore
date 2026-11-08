@@ -2,8 +2,9 @@
 src/app/js/config.js
 node_modules
 dist
-build
-bower_components
 dev_dist
 .gitreview
 *~
+test-results
+playwright-report
+.e2e

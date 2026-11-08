@@ -1,10 +1,10 @@
 <div ng-switch on="fieldDescriptor.type">
     <div ng-switch-when="Document">
         <div style="width: {{ maxFieldNameLength(descriptor) | labelWidth }};">
-            <a ng-show="canDelete();" class="btn btn-xs btn-primary" ng-click="delItem(arrIdx);">
+            <a href="" ng-show="canDelete();" class="btn btn-xs btn-primary" ng-click="delItem(arrIdx);">
                 <span class="glyphicon glyphicon-minus"></span>
             </a>
-            <a class="btn btn-xs btn-default collapse-btn pull-left" ng-click="isCollapsed = !isCollapsed">
+            <a href="" class="btn btn-xs btn-default collapse-btn pull-left" ng-click="isCollapsed = !isCollapsed">
                 <span ng-show="isCollapsed" class="glyphicon glyphicon-chevron-right"></span>
                 <span ng-show="!isCollapsed" class="glyphicon glyphicon-chevron-down"></span>
             </a>
@@ -19,10 +19,10 @@
     </div>
     <div ng-switch-when="Array">
         <div style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}">
-            <a ng-show="canDelete();" class="btn btn-xs btn-primary" ng-click="delItem(arrIdx);">
+            <a href="" ng-show="canDelete();" class="btn btn-xs btn-primary" ng-click="delItem(arrIdx);">
                 <span class="glyphicon glyphicon-minus"></span>
             </a>
-            <a class="btn btn-xs btn-default collapse-btn pull-left" ng-click="isCollapsed = !isCollapsed">
+            <a href="" class="btn btn-xs btn-default collapse-btn pull-left" ng-click="isCollapsed = !isCollapsed">
                 <span ng-show="isCollapsed" class="glyphicon glyphicon-chevron-right"></span>
                 <span ng-show="!isCollapsed" class="glyphicon glyphicon-chevron-down"></span>
             </a>
@@ -49,8 +49,8 @@
                     <div ng-include="'app/partials/entity-descriptor.html'"></div>
                 </li>
                 <li>
-                    <a ng-show="canAdd();" class="btn btn-xs btn-primary" ng-click="addItem();">
-                        <span class="glyphicon glyphicon-plus">Add</span>
+                    <a href="" ng-show="canAdd();" class="btn btn-xs btn-primary" ng-click="addItem();">
+                        <span class="glyphicon glyphicon-plus"></span> Add
                     </a>
                 </li>
             </ul>
@@ -58,7 +58,7 @@
     </div>
     <div ng-form="innerForm" ng-switch-default class="form-group" ng-class="{ 'has-error' : !innerForm.$valid }">
         <fieldset ng-disabled="isReadOnly();">
-            <a ng-show="canDelete();" class="btn btn-xs btn-primary" ng-click="delItem(arrIdx);">
+            <a href="" ng-show="canDelete();" class="btn btn-xs btn-primary" ng-click="delItem(arrIdx);">
                 <span class="glyphicon glyphicon-minus"></span>
             </a>
             <label style="width: {{ maxFieldNameLength(descriptor, isItem()) | labelWidth }}" class="entity-label left-border" for="innerFormField">{{ fieldName }}</label>

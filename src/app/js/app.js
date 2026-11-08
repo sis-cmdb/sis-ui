@@ -207,6 +207,11 @@ angular.module('sisui', ['ui.router', 'ui.bootstrap', 'sisconfig', 'smart-table'
     $rootScope.$state = $state;
     $rootScope.$stateParams = $stateParams;
     $rootScope.sisDlg = SisDialogs;
+    // remember where the user came from (e.g. so login can return there)
+    $rootScope.previousState = null;
+    $rootScope.$on("$stateChangeSuccess", function(event, to, toParams, from) {
+        $rootScope.previousState = from.name ? from : null;
+    });
     var searchObj = $location.search();
     if (searchObj.embed == 'true') {
         $rootScope.embedded = true;
@@ -216,11 +221,11 @@ angular.module('sisui', ['ui.router', 'ui.bootstrap', 'sisconfig', 'smart-table'
     // modify the st pagination template
     var template = [
         '<div class="pagination" ng-if="pages.length >= 2"><ul class="pagination">',
-        '<li><a ng-click="selectPage(1)">First</a></li>',
-        '<li><a ng-click="selectPage(pages[0] - stDisplayedPages)" ng-if="pages[0] > stDisplayedPages">...</a></li>',
-        '<li ng-repeat="page in pages" ng-class="{active: page==currentPage}"><a ng-click="selectPage(page)">{{page}}</a></li>',
-        '<li><a ng-click="selectPage(pages[pages.length - 1] + 1)" ng-if="pages[pages.length - 1] < numPages">...</a></li>',
-        '<li><a ng-click="selectPage(numPages)">Last</a></li>',
+        '<li><a href="" ng-click="selectPage(1)">First</a></li>',
+        '<li><a href="" ng-click="selectPage(pages[0] - stDisplayedPages)" ng-if="pages[0] > stDisplayedPages">...</a></li>',
+        '<li ng-repeat="page in pages" ng-class="{active: page==currentPage}"><a href="" ng-click="selectPage(page)">{{page}}</a></li>',
+        '<li><a href="" ng-click="selectPage(pages[pages.length - 1] + 1)" ng-if="pages[pages.length - 1] < numPages">...</a></li>',
+        '<li><a href="" ng-click="selectPage(numPages)">Last</a></li>',
         '</ul></div>'
     ].join("");
     $templateCache.put('template/smart-table/pagination.html', template);

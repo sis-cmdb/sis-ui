@@ -42,6 +42,15 @@ angular.module('sisui')
         });
     };
 
+    // Login sessions are not stored by the API, so list the current one here.
+    if (SisUser.isSessionToken(user.token)) {
+        $scope.temps.push({
+            name : user.token,
+            session : true,
+            expires : Math.max(user.expirationTime - Date.now(), 0)
+        });
+    }
+
     // fetch and break up
     endpoint.listAll().then(function(tokens) {
         tokens.forEach(function(token) {

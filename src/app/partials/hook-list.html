@@ -23,9 +23,9 @@
     <table class="table table-bordered table-condensed table-striped">
         <thead>
             <tr>
-                <td>Name</td>
-                <td>Entity Type</td>
-                <td>Owners</td>
+                <th>Name</th>
+                <th>Entity Type</th>
+                <th>Owners</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -41,16 +41,16 @@
                         <span class="glyphicon glyphicon-lock"></span>
                     </a>
                     <a ng-show="canManage(hook)" class="btn btn-xs btn-primary" ng-click="cacheHook(hook);" ui-sref="^.edit({id : hook.name})">
-                        <span class="glyphicon glyphicon-edit">Edit</span>
+                        <span class="glyphicon glyphicon-edit"></span> Edit
                     </a>
-                    <a ng-show="canRemove(hook)" class="btn btn-xs btn-danger" ng-click="remove(hook)">
-                        <span class="glyphicon glyphicon-trash">Remove</span>
+                    <a href="" ng-show="canRemove(hook)" class="btn btn-xs btn-danger" ng-click="remove(hook)">
+                        <span class="glyphicon glyphicon-trash"></span> Remove
                     </a>
                     <a type="button" class="btn btn-info btn-xs" ng-click="cacheHook(null, hook)" ui-sref="^.add">
-                        <span class="glyphicon glyphicon-retweet">Clone</span>
+                        <span class="glyphicon glyphicon-retweet"></span> Clone
                     </a>
                     <a type="buton" class="btn btn-info btn-xs" ui-sref="app.commits.sisobj({ type : 'hooks', id : hook.name })">
-                        <span class="glyphicon glyphicon-list">History</span>
+                        <span class="glyphicon glyphicon-list"></span> History
                     </a>
                 </td>
             </tr>
