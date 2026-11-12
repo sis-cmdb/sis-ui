@@ -1,2 +1,0 @@
-angular.module('sisconfig', [])
-    .constant("API_URL", 'http://localhost:3000');

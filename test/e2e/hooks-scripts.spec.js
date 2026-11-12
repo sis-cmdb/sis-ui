@@ -17,8 +17,8 @@ test.describe("hooks", function() {
         await expect(row.getByRole("link", { name: schema })).toHaveAttribute("href", "#/entities/" + schema);
         await expect(row.locator(".label")).toHaveText(["e2e"]);
         await row.getByRole("link", { name: hook }).click();
-        await expect(pages.entityInput(page, "name", "entityView")).toHaveValue(hook);
-        await expect(pages.entityInput(page, "url", "entityView")).toHaveValue("http://127.0.0.1:9/hook");
+        await expect(pages.entityInput(page, "name")).toHaveValue(hook);
+        await expect(pages.entityInput(page, "url")).toHaveValue("http://127.0.0.1:9/hook");
     });
 
     test("a new hook can be created from the form", async function({ page, api, signIn, uniqueName }) {
@@ -33,8 +33,8 @@ test.describe("hooks", function() {
         await pages.entityInput(page, "name").fill(hook);
         await pages.entityInput(page, "action").selectOption("POST");
         await pages.entityInput(page, "url").fill("http://127.0.0.1:9/created");
-        await page.locator("form[name=entityMod] fieldset > div").filter({ hasText: /^\s*update\s*$/ }).locator("input").check();
-        await pages.entityInput(page, "owner", "metaMod").fill("e2e");
+        await pages.entityGroup(page, "events").getByLabel("update", { exact: true }).check();
+        await pages.entityInput(page, "owner", "SIS fields").fill("e2e");
         api.created.push("/hooks/" + hook);
         await page.getByRole("button", { name: "Save" }).click();
 
@@ -59,6 +59,26 @@ test.describe("hooks", function() {
         await expect(pages.tableRow(page, hook)).toHaveCount(0);
         await expect(api.get("/hooks/" + hook)).rejects.toMatchObject({ status: 404 });
     });
+
+    test("the history page shows what changed in a hook", async function({ page, api, signIn, uniqueName }) {
+        var schema = uniqueName("hooked");
+        var hook = uniqueName("hook");
+        await api.createSchema({ name: schema, definition: { a: "String" } });
+        var created = await api.createHook({ name: hook, entity_type: schema, events: ["insert"],
+                                             target: { action: "GET", url: "http://127.0.0.1:9/v1" } });
+        created.target.url = "http://127.0.0.1:9/v2";
+        await api.put("/hooks/" + hook, created);
+        await signIn(page);
+        await page.goto("/#/hooks");
+
+        await pages.tableRow(page, hook).getByRole("link", { name: "History" }).click();
+        await expect(page.getByRole("heading", { name: "Commits for hooks " + hook })).toBeVisible();
+        var commits = page.locator(".panel");
+        await expect(commits).toHaveCount(2);
+        await commits.nth(0).locator(".panel-heading a").click();
+        await expect(commits.nth(0).locator(".jsondiffpatch-modified")).toContainText("url");
+        await expect(commits.nth(0)).toContainText("http://127.0.0.1:9/v2");
+    });
 });
 
 test.describe("scripts", function() {
@@ -70,10 +90,9 @@ test.describe("scripts", function() {
 
         await pages.entityInput(page, "name").fill(name);
         await pages.entityInput(page, "description").fill("says hello");
-        await pages.entityInput(page, "owner", "metaMod").fill("e2e");
+        await pages.entityInput(page, "owner", "SIS fields").fill("e2e");
         await page.getByRole("link", { name: "Open Editor" }).click();
-        var editor = pages.modal(page).locator(".ace_editor");
-        await editor.click();
+        await pages.focusCodeEditor(page);
         await page.keyboard.insertText("res.send('hello');");
         await pages.modal(page).getByRole("button", { name: "Save" }).click();
         await expect(pages.modal(page)).toHaveCount(0);
@@ -99,5 +118,24 @@ test.describe("scripts", function() {
         await expect(pages.modal(page).getByRole("button", { name: "Save" })).toHaveCount(0);
         await pages.modal(page).getByRole("button", { name: "Close" }).click();
         await expect(pages.modal(page)).toHaveCount(0);
+    });
+
+    test("the history page shows what changed in a script", async function({ page, api, signIn, uniqueName }) {
+        var name = uniqueName("script");
+        var created = await api.createScript({ name: name, script_type: "application/javascript", script: "var v = 1;" });
+        created.script = "var v = 2;";
+        await api.put("/scripts/" + name, created);
+        await signIn(page);
+        await page.goto("/#/scripts");
+
+        await pages.tableRow(page, name).getByRole("link", { name: "History" }).click();
+        await expect(page).toHaveURL(new RegExp("#/commits/scripts/" + name + "$"));
+        await expect(page.getByRole("heading", { name: "Commits for scripts " + name })).toBeVisible();
+        var commits = page.locator(".panel");
+        await expect(commits).toHaveCount(2);
+        await commits.nth(0).locator(".panel-heading a").click();
+        await expect(commits.nth(0).locator(".jsondiffpatch-modified")).toContainText("script");
+        await commits.nth(1).locator(".panel-heading a").click();
+        await expect(commits.nth(1).locator("pre")).toContainText("var v = 1;");
     });
 });

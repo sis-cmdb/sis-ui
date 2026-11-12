@@ -6,6 +6,10 @@
 
 var { defineConfig, devices } = require("@playwright/test");
 
+var BROWSER = { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 800 } };
+var VISUAL = /visual\.spec\.js/;
+var VISUAL_SNAPSHOTS = "{testDir}/{testFilePath}-snapshots/{arg}-visual{-snapshotSuffix}{ext}";
+
 module.exports = defineConfig({
     testDir: "test/e2e",
     globalSetup: require.resolve("./test/e2e/support/global-setup"),
@@ -21,6 +25,18 @@ module.exports = defineConfig({
         screenshot: "only-on-failure"
     },
     projects: [
-        { name: "chromium", use: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 800 } } }
+        {
+            name: "chromium",
+            testIgnore: VISUAL,
+            use: BROWSER
+        },
+        {
+            // screenshot baselines: one test at a time, see visual.spec.js
+            name: "visual",
+            testMatch: VISUAL,
+            workers: 1,
+            snapshotPathTemplate: VISUAL_SNAPSHOTS,
+            use: BROWSER
+        }
     ]
 });

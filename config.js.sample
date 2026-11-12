@@ -1,0 +1,5 @@
+// Copy to config.js for `npm run serve` without --api-url (gitignored), or
+// supply it as app/js/config.js next to index.html in a deployment.
+window.SIS_CONFIG = {
+    API_URL: "http://localhost:3000"
+};

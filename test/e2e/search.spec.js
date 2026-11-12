@@ -28,7 +28,7 @@ async function setup(api, uniqueName) {
 }
 
 function names(page) {
-    return page.locator("[st-table=entities] tbody tr td:first-child");
+    return page.getByRole("table").locator("tbody tr td:first-child");
 }
 
 // the entities listed, in any order

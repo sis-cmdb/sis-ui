@@ -1,0 +1,118 @@
+.sisui-bottom-buffer {
+    margin-bottom: 10px;
+}
+ul {
+    list-style-type: none;
+}
+.active > a {
+    position: relative;
+    z-index: 2;
+    font-weight: bold;
+    text-shadow: 0 1px 0 rgba(0,0,0,.15);
+}
+.nav, .pagination, .carousel, .panel-title, a, .clickable { cursor: pointer; }
+
+.add-pointer { cursor: pointer; }
+
+/* bootstrap outlines links and buttons on any focus, so a mouse click leaves
+   a ring behind; keep it for keyboard focus only */
+a:focus:not(:focus-visible),
+.btn:focus:not(:focus-visible) {
+    outline: 0;
+}
+
+.no-item-display li {
+    list-style-type: none;
+}
+
+.wide-modal-window .modal-dialog {
+    width : 800px;
+}
+
+.editor-modal-window .modal-dialog {
+    width : 800px;
+}
+
+.narrow-modal-window .modal-dialog {
+    width : 500px;
+}
+
+.aceEditor {
+    width : 100%;
+    height: 700px;
+}
+
+.entity-label {
+    width: 120px;
+    text-align: right;
+    margin-right: 5px;
+}
+
+/* inline forms size inputs to their content, which makes number inputs too
+   narrow for their placeholder; give entity form inputs one width */
+.entity-input input[type=text].form-control,
+.entity-input input[type=number].form-control {
+    width: 14em;
+}
+
+.schema-label {
+    width: 120px;
+    text-align: right;
+    margin-right: 5px;
+}
+
+/* bootstrap gives labels a bottom margin and only resets it for
+   .control-label in inline forms; without this the field labels sit above
+   their inputs */
+.form-inline .entity-label,
+.form-inline .schema-label {
+    margin-bottom: 0;
+    vertical-align: middle;
+}
+
+/* bootstrap tops checkboxes with a 4px margin, which puts them above the
+   middle of their labels */
+.form-inline .schema-label ~ input[type=checkbox],
+.form-inline .entity-label ~ .entity-input input[type=checkbox] {
+    margin-top: 0;
+    vertical-align: middle;
+}
+
+/* stolen from bootstrap */
+input[aria-invalid="true"] {
+    border: 2px solid #e74c3c;
+}
+
+pre {
+  overflow: auto;
+  word-wrap: normal;
+  white-space: pre;
+}
+
+.jsondiffpatch-delta {
+    width: 100%;
+    overflow-x: scroll;
+}
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 30px;
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 30px;
+  background-color: #95a5a6;
+}
+
+.footer small {
+    line-height: 30px;
+}

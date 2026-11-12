@@ -22,7 +22,7 @@ test.describe("layout", function() {
 
     test("the theme menu switches the bootstrap theme", async function({ page }) {
         await page.goto("/#/schemas");
-        var theme = page.locator("link[ng-href*=bootswatch]");
+        var theme = page.locator("link#theme");
         await expect(theme).toHaveAttribute("href", /\/flatly\/bootstrap\.min\.css/);
         var navbarColor = function() {
             return page.locator("header.navbar").evaluate(function(el) { return el.ownerDocument.defaultView.getComputedStyle(el).backgroundColor; });
@@ -43,6 +43,28 @@ test.describe("layout", function() {
         await sidebar.getByRole("link", { name: "Users" }).click();
         await expect(page).toHaveURL(/#\/users$/);
         await expect(sidebar.locator("li.active")).toHaveText("Users");
+    });
+
+    test("the sidebar highlights the section on add, edit, view and history pages", async function({ page, api, signIn, uniqueName }) {
+        var schema = uniqueName("side");
+        await api.createSchema({ name: schema, definition: { a: "String" } });
+        var entity = await api.createEntity(schema, { a: "x" });
+        await signIn(page);
+        var sidebar = page.locator(".nav-toc");
+        var cases = [
+            ["/#/schemas/add", "Schemas"],
+            ["/#/schemas/edit/" + schema, "Schemas"],
+            ["/#/entities/" + schema, "Schemas"],
+            ["/#/entities/" + schema + "/view/" + entity._id, "Schemas"],
+            ["/#/commits/entities/" + schema + "/" + entity._id, "Schemas"],
+            ["/#/commits/schemas/" + schema, "Schemas"],
+            ["/#/hooks/add", "Hooks"],
+            ["/#/scripts/add", "Scripts"]
+        ];
+        for (var c of cases) {
+            await page.goto(c[0]);
+            await expect(sidebar.locator("li.active > a"), c[0]).toHaveText(c[1]);
+        }
     });
 
     test("embed mode hides the header, footer and sidebar", async function({ page }) {
