@@ -89,6 +89,7 @@ function sisApiEnv(port) {
 
 async function buildVue() {
     var vite = await import("vite");
+    process.env.SIS_DOCPATH = path.join(env.SIS_API_DIR, "docs");
     await vite.build({
         configFile: path.join(env.ROOT, "vite.config.mts"),
         logLevel: "warn",

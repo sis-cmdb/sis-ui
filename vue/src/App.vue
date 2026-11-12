@@ -1,27 +1,20 @@
 <script setup lang="ts">
-// Placeholder until the app shell is ported: shows the footer's version line,
-// which proves the runtime config and the API client work.
-import { onMounted, ref } from "vue";
-import type { BuildInfo } from "./lib/api/types";
-import { api } from "./services";
-
-const apiInfo = ref<BuildInfo | null>(null);
-const error = ref("");
-const ui = __UI_BUILD__;
-
-onMounted(async function() {
-    try {
-        apiInfo.value = await api.info();
-    } catch (err) {
-        error.value = err instanceof Error ? err.message : String(err);
-    }
-});
+// The page frame, as in the AngularJS index.html: navbar, page, footer.
+import AppFooter from "./components/AppFooter.vue";
+import AppHeader from "./components/AppHeader.vue";
+import DialogHost from "./components/DialogHost.vue";
+import { state } from "./state";
 </script>
 
 <template>
-    <div class="footer">
-        <small v-if="apiInfo">API {{ apiInfo.version }}-{{ apiInfo.build_num }}</small>
-        <small v-else-if="error" class="text-danger">{{ error }}</small>
-        | <small>UI {{ ui.version }}-{{ ui.build_num }}</small>
+    <AppHeader v-show="!state.embedded" />
+    <div class="container">
+        <RouterView :key="state.pageKey" />
     </div>
+    <div v-show="!state.embedded" class="footer">
+        <div class="container">
+            <AppFooter />
+        </div>
+    </div>
+    <DialogHost />
 </template>

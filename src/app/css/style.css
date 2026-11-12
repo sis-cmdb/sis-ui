@@ -82,8 +82,9 @@ sis-entity-input input[type=number].form-control {
     /*border-left: black solid 1px;*/
 }
 
-/* stolen from bootstrap */
-input.ng-invalid {
+/* stolen from bootstrap; the Vue rewrite marks invalid inputs with aria-invalid */
+input.ng-invalid,
+input[aria-invalid="true"] {
     border: 2px solid #e74c3c;
 }
 

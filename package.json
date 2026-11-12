@@ -27,10 +27,12 @@
     "bootswatch": "github:thomaspark/bootswatch#c6def2a07b63f0fdc7dab5dbc4f06cdbf5227cdc",
     "ipv6": "3.1.1",
     "jquery": "2.1.4",
-    "jsondiffpatch": "0.1.43",
+    "jsondiffpatch": "^0.7.7",
+    "jsondiffpatch-legacy": "npm:jsondiffpatch@0.1.43",
     "moment": "2.8.4",
     "sis": "0.1.2",
-    "vue": "^3.5.45"
+    "vue": "^3.5.45",
+    "vue-router": "^5.5.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

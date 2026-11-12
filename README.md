@@ -48,7 +48,8 @@ Use `--port` and `--host` to change where it listens.
 
 The UI is being rewritten in Vue 3 and TypeScript (in `vue/`).  Start its
 development server with `SIS_API_URL=http://localhost:3000 npm run dev:vue`
-(http://127.0.0.1:9001/) and build it with `npm run build:vue` (into
+(http://127.0.0.1:9001/; add `SIS_DOCPATH=../sis-api/docs` for the API
+documentation) and build it with `npm run build:vue` (into
 `dist-vue`).  It reads the same `config.js` as the current UI.
 
 # Testing

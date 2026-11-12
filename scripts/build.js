@@ -34,8 +34,8 @@ var VENDOR_JS = [
     // not published to npm at this version, so it is vendored
     path.join(ROOT, "vendor/angular-ui-bootstrap/ui-bootstrap-tpls-0.11.2.js"),
     nm("moment/min/moment.min.js"),
-    nm("jsondiffpatch/public/build/jsondiffpatch-full.min.js"),
-    nm("jsondiffpatch/public/build/jsondiffpatch-formatters.min.js"),
+    nm("jsondiffpatch-legacy/public/build/jsondiffpatch-full.min.js"),
+    nm("jsondiffpatch-legacy/public/build/jsondiffpatch-formatters.min.js"),
     // ipv6 - https://github.com/beaugunderson/javascript-ipv6
     nm("ipv6/lib/browser/jsbn-combined.js"),
     nm("ipv6/lib/browser/sprintf.js"),
@@ -244,7 +244,7 @@ async function build(options) {
             return isCss(f) || path.basename(f).startsWith("glyphicons");
         });
     });
-    copyTree(nm("jsondiffpatch/public/formatters-styles"), path.join(dist, "common/css/jsondiffpatch"), isCss);
+    copyTree(nm("jsondiffpatch-legacy/public/formatters-styles"), path.join(dist, "common/css/jsondiffpatch"), isCss);
 
     if (options.withConfig) {
         var config = path.join(SRC, "app/js/config.js");

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Schema, SchemaDefinition } from "./api/types";
-import { attributesForType, hookSchema, idField, inputType, newValue, objectField, scriptSchema } from "./schema";
+import { attributesForType, describeFields, hookSchema, idField, inputType, newValue, objectField, scriptSchema } from "./schema";
 
 function schema(definition: SchemaDefinition, id_field?: string): Schema {
     return { name: "s", definition, id_field, _sis: { owner: [] } };
@@ -69,5 +69,40 @@ describe("schema", function() {
         expect(hookSchema(["ops"])._sis.owner).toEqual(["ops"]);
         expect(Object.keys(hookSchema([]).definition).sort()).toEqual(["entity_type", "events", "name", "retry_count", "retry_delay", "target"]);
         expect(scriptSchema(["ops"]).definition.script).toEqual({ type: "String", code: true, code_type_field: "script_type" });
+    });
+
+    describe("describeFields", function() {
+        it("describes every form of field, sorted by name", function() {
+            expect(describeFields({
+                name: "String",
+                cpus: { type: "Number", min: 1 },
+                tags: ["String"],
+                env: { type: [{ type: "String", enum: ["prod", "dev"] }], required: true },
+                location: { rack: { type: "ObjectId", ref: "rack" }, row: "String" },
+                target: { type: { url: "String" }, required: true },
+                any: [],
+                odd: { type: { type: "String" }, kind: "Number" }
+            })).toEqual([
+                { name: "any", type: "Array", children: [{ type: "Mixed" }] },
+                { name: "cpus", type: "Number", min: 1 },
+                { name: "env", type: "Array", enum: ["prod", "dev"], required: true, children: [{ type: "String" }] },
+                { name: "location", type: "Document", children: [
+                    { name: "rack", type: "ObjectId", ref: "rack" },
+                    { name: "row", type: "String" }
+                ] },
+                { name: "name", type: "String" },
+                // a document with a field named "type"
+                { name: "odd", type: "Document", children: [
+                    { name: "kind", type: "Number" },
+                    { name: "type", type: "String" }
+                ] },
+                { name: "tags", type: "Array", children: [{ type: "String" }] },
+                { name: "target", type: "Document", required: true, children: [{ name: "url", type: "String" }] }
+            ]);
+        });
+
+        it("describes nothing for no definition", function() {
+            expect(describeFields(undefined)).toEqual([]);
+        });
     });
 });

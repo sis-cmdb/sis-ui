@@ -67,7 +67,10 @@ module.exports = [
         }
     },
     ...scoped(tseslint.configs.recommended, TS_FILES),
-    ...scoped(pluginVue.configs["flat/recommended"], ["vue/**/*.vue"]),
+    // only the rules that catch mistakes: the templates keep their whitespace
+    // (see vite.config.mts), so formatting rules that move content onto other
+    // lines would change how pages render
+    ...scoped(pluginVue.configs["flat/essential"], ["vue/**/*.vue"]),
     {
         files: TS_FILES,
         languageOptions: {
@@ -81,9 +84,7 @@ module.exports = [
             parserOptions: { parser: tseslint.parser, extraFileExtensions: [".vue"] }
         },
         rules: {
-            "vue/html-indent": ["error", 4],
-            // templates keep an element's attributes on one line, like the partials
-            "vue/max-attributes-per-line": "off"
+            "vue/html-indent": ["error", 4, { alignAttributesVertically: true }]
         }
     }
 ];

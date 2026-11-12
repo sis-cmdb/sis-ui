@@ -59,6 +59,78 @@ export function objectField(obj: unknown, path: string | null | undefined): unkn
     return value;
 }
 
+// A field of a schema definition in one shape, whatever form the definition
+// used (see FieldSpec): its type, attributes and, for documents and arrays, its
+// fields or item type.
+export interface FieldDescriptor {
+    // undefined for the item type of an array
+    name?: string;
+    type: string;
+    children?: FieldDescriptor[];
+    enum?: unknown[];
+    ref?: string;
+    required?: boolean;
+    unique?: boolean;
+    [attribute: string]: unknown;
+}
+
+function byName(a: FieldDescriptor, b: FieldDescriptor): number {
+    const x = a.name ?? "";
+    const y = b.name ?? "";
+    return x < y ? -1 : x > y ? 1 : 0;
+}
+
+function arrayDescriptor(items: FieldSpec[], name?: string): FieldDescriptor {
+    const result: FieldDescriptor = { type: "Array" };
+    const item = items.length && items[0] ? describeField(items[0]) : { type: "Mixed" };
+    // an enum of the items is the array's (a multiple choice)
+    if (item.enum) {
+        result.enum = item.enum;
+        delete item.enum;
+    }
+    result.children = [item];
+    if (name) {
+        result.name = name;
+    }
+    return result;
+}
+
+function documentDescriptor(definition: Record<string, FieldSpec>, name?: string): FieldDescriptor {
+    return { name, type: "Document", children: describeFields(definition) };
+}
+
+// one field of a definition
+export function describeField(spec: FieldSpec, name?: string): FieldDescriptor {
+    if (Array.isArray(spec)) {
+        return arrayDescriptor(spec, name);
+    }
+    if (typeof spec === "string") {
+        return { type: spec, name };
+    }
+    if (!("type" in spec)) {
+        // an embedded document
+        return documentDescriptor(spec as Record<string, FieldSpec>, name);
+    }
+    const { type, ...attributes } = spec;
+    if (typeof type === "string") {
+        return { name, ...attributes, type };
+    }
+    if (Array.isArray(type)) {
+        return { ...arrayDescriptor(type as FieldSpec[], name), ...attributes };
+    }
+    const inner = type as Record<string, unknown>;
+    if (typeof inner.type === "string") {
+        // a document with a field named "type": spec itself is the document
+        return documentDescriptor(spec as Record<string, FieldSpec>, name);
+    }
+    return { ...documentDescriptor(inner as Record<string, FieldSpec>, name), ...attributes };
+}
+
+// the fields of a definition, sorted by name
+export function describeFields(definition: Record<string, FieldSpec> | null | undefined): FieldDescriptor[] {
+    return Object.entries(definition || {}).map(([name, spec]) => describeField(spec, name)).sort(byName);
+}
+
 // the value a new field (or array item) starts with
 export function newValue(field: FieldInfo): unknown {
     switch (field.type) {

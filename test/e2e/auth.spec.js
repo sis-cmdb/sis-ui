@@ -82,7 +82,12 @@ test.describe("authentication", function() {
         await expectLoggedInAs(page, user.name);
         var token = (await storedSession(page)).token;
 
+        // the UI shows the visitor view before the server has ended the session
+        var ended = page.waitForResponse(function(res) {
+            return res.request().method() === "DELETE" && res.url().endsWith("/users/auth_token");
+        });
         await logout(page, user.name);
+        expect((await ended).ok()).toBe(true);
 
         expect(await storedSession(page)).toBeNull();
         var stale = new SisClient(sis.apiUrl, token);

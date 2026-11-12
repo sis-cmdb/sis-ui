@@ -9,12 +9,14 @@
 // per platform; update them with `npm run test:e2e -- --project visual
 // --update-snapshots`.
 
-var { test, expect } = require("./fixtures");
+var { test, expect, env } = require("./fixtures");
 var { SisClient } = require("./support/sis-client");
 var pages = require("./support/pages");
 
 var RACK = "visual_rack";
 var HOST = "visual_host";
+// not matched by the schema list's "visual_" filter
+var PAGED = "paged_visual";
 var HOOK = "visual_hook";
 var SCRIPT = "visual_script";
 var USER = { name: "visual_user", pw: "visual_pw_1", roles: { visual: "admin", ops: "user" } };
@@ -36,10 +38,13 @@ async function removeAll(client) {
     await removeIfPresent(client, "/scripts/" + SCRIPT);
     await removeIfPresent(client, "/schemas/" + HOST);
     await removeIfPresent(client, "/schemas/" + RACK);
+    await removeIfPresent(client, "/schemas/" + PAGED);
     await removeIfPresent(client, "/users/" + USER.name);
 }
 
-test.describe.configure({ mode: "serial" });
+// in order, in one worker (see the visual projects); a failure restarts the
+// worker, which sets the data up again
+test.describe.configure({ mode: "default" });
 
 test.beforeAll(async function({ sis }) {
     var client = new SisClient(sis.apiUrl, sis.adminToken);
@@ -66,6 +71,12 @@ test.beforeAll(async function({ sis }) {
         }
     });
     var rack = await client.post("/entities/" + RACK, { name: "r1", _sis: { owner: ["visual"] } });
+    // enough for three pages
+    await client.post("/schemas", { name: PAGED, id_field: "name", _sis: { owner: ["visual"] },
+                                    definition: { name: { type: "String", required: true, unique: true } } });
+    for (var i = 1; i <= 45; i++) {
+        await client.post("/entities/" + PAGED, { name: "p" + String(i).padStart(2, "0"), _sis: { owner: ["visual"] } });
+    }
     var web1 = {
         hostname: "web1.example.com", ip: "10.1.2.3", cpus: 8, active: true, env: "prod",
         location: { rack: rack._id, row: "A" }, tags: ["web", "edge"],
@@ -119,14 +130,17 @@ test.describe("visual", function() {
         await snap(page, "login-failed");
     });
 
-    test("schemas", async function({ page, signIn }) {
+    test("schema list", async function({ page, signIn }) {
         await signIn(page);
         await page.goto("/#/schemas");
         await page.getByLabel("Filter").fill("visual_");
         await expect(pages.tableRow(page, HOST)).toBeVisible();
         await expect(page.locator("table tbody tr")).toHaveCount(2);
         await snap(page, "schema-list");
+    });
 
+    test("schema forms", async function({ page, signIn }) {
+        await signIn(page);
         await page.goto("/#/schemas/add");
         await expect(page.getByRole("heading", { name: "Add a new schema" })).toBeVisible();
         await snap(page, "schema-add");
@@ -221,21 +235,24 @@ test.describe("visual", function() {
         await snap(page, "history-insert", { mask: commitMasks(page).concat([commits.nth(1).locator("pre")]) });
     });
 
-    test("hooks and scripts", async function({ page, signIn }) {
+    test("hook and script lists", async function({ page, signIn }) {
         await signIn(page);
         await page.goto("/#/hooks?q=" + encodeURIComponent("name = \"" + HOOK + "\""));
         await expect(page.locator("table tbody tr")).toHaveCount(1);
         await snap(page, "hook-list");
+        await page.goto("/#/scripts?q=" + encodeURIComponent("name = \"" + SCRIPT + "\""));
+        await expect(page.locator("table tbody tr")).toHaveCount(1);
+        await snap(page, "script-list");
+    });
+
+    test("hook and script forms", async function({ page, signIn }) {
+        await signIn(page);
         await page.goto("/#/hooks/view/" + HOOK);
         await expect(pages.entityInput(page, "url")).toHaveValue("http://hooks.example.com/sis");
         await snap(page, "hook-view");
         await page.goto("/#/hooks/edit/" + HOOK);
         await expect(pages.entityInput(page, "url")).toHaveValue("http://hooks.example.com/sis");
         await snap(page, "hook-edit");
-
-        await page.goto("/#/scripts?q=" + encodeURIComponent("name = \"" + SCRIPT + "\""));
-        await expect(page.locator("table tbody tr")).toHaveCount(1);
-        await snap(page, "script-list");
         await page.goto("/#/scripts/view/" + SCRIPT);
         await expect(pages.entityInput(page, "name")).toHaveValue(SCRIPT);
         await snap(page, "script-view");
@@ -268,18 +285,81 @@ test.describe("visual", function() {
         await snap(page, "tokens", { mask: [page.locator("table").first().locator("tbody td:not(:first-child)")] });
     });
 
-    test("layout", async function({ page, signIn }) {
+    test("docs", async function({ page, signIn }) {
         await signIn(page);
         await page.goto("/#/docs/schemas");
         await expect(page.getByRole("heading", { name: "Schema API" })).toBeVisible();
         await snap(page, "docs", { fullPage: false });
+    });
 
+    test("theme", async function({ page, signIn }) {
+        await signIn(page);
         await page.goto("/#/entities/" + HOST + "/view/" + ids.web1);
         await expect(pages.entityInput(page, "rack")).toHaveValue("r1");
         await page.locator("header").getByRole("link", { name: "Theme" }).click();
         await page.locator("header").getByRole("link", { name: "slate" }).click();
         await expect(page.locator("link#theme")).toHaveAttribute("href", /slate/);
         await snap(page, "entity-view-slate");
+    });
+
+    test("menus", async function({ page, signIn }) {
+        await signIn(page, USER);
+        await page.goto("/#/hooks?q=" + encodeURIComponent("name = \"" + HOOK + "\""));
+        await expect(page.locator("table tbody tr")).toHaveCount(1);
+        var header = page.locator("header");
+
+        await header.locator("a.dropdown-toggle", { hasText: USER.name }).click();
+        await expect(header.getByText("Admin of:")).toBeVisible();
+        await snap(page, "user-menu", { fullPage: false });
+        await page.keyboard.press("Escape");
+        await expect(header.getByText("Admin of:")).toBeHidden();
+
+        await header.getByRole("link", { name: "Theme" }).click();
+        await expect(header.getByRole("link", { name: "slate" })).toBeVisible();
+        await snap(page, "theme-menu", { fullPage: false });
+        await page.keyboard.press("Escape");
+
+        await header.getByRole("link", { name: "Docs" }).click();
+        await expect(header.getByRole("link", { name: "RBAC" })).toBeVisible();
+        await snap(page, "docs-menu", { fullPage: false });
+    });
+
+    test("schema information", async function({ page, signIn }) {
+        await signIn(page);
+        await page.goto("/#/entities/" + HOST);
+        await expect(pages.tableRow(page, "web1.example.com")).toBeVisible();
+        var panels = page.locator(".panel-collapse");
+
+        await page.getByRole("link", { name: "JSON" }).click();
+        await expect(panels.nth(1)).toHaveClass(/(^|\s)in(\s|$)/);
+        await expect(panels.nth(1)).not.toHaveClass(/collapsing/);
+        // the schema's id and timestamps change every run
+        await snap(page, "entity-list-json", { mask: [panels.nth(1).locator("pre")] });
+
+        await page.getByRole("link", { name: "Admins" }).click();
+        await expect(panels.nth(2)).toHaveClass(/(^|\s)in(\s|$)/);
+        await expect(panels.nth(2)).not.toHaveClass(/collapsing/);
+        await expect(panels.nth(1)).not.toHaveClass(/(^|\s)in(\s|$)/);
+        await expect(panels.nth(2).getByText(env.ADMIN.name, { exact: true })).toBeVisible();
+        await snap(page, "entity-list-admins");
+    });
+
+    test("pagination", async function({ page, signIn }) {
+        await signIn(page);
+        await page.goto("/#/entities/" + PAGED + "?p=2");
+        await expect(pages.tableRow(page, "p21")).toBeVisible();
+        // the visible table: the schema's admins are in a closed panel
+        await expect(page.getByRole("table").locator("tbody tr")).toHaveCount(20);
+        await snap(page, "entity-list-page-2");
+    });
+
+    test("group dialog", async function({ page, signIn }) {
+        await signIn(page);
+        await page.goto("/#/users?q=" + encodeURIComponent("name = \"" + USER.name + "\""));
+        await expect(page.locator("table tbody tr")).toHaveCount(1);
+        await pages.tableRow(page, USER.name).getByText("visual", { exact: true }).click();
+        await expect(pages.tableRow(pages.modal(page), USER.name)).toBeVisible();
+        await snapDialog(page, "users-in-group");
     });
 
     test("embed", async function({ page, signIn }) {

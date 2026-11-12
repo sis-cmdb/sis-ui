@@ -1,18 +1,12 @@
 import moment from "moment";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { escapeDeltaKeys, escapeHtml, expireTime, fromNow, labelWidth, shortDateTime, toRegex, toStringArray,
+import { escapeHtml, expireTime, fromNow, labelWidth, shortDateTime, toRegex, toStringArray,
          validationMessage } from "./format";
 
 describe("format", function() {
     it("escapes html", function() {
         expect(escapeHtml("<img src=\"x\" onerror='y'>&")).toBe("&lt;img src=&quot;x&quot; onerror=&#39;y&#39;&gt;&amp;");
         expect(escapeHtml(5)).toBe("5");
-    });
-
-    it("escapes the keys of a diff but leaves values to the formatter", function() {
-        const delta = { "<b>": { "<i>": [1, 2] }, _t: "a", plain: ["<v>"] };
-        expect(escapeDeltaKeys(delta)).toEqual({ "&lt;b&gt;": { "&lt;i&gt;": [1, 2] }, _t: "a", plain: ["<v>"] });
-        expect(escapeDeltaKeys(null)).toBeNull();
     });
 
     it("turns /regex/flags strings into regular expressions", function() {

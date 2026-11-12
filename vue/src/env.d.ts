@@ -12,8 +12,16 @@ declare module "*.pegjs" {
     export class SyntaxError extends Error {}
 }
 
-// build info, set by vite.config.mts
+// set by vite.config.mts: build info, and the Bootswatch themes (first is the default)
 declare const __UI_BUILD__: { version: string; build_num: string; git_hash: string };
+declare const __THEMES__: string[];
+
+// the SIS API docs, rendered at build time (sis-docs plugin in vite.config.mts)
+declare module "virtual:sis-docs" {
+    export const docs: Array<{ name: string; title: string }>;
+    // the page's html, or null for an unknown page
+    export function loadDoc(name: string): Promise<string | null>;
+}
 
 interface Window {
     SIS_CONFIG?: { API_URL?: string };

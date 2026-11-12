@@ -6,20 +6,6 @@ export function escapeHtml(text: unknown): string {
         .replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 
-// The jsondiffpatch html formatter escapes values but not object keys
-// (GHSA-33vc-wfww-vjfv), so escape the keys of a delta before formatting it.
-// Arrays in a delta are leaf changes holding plain values.
-export function escapeDeltaKeys(delta: unknown): unknown {
-    if (!delta || typeof delta !== "object" || Array.isArray(delta)) {
-        return delta;
-    }
-    const result: Record<string, unknown> = {};
-    for (const [key, value] of Object.entries(delta)) {
-        result[escapeHtml(key)] = escapeDeltaKeys(value);
-    }
-    return result;
-}
-
 // "/^ab+$/i" -> /^ab+$/i; null for anything else, including invalid patterns
 export function toRegex(text: string | RegExp | null | undefined): RegExp | null {
     if (text instanceof RegExp) {

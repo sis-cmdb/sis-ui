@@ -5,49 +5,69 @@
 // must show its page without being redirected.
 
 var { test, expect } = require("./fixtures");
+var { SisClient } = require("./support/sis-client");
 
-test("every page can be opened from a direct link", async function({ page, api, signIn, uniqueName }) {
-    var schema = uniqueName("route");
-    var hook = uniqueName("hook");
-    var script = uniqueName("script");
-    await api.createSchema({ name: schema, id_field: "name",
-                             definition: { name: { type: "String", required: true, unique: true } } });
-    var entity = await api.createEntity(schema, { name: "e1" });
-    await api.createHook({ name: hook, entity_type: schema, events: ["insert"],
-                           target: { action: "GET", url: "http://127.0.0.1:9/x" } });
-    await api.createScript({ name: script, script_type: "application/javascript", script: "1;" });
-    await signIn(page);
+var names = {};
+var client;
 
-    var routes = [
-        ["/#/schemas", "Schemas"],
-        ["/#/schemas/add", "Add a new schema"],
-        ["/#/schemas/edit/" + schema, "Modify schema " + schema],
-        ["/#/entities/" + schema, schema + " Entities"],
-        ["/#/entities/" + schema + "?q=" + encodeURIComponent('name = "e1"'), schema + " Entities"],
-        ["/#/entities/" + schema + "/add", "Add a new entity of type " + schema],
-        ["/#/entities/" + schema + "/edit/" + entity._id, "Modify entity of type " + schema + " - e1"],
-        ["/#/entities/" + schema + "/view/" + entity._id, "View entity e1 of type " + schema],
-        ["/#/hooks", "Hooks"],
-        ["/#/hooks/add", "Add a new hook"],
-        ["/#/hooks/edit/" + hook, "Modify hook " + hook],
-        ["/#/hooks/view/" + hook, "View hook " + hook],
-        ["/#/scripts", "Scripts"],
-        ["/#/scripts/add", "Add a new script"],
-        ["/#/scripts/edit/" + script, "Modify script " + script],
-        ["/#/scripts/view/" + script, "View script " + script],
-        ["/#/users", "SIS Users"],
-        ["/#/tokens", "Tokens"],
-        ["/#/commits/entities/" + schema + "/" + entity._id, "Commits for " + schema + " " + entity._id],
-        ["/#/commits/schemas/" + schema, "Commits for schemas " + schema],
-        ["/#/commits/hooks/" + hook, "Commits for hooks " + hook],
-        ["/#/commits/scripts/" + script, "Commits for scripts " + script],
-        ["/#/docs/schemas", "Schema API"]
-    ];
-    for (var r of routes) {
-        await test.step(r[0], async function() {
-            await page.goto(r[0]);
-            await expect(page.getByRole("heading", { name: r[1], exact: true }).first()).toBeVisible();
-            expect(new URL(page.url()).hash).toBe(r[0].slice(1));
+// in order, in one worker; a failure restarts the worker (and beforeAll)
+test.describe.configure({ mode: "default" });
+
+test.beforeAll(async function({ sis }, testInfo) {
+    var suffix = "w" + testInfo.workerIndex + "_" + Math.random().toString(36).slice(2, 7);
+    names = { schema: "route_" + suffix, hook: "hook_" + suffix, script: "script_" + suffix };
+    client = new SisClient(sis.apiUrl, sis.adminToken);
+    await client.createSchema({ name: names.schema, id_field: "name",
+                                definition: { name: { type: "String", required: true, unique: true } } });
+    names.entity = (await client.createEntity(names.schema, { name: "e1" }))._id;
+    await client.createHook({ name: names.hook, entity_type: names.schema, events: ["insert"],
+                              target: { action: "GET", url: "http://127.0.0.1:9/x" } });
+    await client.createScript({ name: names.script, script_type: "application/javascript", script: "1;" });
+});
+
+test.afterAll(async function() {
+    await client.cleanup();
+});
+
+// [title, url, heading]; functions because the names are made in beforeAll
+var ROUTES = [
+    ["schema list", () => "/#/schemas", () => "Schemas"],
+    ["schema add", () => "/#/schemas/add", () => "Add a new schema"],
+    ["schema edit", () => "/#/schemas/edit/" + names.schema, () => "Modify schema " + names.schema],
+    ["entity list", () => "/#/entities/" + names.schema, () => names.schema + " Entities"],
+    ["filtered entity list", () => "/#/entities/" + names.schema + "?q=" + encodeURIComponent('name = "e1"'),
+     () => names.schema + " Entities"],
+    ["entity add", () => "/#/entities/" + names.schema + "/add", () => "Add a new entity of type " + names.schema],
+    ["entity edit", () => "/#/entities/" + names.schema + "/edit/" + names.entity,
+     () => "Modify entity of type " + names.schema + " - e1"],
+    ["entity view", () => "/#/entities/" + names.schema + "/view/" + names.entity,
+     () => "View entity e1 of type " + names.schema],
+    ["hook list", () => "/#/hooks", () => "Hooks"],
+    ["hook add", () => "/#/hooks/add", () => "Add a new hook"],
+    ["hook edit", () => "/#/hooks/edit/" + names.hook, () => "Modify hook " + names.hook],
+    ["hook view", () => "/#/hooks/view/" + names.hook, () => "View hook " + names.hook],
+    ["script list", () => "/#/scripts", () => "Scripts"],
+    ["script add", () => "/#/scripts/add", () => "Add a new script"],
+    ["script edit", () => "/#/scripts/edit/" + names.script, () => "Modify script " + names.script],
+    ["script view", () => "/#/scripts/view/" + names.script, () => "View script " + names.script],
+    ["user list", () => "/#/users", () => "SIS Users"],
+    ["tokens", () => "/#/tokens", () => "Tokens"],
+    ["entity history", () => "/#/commits/entities/" + names.schema + "/" + names.entity,
+     () => "Commits for " + names.schema + " " + names.entity],
+    ["schema history", () => "/#/commits/schemas/" + names.schema, () => "Commits for schemas " + names.schema],
+    ["hook history", () => "/#/commits/hooks/" + names.hook, () => "Commits for hooks " + names.hook],
+    ["script history", () => "/#/commits/scripts/" + names.script, () => "Commits for scripts " + names.script],
+    ["docs page", () => "/#/docs/schemas", () => "Schema API"]
+];
+
+test.describe("direct links", function() {
+    for (var r of ROUTES) {
+        let [title, url, heading] = r;
+        test("the " + title + " page can be opened from a direct link", async function({ page, signIn }) {
+            await signIn(page);
+            await page.goto(url());
+            await expect(page.getByRole("heading", { name: heading(), exact: true }).first()).toBeVisible();
+            expect(new URL(page.url()).hash).toBe(url().slice(1));
         });
     }
 });
