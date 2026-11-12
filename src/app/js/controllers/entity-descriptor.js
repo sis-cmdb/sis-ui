@@ -226,6 +226,9 @@ angular.module('sisui')
 
     $scope.fieldValue = "<NOT_SET>";
 
+    // unique per field, links the label (and error message) to the input
+    $scope.inputId = "field_" + $scope.$id;
+
     // initialize a controller where value is a
     // container object (document or array),
     // descriptor is a field of the container that is managed

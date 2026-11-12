@@ -24,7 +24,7 @@ test.describe("users", function() {
         var dlg = pages.modal(page);
         await expect(dlg.getByRole("heading", { name: "Edit permissions for " + user.name })).toBeVisible();
         await expect(dlg.getByRole("button", { name: "Save" })).toBeDisabled();
-        await dlg.locator("li").filter({ hasText: "ops" }).locator("select").selectOption("admin");
+        await dlg.getByLabel("ops", { exact: true }).selectOption("admin");
         await dlg.getByPlaceholder("group").fill("qa");
         await dlg.getByRole("link", { name: "Add" }).click();
         await dlg.getByRole("button", { name: "Save" }).click();

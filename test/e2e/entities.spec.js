@@ -39,19 +39,19 @@ test.describe("entities", function() {
         await page.getByRole("link", { name: schema, exact: true }).click();
 
         await expect(page.getByRole("heading", { name: schema + " Entities" })).toBeVisible();
-        await expect(page.locator("[st-table=entities] th").first()).toHaveText("hostname");
+        await expect(page.getByRole("table").getByRole("columnheader").first()).toHaveText("hostname");
         await pages.tableRow(page, "web1").getByRole("link", { name: "web1" }).click();
 
         await expect(page.getByRole("heading", { name: "View entity web1 of type " + schema })).toBeVisible();
-        await expect(pages.entityInput(page, "hostname", "entityView")).toHaveValue("web1");
-        await expect(pages.entityInput(page, "hostname", "entityView")).toBeDisabled();
-        await expect(pages.entityInput(page, "ip", "entityView")).toHaveValue("10.1.2.3/32");
-        await expect(pages.entityInput(page, "cpus", "entityView")).toHaveValue("4");
-        await expect(pages.entityInput(page, "active", "entityView")).toBeChecked();
-        await expect(pages.entityInput(page, "env", "entityView")).toHaveText(/stage/);
-        await expect(pages.entityInput(page, "rack", "entityView")).toHaveValue("r7");
-        await expect(pages.entityInput(page, "0", "entityView")).toHaveValue("web");
-        await expect(pages.entityInput(page, "1", "entityView")).toHaveValue("edge");
+        await expect(pages.entityInput(page, "hostname")).toHaveValue("web1");
+        await expect(pages.entityInput(page, "hostname")).toBeDisabled();
+        await expect(pages.entityInput(page, "ip")).toHaveValue("10.1.2.3/32");
+        await expect(pages.entityInput(page, "cpus")).toHaveValue("4");
+        await expect(pages.entityInput(page, "active")).toBeChecked();
+        await expect(pages.entityInput(page, "env")).toHaveText(/stage/);
+        await expect(pages.entityInput(page, "rack")).toHaveValue("r7");
+        await expect(pages.entityInput(page, "0")).toHaveValue("web");
+        await expect(pages.entityInput(page, "1")).toHaveValue("edge");
     });
 
     test("a new entity can be added from the form", async function({ page, api, signIn, uniqueName }) {
@@ -85,8 +85,7 @@ test.describe("entities", function() {
         await page.goto("/#/entities/" + schema + "/add");
 
         await pages.entityInput(page, "hostname").fill("tagged");
-        var addTag = page.locator("form[name=entityMod] li").filter({ has: page.locator("label", { hasText: /^tags$/ }) })
-            .getByRole("link", { name: "Add" });
+        var addTag = pages.entityGroup(page, "tags").getByRole("link", { name: "Add" });
         await addTag.click();
         await pages.entityInput(page, "0").fill("blue");
         await addTag.click();
@@ -105,19 +104,21 @@ test.describe("entities", function() {
         var save = page.getByRole("button", { name: "Save" });
 
         await expect(save).toBeDisabled();
-        await expect(pages.entityField(page, "hostname").locator("small")).toHaveText("Required");
+        await expect(pages.entityInput(page, "hostname")).toHaveAttribute("aria-invalid", "true");
+        await expect(pages.entityInput(page, "hostname")).toHaveAccessibleDescription("Required");
         await pages.entityInput(page, "hostname").fill("h1");
         await expect(save).toBeEnabled();
 
         for (var bad of ["10.0.0.999", "not-an-ip", "2001:db8::zz"]) {
             await pages.entityInput(page, "ip").fill(bad);
-            await expect(pages.entityField(page, "ip")).toHaveClass(/has-error/);
-            await expect(pages.entityField(page, "ip").locator("small")).toHaveText("Not a valid IP address");
+            await expect(pages.entityInput(page, "ip")).toHaveAttribute("aria-invalid", "true");
+            await expect(pages.entityInput(page, "ip")).toHaveAccessibleDescription("Not a valid IP address");
             await expect(save).toBeDisabled();
         }
         for (var good of ["10.0.0.1", "10.0.0.0/24", "2001:db8::1"]) {
             await pages.entityInput(page, "ip").fill(good);
-            await expect(pages.entityField(page, "ip")).not.toHaveClass(/has-error/);
+            await expect(pages.entityInput(page, "ip")).toHaveAttribute("aria-invalid", "false");
+            await expect(pages.entityInput(page, "ip")).toHaveAccessibleDescription("");
             await expect(save).toBeEnabled();
         }
     });
@@ -236,7 +237,7 @@ test.describe("entities", function() {
         await expect(row.getByRole("link", { name: "Edit" })).toBeHidden();
         await expect(page.getByRole("button", { name: "Add New" })).toBeHidden();
         await row.getByRole("link", { name: "ro" }).click();
-        await expect(pages.entityInput(page, "hostname", "entityView")).toHaveValue("ro");
+        await expect(pages.entityInput(page, "hostname")).toHaveValue("ro");
         await expect(page.getByRole("button", { name: "Edit" })).toHaveCount(0);
     });
 });

@@ -16,8 +16,8 @@
                         <a href="" class="btn btn-xs btn-primary" ng-click="deleteGroup(group);" ng-disabled="!canManageRole(group)">
                             <span class="glyphicon glyphicon-minus"></span>
                         </a>
-                        <label for="{{ group }}">{{ group }}</label>
-                        <select ng-disabled="!canManageRole(group)" ng-model="user.roles[group]" ng-options="r for r in ['user','admin']">
+                        <label for="role_{{ $index }}">{{ group }}</label>
+                        <select id="role_{{ $index }}" ng-disabled="!canManageRole(group)" ng-model="user.roles[group]" ng-options="r for r in ['user','admin']">
                         </select>
                     </div>
                 </li>
@@ -26,14 +26,14 @@
                         <a href="" class="btn btn-xs btn-primary" ng-click="deleteGroup(group);">
                             <span class="glyphicon glyphicon-minus"></span>
                         </a>
-                        <label for="{{group}}">{{ group }}</label>
-                        <select ng-model="user.roles[group]" ng-options="r for r in ['user','admin']"></select>
+                        <label for="newrole_{{ $index }}">{{ group }}</label>
+                        <select id="newrole_{{ $index }}" ng-model="user.roles[group]" ng-options="r for r in ['user','admin']"></select>
                     </div>
                 </li>
                 <li ng-if="isSuperUser()">
                     <div class="form-group">
-                        <input ng-model="role.group" placeholder="group">
-                        <select ng-model="role.role" ng-options="r for r in ['user', 'admin']"></select>
+                        <input ng-model="role.group" aria-label="New group" placeholder="group">
+                        <select ng-model="role.role" aria-label="New group role" ng-options="r for r in ['user', 'admin']"></select>
                         <a href="" class="btn btn-xs btn-primary" ng-click="addRole();">
                             <span class="glyphicon glyphicon-plus"></span> Add
                         </a>

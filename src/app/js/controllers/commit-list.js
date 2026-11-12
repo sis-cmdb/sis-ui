@@ -8,6 +8,7 @@ angular.module('sisui')
     var supportedTypes = [
         'schemas',
         'hooks',
+        'scripts',
         'hiera',
         'entities'
     ];

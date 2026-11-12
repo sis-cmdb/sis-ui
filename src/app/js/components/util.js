@@ -453,6 +453,9 @@ angular.module('sisui')
                 case "match": return descriptor.match ? "Must match " + descriptor.match : "Invalid format";
                 case "min": return "Must be at least " + descriptor.min;
                 case "max": return "Must be at most " + descriptor.max;
+                case "regex": return "Not a valid regular expression";
+                case "minVal": return "Must not be more than max";
+                case "maxVal": return "Must not be less than min";
                 default: return "Invalid (" + k + ")";
             }
         }

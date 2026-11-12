@@ -9,14 +9,14 @@
 </div>
 <div class="row no-item-display">
     <div ng-class="{ 'col-md-12' : !showJson, 'col-md-6' : showJson }">
-        <form class="form-inline" role="form" novalidate name="schemaMod">
+        <form class="form-inline" role="form" aria-label="Fields" novalidate name="schemaMod">
             <li ng-controller="SchemaDescriptorController" ng-repeat="descriptor in descriptors">
                 <div ng-include="'app/partials/schema-descriptor.html'"></div>
             </li>
         </form>
         <hr/>
         <h4>SIS fields</h4>
-        <form class="form-inline" role="form" novalidate name="metaMod">
+        <form class="form-inline" role="form" aria-label="SIS fields" novalidate name="metaMod">
             <li ng-controller="SchemaDescriptorController" ng-repeat="descriptor in metaDescriptors">
                 <div ng-include="'app/partials/schema-descriptor.html'"></div>
             </li>

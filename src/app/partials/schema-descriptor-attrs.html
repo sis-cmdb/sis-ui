@@ -6,9 +6,9 @@
     <div class="modal-body no-item-display">
         <div class="row" ng-form name="inner">
             <div ng-repeat="f in additionalFields" class="form-group">
-                <label class="entity-label control-label">{{ f.name }}</label>
+                <label class="entity-label control-label" for="attr_{{ f.name }}">{{ f.name }}</label>
                 <sis-schema-attr field="f" changed="attrChanged" choices="schemaList" descriptor="descriptor"></sis-schema-attr>
-                <small style="margin-left: 4px;" ng-if="!inner[f.name].$valid">{{ getErrorMsg(inner[f.name]) }}</small>
+                <small style="margin-left: 4px;" id="attr_{{ f.name }}_error" ng-if="!inner[f.name].$valid">{{ getErrorMsg(inner[f.name]) }}</small>
             </div>
         </div>
     </div>

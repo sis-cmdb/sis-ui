@@ -21,6 +21,17 @@ module.exports = defineConfig({
         screenshot: "only-on-failure"
     },
     projects: [
-        { name: "chromium", use: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 800 } } }
+        {
+            name: "chromium",
+            testIgnore: /visual\.spec\.js/,
+            use: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 800 } }
+        },
+        {
+            // screenshot baselines: one test at a time, see visual.spec.js
+            name: "visual",
+            testMatch: /visual\.spec\.js/,
+            workers: 1,
+            use: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 800 } }
+        }
     ]
 });

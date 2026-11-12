@@ -8,8 +8,8 @@ function navbar(page) {
 }
 
 async function loginThroughForm(page, user) {
-    await page.getByPlaceholder("Username").fill(user.name);
-    await page.getByPlaceholder("Password").fill(user.pw);
+    await page.getByLabel("Username").fill(user.name);
+    await page.getByLabel("Password").fill(user.pw);
     await page.getByRole("button", { name: "Login" }).click();
 }
 

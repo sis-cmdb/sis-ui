@@ -1,5 +1,5 @@
 <div ng-switch on="fieldDescriptor.type">
-    <div ng-switch-when="Document">
+    <div ng-switch-when="Document" role="group" aria-labelledby="{{ inputId }}_label">
         <div style="width: {{ maxFieldNameLength(descriptor) | labelWidth }};">
             <a href="" ng-show="canDelete();" class="btn btn-xs btn-primary" ng-click="delItem(arrIdx);">
                 <span class="glyphicon glyphicon-minus"></span>
@@ -8,7 +8,7 @@
                 <span ng-show="isCollapsed" class="glyphicon glyphicon-chevron-right"></span>
                 <span ng-show="!isCollapsed" class="glyphicon glyphicon-chevron-down"></span>
             </a>
-            <label class="pull-right">{{ fieldName }}</label>
+            <label class="pull-right" id="{{ inputId }}_label">{{ fieldName }}</label>
             <br style="clear: both;"/>
         </div>
         <ul collapse="isCollapsed">
@@ -17,7 +17,7 @@
             </li>
         </ul>
     </div>
-    <div ng-switch-when="Array">
+    <div ng-switch-when="Array" role="group" aria-labelledby="{{ inputId }}_label">
         <div style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}">
             <a href="" ng-show="canDelete();" class="btn btn-xs btn-primary" ng-click="delItem(arrIdx);">
                 <span class="glyphicon glyphicon-minus"></span>
@@ -26,7 +26,7 @@
                 <span ng-show="isCollapsed" class="glyphicon glyphicon-chevron-right"></span>
                 <span ng-show="!isCollapsed" class="glyphicon glyphicon-chevron-down"></span>
             </a>
-            <label class="pull-right">{{ fieldName }}</label>
+            <label class="pull-right" id="{{ inputId }}_label">{{ fieldName }}</label>
             <br style="clear: both;"/>
         </div>
         <div ng-if="fieldDescriptor.enum">
@@ -34,10 +34,10 @@
                 <li>
                     <fieldset ng-disabled="isReadOnly();">
                         <div  ng-repeat="choice in fieldDescriptor.enum">
-                            <input type="checkbox"
+                            <input type="checkbox" id="{{ inputId }}_{{ $index }}"
                                    ng-checked="fieldValue.indexOf(choice) >= 0"
                                    ng-click="toggleChoice(choice)">
-                            <label style="margin-left: 4px;">{{ choice }}</label>
+                            <label style="margin-left: 4px;" for="{{ inputId }}_{{ $index }}">{{ choice }}</label>
                         </div>
                     </fieldset>
                 </li>
@@ -61,13 +61,13 @@
             <a href="" ng-show="canDelete();" class="btn btn-xs btn-primary" ng-click="delItem(arrIdx);">
                 <span class="glyphicon glyphicon-minus"></span>
             </a>
-            <label style="width: {{ maxFieldNameLength(descriptor, isItem()) | labelWidth }}" class="entity-label left-border" for="innerFormField">{{ fieldName }}</label>
-            <sis-entity-input ref-id="refId" field-descriptor="fieldDescriptor" path="innerFormField" ng-model="fieldValue" entity="entity" value-changed="valueChanged" action="action"></sis-entity-input>
+            <label style="width: {{ maxFieldNameLength(descriptor, isItem()) | labelWidth }}" class="entity-label left-border" for="{{ inputId }}">{{ fieldName }}</label>
+            <sis-entity-input ref-id="refId" field-descriptor="fieldDescriptor" path="innerFormField" input-id="inputId" ng-model="fieldValue" entity="entity" value-changed="valueChanged" action="action"></sis-entity-input>
             <button style="margin-left: 4px;" ng-if="fieldDescriptor.ref && !isReadOnly()" class="btn btn-sm btn-info" ng-click="chooseEntity();">Choose</button>
             <a ng-if="refId" ui-sref="app.entities.view({ schema : fieldDescriptor.ref, eid : refId })">View</a>
             <div ng-if="!innerForm.innerFormField.$valid">
-                <label style="width: {{ maxFieldNameLength(descriptor, isItem()) | labelWidth }}" class="entity-label left-border" for="innerFormField"></label>
-                <small style="margin-left: 4px;" ng-if="!innerForm.innerFormField.$valid">{{ getErrorMsg(innerForm.innerFormField) }}</small>
+                <label style="width: {{ maxFieldNameLength(descriptor, isItem()) | labelWidth }}" class="entity-label left-border" aria-hidden="true"></label>
+                <small style="margin-left: 4px;" id="{{ inputId }}_error" ng-if="!innerForm.innerFormField.$valid">{{ getErrorMsg(innerForm.innerFormField) }}</small>
             </div>
         </fieldset>
     </div>

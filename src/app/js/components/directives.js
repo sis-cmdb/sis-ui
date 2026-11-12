@@ -20,11 +20,16 @@ angular.module('sisui')
     // returns a select or input element
     // based on descriptor
     // will setup valueChanged and the model
-    var getTemplate = function(descriptor, path, action) {
+    var getTemplate = function(descriptor, path, inputId) {
         var attrs = [
             'ng-model="fieldValue"',
             'name="' + path.replace(/\./g, '_') + '"'
         ];
+        if (inputId) {
+            attrs.push('id="' + inputId + '"');
+            attrs.push('aria-describedby="' + inputId + '_error"');
+            attrs.push('aria-invalid="{{ !!ctrl.$invalid }}"');
+        }
         if (descriptor.required) {
             attrs.push("required");
         }
@@ -35,6 +40,7 @@ angular.module('sisui')
         if (descriptor.enum) {
             // select
             elem = "select";
+            attrs.push('class="form-control input-sm"');
             attrs.push('ng-options="choice for choice in fieldDescriptor().enum"');
             attrs.push('ng-change="valueChanged(fieldValue)"');
         } else {
@@ -74,11 +80,12 @@ angular.module('sisui')
     var linker = function(scope, element, attrs, ctrl) {
         var descriptor = scope.fieldDescriptor();
         var path = scope.path;
-        element.html(getTemplate(descriptor, path, scope.action)).show();
+        element.html(getTemplate(descriptor, path, scope.inputId())).show();
         $compile(element.contents())(scope);
         if (!ctrl || !ctrl[path]) {
             return;
         }
+        scope.ctrl = ctrl[path];
         scope.$state = $state;
 
         scope.openEditor = function() {
@@ -146,6 +153,7 @@ angular.module('sisui')
             path : '@',
             entity : "&",
             fieldDescriptor : '&',
+            inputId : '&',
             fieldValue : "=ngModel",
             valueChanged : '=',
             action : "="
@@ -163,7 +171,9 @@ angular.module('sisui')
         var attrs = [
             "ng-model='descriptor[field.name]'",
             "ng-change='changed(descriptor, field, formCtrl)'",
-            'name="' + name + '"'
+            'name="' + name + '"',
+            'id="attr_' + name + '"',
+            'aria-describedby="attr_' + name + '_error"'
         ];
         var elem = "input";
         if (type == 'select') {
@@ -238,13 +248,13 @@ angular.module('sisui')
 .directive("sisSchemaFieldName", function(SisUtil, $compile) {
     var getTemplate = function(readOnly, name) {
         if (!readOnly) {
-            return '<input name="' + name + '" ' +
-                'style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}; "' +
+            return '<input name="' + name + '" aria-label="Field name" ' +
+                'style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}; ' +
                 'margin-right: 4px;" ng-model="descriptor.name" ' +
                 'ng-change="change(descriptor)" required>';
         } else {
             return '<label class="schema-label" ' +
-                'style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}; "' +
+                'style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}; ' +
                 'margin-right: 4px;">{{ descriptor.name }}</label>';
         }
     };

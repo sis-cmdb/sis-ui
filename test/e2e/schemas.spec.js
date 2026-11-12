@@ -43,12 +43,11 @@ test.describe("schemas", function() {
 
         await pages.schemaValue(page, "name").fill(name);
         await pages.schemaValue(page, "description").fill("Services we run");
-        await pages.schemaValue(page, "owner", "metaMod").fill("e2e");
-        var rows = pages.definitionRows(page);
-        await rows.nth(0).locator("sis-schema-field-name input").fill("svcname");
-        await page.locator("form[name=schemaMod]").getByRole("link", { name: "Add" }).last().click();
-        await rows.nth(1).locator("sis-schema-field-name input").fill("port");
-        await rows.nth(1).locator("select").selectOption("Number");
+        await pages.schemaValue(page, "owner", "SIS fields").fill("e2e");
+        await pages.definitionNames(page).nth(0).fill("svcname");
+        await pages.form(page).getByRole("link", { name: "Add" }).last().click();
+        await pages.definitionNames(page).nth(1).fill("port");
+        await pages.definitionTypes(page).nth(1).selectOption("Number");
         api.created.push("/schemas/" + name);
         await page.getByRole("button", { name: "Save" }).click();
 
@@ -64,7 +63,8 @@ test.describe("schemas", function() {
         await signIn(page);
         await page.goto("/#/schemas/add");
         await expect(page.getByRole("button", { name: "Save" })).toBeDisabled();
-        await expect(pages.schemaValue(page, "name")).toHaveClass(/ng-invalid/);
+        await expect(pages.schemaValue(page, "name")).toBeEmpty();
+        expect(await pages.isValid(pages.schemaValue(page, "name"))).toBe(false);
     });
 
     test("an existing schema can be edited", async function({ page, api, signIn, uniqueName }) {
@@ -77,8 +77,8 @@ test.describe("schemas", function() {
         await expect(page.getByRole("heading", { name: "Modify schema " + name })).toBeVisible();
         await expect(pages.schemaValue(page, "name")).toBeDisabled();
         await pages.schemaValue(page, "description").fill("after");
-        await page.locator("form[name=schemaMod]").getByRole("link", { name: "Add" }).last().click();
-        await pages.definitionRows(page).last().locator("sis-schema-field-name input").fill("b");
+        await pages.form(page).getByRole("link", { name: "Add" }).last().click();
+        await pages.definitionNames(page).last().fill("b");
         await page.getByRole("button", { name: "Save" }).click();
 
         await expect(page).toHaveURL(/#\/schemas$/);

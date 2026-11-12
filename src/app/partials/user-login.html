@@ -3,11 +3,11 @@
         <form role="form">
           <div class="form-group">
             <label for="username">Username</label>
-            <input type="text" name="username" class="form-control" placeholder="Username" ng-model="username" required>
+            <input type="text" id="username" name="username" class="form-control" placeholder="Username" ng-model="username" required>
           </div>
           <div class="form-group">
             <label for="password">Password</label>
-            <input type="password" class="form-control" name="password" placeholder="Password" ng-model="password" required ng-enter="login()">
+            <input type="password" id="password" class="form-control" name="password" placeholder="Password" ng-model="password" required ng-enter="login()">
           </div>
           <div class="has-warning has-feedback" ng-if="error">
             <label>Authentication failed.  Please try again.</label>

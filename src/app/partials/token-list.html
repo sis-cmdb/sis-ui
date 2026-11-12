@@ -38,7 +38,7 @@
 <div class="row sisui-bottom-buffer" ng-if="canAdd()">
     <form class="form-inline" role="form">
       <div class="form-group">
-        <input ng-model="newToken.desc" type="text" class="form-control input-sm" placeholder="Description">
+        <input ng-model="newToken.desc" aria-label="Description" type="text" class="form-control input-sm" placeholder="Description">
         <button type="button" class="btn btn-primary btn-sm" ng-click="addNew();" ng-disabled="!newToken.desc">Add New</button>
       </div>
     </form>

@@ -207,6 +207,18 @@ angular.module('sisui', ['ui.router', 'ui.bootstrap', 'sisconfig', 'smart-table'
     $rootScope.$state = $state;
     $rootScope.$stateParams = $stateParams;
     $rootScope.sisDlg = SisDialogs;
+    // the sidebar section a page belongs to: schemas (and their entities),
+    // hooks, scripts or users, including their add/edit/view/history pages
+    $rootScope.inSection = function(section) {
+        if ($state.includes("app.commits")) {
+            var type = $stateParams.type || "entities";
+            return section === (type === "entities" ? "schemas" : type);
+        }
+        if (section === "schemas") {
+            return $state.includes("app.schemas") || $state.includes("app.entities");
+        }
+        return $state.includes("app." + section);
+    };
     // remember where the user came from (e.g. so login can return there)
     $rootScope.previousState = null;
     $rootScope.$on("$stateChangeSuccess", function(event, to, toParams, from) {
@@ -229,4 +241,15 @@ angular.module('sisui', ['ui.router', 'ui.bootstrap', 'sisconfig', 'smart-table'
         '</ul></div>'
     ].join("");
     $templateCache.put('template/smart-table/pagination.html', template);
+
+    // ui-bootstrap's accordion heading, with href="" so it is a focusable link
+    $templateCache.put('template/accordion/accordion-group.html', [
+        '<div class="panel panel-default">',
+        '<div class="panel-heading"><h4 class="panel-title">',
+        '<a href="" class="accordion-toggle" ng-click="toggleOpen()" accordion-transclude="heading">',
+        '<span ng-class="{\'text-muted\': isDisabled}">{{heading}}</span></a>',
+        '</h4></div>',
+        '<div class="panel-collapse" collapse="!isOpen"><div class="panel-body" ng-transclude></div></div>',
+        '</div>'
+    ].join(""));
 });

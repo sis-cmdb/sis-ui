@@ -65,6 +65,9 @@ describe("components", function() {
             assert.equal(msg({ min: true }, { min: 1 }), "Must be at least 1");
             assert.equal(msg({ max: true }, { max: 9 }), "Must be at most 9");
             assert.equal(msg({ number: true }), "Must be a number");
+            assert.equal(msg({ regex: true }), "Not a valid regular expression");
+            assert.equal(msg({ minVal: true }), "Must not be more than max");
+            assert.equal(msg({ maxVal: true }), "Must not be less than min");
             assert.equal(msg({ weird: true }), "Invalid (weird)");
             assert.equal(SisUtil.validationMessage(undefined), "");
         });

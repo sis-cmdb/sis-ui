@@ -6,6 +6,8 @@ angular.module('sisui')
 
     $scope.paths = SisUtil.getDescriptorPath($scope.descriptor);
     $scope.path = $scope.paths.join(".");
+    // unique per descriptor, links the label to the input
+    $scope.inputId = "schema_" + $scope.$id;
 
     $scope.isEntityDescriptor = function() {
         return $scope.paths.length > 1 &&
@@ -18,6 +20,13 @@ angular.module('sisui')
 
     $scope.inputType = function() {
         return SisUtil.getInputType($scope.descriptor.type);
+    };
+
+    // the type to show as a placeholder; lists (e.g. owner) show their
+    // element type, the same as tags
+    $scope.placeholder = function() {
+        var type = $scope.descriptor.type;
+        return angular.isArray(type) ? type[0] : type;
     };
 
     // returns a boolean if the descriptor represents a value

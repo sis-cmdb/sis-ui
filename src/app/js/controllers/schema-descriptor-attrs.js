@@ -2,6 +2,10 @@ angular.module('sisui')
 .controller("SchemaAttrsDescriptorController", function($scope, SisUtil,
                                                         $modalInstance, $log) {
 
+    $scope.getErrorMsg = function(field) {
+        return SisUtil.validationMessage(field);
+    };
+
     $scope.attrChanged = function(desc, f, form) {
         if (f.name == "min" || f.name == "max") {
             // validate both

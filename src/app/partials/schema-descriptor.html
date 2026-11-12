@@ -1,20 +1,20 @@
 <div>
-    <label class="schema-label" style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}" ng-if="path === 'definition'" for="{{ path }}">{{ descriptor.name }}</label>
+    <label class="schema-label" style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}" ng-if="path === 'definition'">{{ descriptor.name }}</label>
     <div ng-if="canModifyDescriptor()" >
         <div ng-class="{ 'input-error' : !nameForm.$valid }">
-            <a href="" ng-disabled="!canDelete();" class="btn btn-xs btn-primary" ng-click="deleteDescriptor();" style="margin-right: 4px;">
+            <a href="" ng-disabled="!canDelete();" class="btn btn-xs btn-primary" ng-click="deleteDescriptor();" style="margin-right: 4px;" aria-label="Remove field {{ descriptor.name }}">
                 <span class="glyphicon glyphicon-minus"></span>
             </a>
             <sis-schema-field-name name="'field_' + $index" read-only="!canModifyDescriptorName()" descriptor="descriptor" change="nameChanged"></sis-schema-field-name>
-            <select ng-model="descriptor.type" ng-options="type for type in validDescriptorTypes" style="margin-right: 4px;" ng-change="typeChanged(descriptor);"></select>
-            <button type="button" class="btn btn-default btn-xs" ng-click="showAttrs();">
+            <select ng-model="descriptor.type" aria-label="Field type" ng-options="type for type in validDescriptorTypes" style="margin-right: 4px;" ng-change="typeChanged(descriptor);"></select>
+            <button type="button" class="btn btn-default btn-xs" ng-click="showAttrs();" aria-label="Field attributes {{ descriptor.name }}">
                 <span class="glyphicon glyphicon-list"></span>
             </button>
         </div>
     </div>
     <div ng-if="isSchemaValue()">
         <div ng-form="valueForm">
-            <label class="schema-label" style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}">{{ descriptor.name }}</label>
+            <label class="schema-label" style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}" for="{{ inputId }}">{{ descriptor.name }}</label>
             <div ng-if="descriptor.enum">
                 <ul>
                     <li>
@@ -28,7 +28,7 @@
                     </li>
                 </ul>
             </div>
-            <input ng-if="!descriptor.enum" type="{{ inputType() }}" placeholder="{{descriptor.type}}" ng-model="value" ng-disabled="descriptor.readonly" ng-change="schemaValueChanged(value)" name="valueField" ng-pattern="{{ descriptor.match }}" ng-required="descriptor.required"/>
+            <input ng-if="!descriptor.enum" id="{{ inputId }}" type="{{ inputType() }}" placeholder="{{ placeholder() }}" ng-model="value" ng-disabled="descriptor.readonly" ng-change="schemaValueChanged(value)" name="valueField" ng-pattern="{{ descriptor.match }}" ng-required="descriptor.required"/>
         </div>
     </div>
 </div>
