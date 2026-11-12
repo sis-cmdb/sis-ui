@@ -1,12 +1,10 @@
 .DS_Store
-src/app/js/config.js
+# local configuration for npm run serve (see config.js.sample)
+/config.js
 node_modules
 dist
-dev_dist
 .gitreview
 *~
 test-results
 playwright-report
 .e2e
-dist-vue
-vue/public/config.js

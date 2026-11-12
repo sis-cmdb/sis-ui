@@ -1,7 +1,9 @@
 "use strict";
 
-// Screenshot baselines of every page and dialog, so a rewrite of the UI can be
-// compared with the current look pixel by pixel.
+// Screenshot baselines of every page and dialog, so changes to the look are
+// noticed. They were taken from the AngularJS UI, which the Vue UI matches
+// pixel for pixel; update them only for an intended change of the look, and look
+// at every changed image.
 //
 // Runs in its own project, one test at a time (playwright.config.js), with
 // fixed names so the pages render the same every run. Lists are filtered down to

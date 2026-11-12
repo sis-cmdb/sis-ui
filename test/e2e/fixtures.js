@@ -2,7 +2,6 @@
 
 // Shared Playwright fixtures for the e2e suite.
 //
-//   ui           option: the UI under test, "angular" or "vue" (per project)
 //   api          SisClient authenticated as the seeded super user. Objects created
 //                through it are deleted after the test.
 //   uniqueName   uniqueName("host") -> "host_w0_k3x9a1", safe for parallel tests
@@ -21,13 +20,10 @@ function runtime() {
 }
 
 var test = base.test.extend({
-    // the UI a project tests: "angular" (src/) or "vue" (the rewrite in vue/)
-    ui: ["angular", { option: true, scope: "worker" }],
-
-    sis: [async function({ ui }, use) {
+    sis: [async function({}, use) {
         var rt = runtime();
         var session = await SisClient.login(rt.apiUrl, env.ADMIN.name, env.ADMIN.pw);
-        await use({ apiUrl: rt.apiUrl, uiUrl: ui === "vue" ? rt.vueUrl : rt.uiUrl, adminToken: session.name });
+        await use({ apiUrl: rt.apiUrl, uiUrl: rt.uiUrl, adminToken: session.name });
     }, { scope: "worker" }],
 
     baseURL: async function({ sis }, use) {

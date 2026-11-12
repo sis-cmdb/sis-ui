@@ -11,10 +11,8 @@
     "noUncheckedIndexedAccess": true,
     "types": ["vite/client"],
     "paths": {
-      "@/*": ["./vue/src/*"],
-      "@grammar/*": ["./src/pegjs/*"]
+      "@/*": ["./src/*"]
     }
   },
-  "include": ["vue/src/**/*.ts", "vue/src/**/*.vue"],
-  "exclude": ["vue/src/**/*.test.ts"]
+  "include": ["src/**/*.ts", "src/**/*.vue"]
 }

@@ -9,7 +9,8 @@
     "moduleResolution": "Bundler",
     "strict": true,
     "skipLibCheck": true,
+    "allowImportingTsExtensions": true,
     "types": ["node"]
   },
-  "include": ["vite.config.mts"]
+  "include": ["vite.config.mts", "scripts/**/*.mts"]
 }

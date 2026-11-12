@@ -1,12 +1,10 @@
 "use strict";
 
 // Brings up a real SIS stack for the e2e tests:
-//   1. builds the UI (with the sis-api docs) into .e2e/dist, and the Vue
-//      rewrite into .e2e/dist-vue
+//   1. builds the UI (with the sis-api docs) into .e2e/dist
 //   2. drops the e2e database and seeds a super user with sis-api's useradmin tool
-//   3. starts sis-api and a static server for each UI on free ports; both get a
-//      config.js in the AngularJS format, as existing deployments have
-// Returns a teardown function that stops the servers.
+//   3. starts sis-api and a preview server for the UI on free ports
+// Returns a teardown function that stops both.
 
 var fs = require("node:fs");
 var net = require("node:net");
@@ -15,8 +13,6 @@ var childProcess = require("node:child_process");
 var { MongoClient } = require("mongodb");
 
 var env = require("./env");
-var builder = require("../../../scripts/build");
-var serve = require("../../../scripts/serve");
 
 function freePort() {
     return new Promise(function(resolve, reject) {
@@ -87,25 +83,17 @@ function sisApiEnv(port) {
     });
 }
 
-async function buildVue() {
+// vite preview of the build; it answers app/js/config.js with SIS_API_URL
+async function startUi(apiUrl) {
     var vite = await import("vite");
-    process.env.SIS_DOCPATH = path.join(env.SIS_API_DIR, "docs");
-    await vite.build({
+    process.env.SIS_API_URL = apiUrl;
+    var server = await vite.preview({
         configFile: path.join(env.ROOT, "vite.config.mts"),
         logLevel: "warn",
-        build: { outDir: env.VUE_DIST }
+        build: { outDir: env.DIST },
+        preview: { port: await freePort(), strictPort: true }
     });
-}
-
-async function startServer(options) {
-    var port = await freePort();
-    var server = serve.createServer(options);
-    await new Promise(function(resolve) { server.listen(port, "127.0.0.1", resolve); });
-    return { server: server, url: "http://127.0.0.1:" + port };
-}
-
-function stopServer(server) {
-    return new Promise(function(resolve) { server.close(resolve); server.closeAllConnections(); });
+    return { server: server, url: server.resolvedUrls.local[0].replace(/\/$/, "") };
 }
 
 function seedAdmin(port) {
@@ -122,13 +110,9 @@ module.exports = async function globalSetup() {
     checkSisApi();
     fs.mkdirSync(path.dirname(env.RUNTIME_FILE), { recursive: true });
 
-    var buildPromise = Promise.all([
-        builder.build({
-            dist: env.DIST,
-            docPath: path.join(env.SIS_API_DIR, "docs")
-        }),
-        buildVue()
-    ]);
+    var buildPromise = import("../../../scripts/build.mjs").then(function(builder) {
+        return builder.buildUi({ docPath: path.join(env.SIS_API_DIR, "docs"), outDir: env.DIST, logLevel: "warn" });
+    });
     await resetDatabase();
 
     var apiPort = await freePort();
@@ -153,14 +137,12 @@ module.exports = async function globalSetup() {
         throw err;
     }
 
-    var ui = await startServer({ root: env.DIST, apiUrl: apiUrl });
-    var vue = await startServer({ root: env.VUE_DIST, apiUrl: apiUrl, configPath: "/config.js" });
+    var ui = await startUi(apiUrl);
 
-    fs.writeFileSync(env.RUNTIME_FILE, JSON.stringify({ apiUrl: apiUrl, uiUrl: ui.url, vueUrl: vue.url }));
-    process.env.SIS_E2E_UI_URL = ui.url;
+    fs.writeFileSync(env.RUNTIME_FILE, JSON.stringify({ apiUrl: apiUrl, uiUrl: ui.url }));
 
     return async function teardown() {
-        await Promise.all([stopServer(ui.server), stopServer(vue.server)]);
+        await ui.server.close();
         api.kill();
         await new Promise(function(resolve) {
             if (api.exitCode !== null) {

@@ -8,10 +8,7 @@ var { defineConfig, devices } = require("@playwright/test");
 
 var BROWSER = { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 800 } };
 var VISUAL = /visual\.spec\.js/;
-// shared by both UIs' visual projects
 var VISUAL_SNAPSHOTS = "{testDir}/{testFilePath}-snapshots/{arg}-visual{-snapshotSuffix}{ext}";
-// tests of the Vue rewrite itself
-var VUE_ONLY = /[\\/]vue[\\/]/;
 
 module.exports = defineConfig({
     testDir: "test/e2e",
@@ -30,7 +27,7 @@ module.exports = defineConfig({
     projects: [
         {
             name: "chromium",
-            testIgnore: [VISUAL, VUE_ONLY],
+            testIgnore: VISUAL,
             use: BROWSER
         },
         {
@@ -40,22 +37,6 @@ module.exports = defineConfig({
             workers: 1,
             snapshotPathTemplate: VISUAL_SNAPSHOTS,
             use: BROWSER
-        },
-        {
-            // the same tests against the Vue rewrite (vue/)
-            name: "vue",
-            testIgnore: VISUAL,
-            use: { ...BROWSER, ui: "vue" }
-        },
-        {
-            // the Vue rewrite must look the same: compared with the same baselines.
-            // After "visual", since both use the same fixed names.
-            name: "visual-vue",
-            testMatch: VISUAL,
-            workers: 1,
-            snapshotPathTemplate: VISUAL_SNAPSHOTS,
-            dependencies: ["visual"],
-            use: { ...BROWSER, ui: "vue" }
         }
     ]
 });
