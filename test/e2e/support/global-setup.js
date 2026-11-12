@@ -1,10 +1,12 @@
 "use strict";
 
 // Brings up a real SIS stack for the e2e tests:
-//   1. builds the UI (with the sis-api docs) into .e2e/dist
+//   1. builds the UI (with the sis-api docs) into .e2e/dist, and the Vue
+//      rewrite into .e2e/dist-vue
 //   2. drops the e2e database and seeds a super user with sis-api's useradmin tool
-//   3. starts sis-api and the UI static server on free ports
-// Returns a teardown function that stops both servers.
+//   3. starts sis-api and a static server for each UI on free ports; both get a
+//      config.js in the AngularJS format, as existing deployments have
+// Returns a teardown function that stops the servers.
 
 var fs = require("node:fs");
 var net = require("node:net");
@@ -85,6 +87,26 @@ function sisApiEnv(port) {
     });
 }
 
+async function buildVue() {
+    var vite = await import("vite");
+    await vite.build({
+        configFile: path.join(env.ROOT, "vite.config.mts"),
+        logLevel: "warn",
+        build: { outDir: env.VUE_DIST }
+    });
+}
+
+async function startServer(options) {
+    var port = await freePort();
+    var server = serve.createServer(options);
+    await new Promise(function(resolve) { server.listen(port, "127.0.0.1", resolve); });
+    return { server: server, url: "http://127.0.0.1:" + port };
+}
+
+function stopServer(server) {
+    return new Promise(function(resolve) { server.close(resolve); server.closeAllConnections(); });
+}
+
 function seedAdmin(port) {
     var file = path.join(path.dirname(env.RUNTIME_FILE), "admin.json");
     fs.writeFileSync(file, JSON.stringify(env.ADMIN));
@@ -99,10 +121,13 @@ module.exports = async function globalSetup() {
     checkSisApi();
     fs.mkdirSync(path.dirname(env.RUNTIME_FILE), { recursive: true });
 
-    var buildPromise = builder.build({
-        dist: env.DIST,
-        docPath: path.join(env.SIS_API_DIR, "docs")
-    });
+    var buildPromise = Promise.all([
+        builder.build({
+            dist: env.DIST,
+            docPath: path.join(env.SIS_API_DIR, "docs")
+        }),
+        buildVue()
+    ]);
     await resetDatabase();
 
     var apiPort = await freePort();
@@ -127,16 +152,14 @@ module.exports = async function globalSetup() {
         throw err;
     }
 
-    var uiPort = await freePort();
-    var ui = serve.createServer({ root: env.DIST, apiUrl: apiUrl });
-    await new Promise(function(resolve) { ui.listen(uiPort, "127.0.0.1", resolve); });
-    var uiUrl = "http://127.0.0.1:" + uiPort;
+    var ui = await startServer({ root: env.DIST, apiUrl: apiUrl });
+    var vue = await startServer({ root: env.VUE_DIST, apiUrl: apiUrl, configPath: "/config.js" });
 
-    fs.writeFileSync(env.RUNTIME_FILE, JSON.stringify({ apiUrl: apiUrl, uiUrl: uiUrl }));
-    process.env.SIS_E2E_UI_URL = uiUrl;
+    fs.writeFileSync(env.RUNTIME_FILE, JSON.stringify({ apiUrl: apiUrl, uiUrl: ui.url, vueUrl: vue.url }));
+    process.env.SIS_E2E_UI_URL = ui.url;
 
     return async function teardown() {
-        await new Promise(function(resolve) { ui.close(resolve); ui.closeAllConnections(); });
+        await Promise.all([stopServer(ui.server), stopServer(vue.server)]);
         api.kill();
         await new Promise(function(resolve) {
             if (api.exitCode !== null) {

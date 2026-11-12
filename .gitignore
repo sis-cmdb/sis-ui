@@ -8,3 +8,5 @@ dev_dist
 test-results
 playwright-report
 .e2e
+dist-vue
+vue/public/config.js

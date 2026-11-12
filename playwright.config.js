@@ -23,7 +23,7 @@ module.exports = defineConfig({
     projects: [
         {
             name: "chromium",
-            testIgnore: /visual\.spec\.js/,
+            testIgnore: [/visual\.spec\.js/, /[\\/]vue[\\/]/],
             use: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 800 } }
         },
         {
@@ -32,6 +32,12 @@ module.exports = defineConfig({
             testMatch: /visual\.spec\.js/,
             workers: 1,
             use: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 800 } }
+        },
+        {
+            // the Vue rewrite (vue/), while it is being built
+            name: "vue",
+            testMatch: /[\\/]vue[\\/].*\.spec\.js/,
+            use: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 800 }, ui: "vue" }
         }
     ]
 });

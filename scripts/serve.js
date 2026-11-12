@@ -40,6 +40,8 @@ function configJs(apiUrl) {
 }
 
 // Returns an http.Server (not yet listening) with a reload() method.
+// options: root, apiUrl, configPath (where apiUrl's config.js is served;
+// default /app/js/config.js), liveReload
 function createServer(options) {
     var root = path.resolve(options.root);
     var clients = new Set();
@@ -54,7 +56,7 @@ function createServer(options) {
             req.on("close", function() { clients.delete(res); });
             return;
         }
-        if (options.apiUrl !== undefined && urlPath === "/app/js/config.js") {
+        if (options.apiUrl !== undefined && urlPath === (options.configPath || "/app/js/config.js")) {
             res.writeHead(200, { "Content-Type": MIME[".js"], "Cache-Control": "no-cache" });
             return res.end(configJs(options.apiUrl));
         }

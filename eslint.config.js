@@ -2,15 +2,25 @@
 
 var js = require("@eslint/js");
 var globals = require("globals");
+var tseslint = require("typescript-eslint");
+var pluginVue = require("eslint-plugin-vue");
+
+// the Vue rewrite (vue/) and its build config
+var TS_FILES = ["vue/**/*.ts", "vue/**/*.vue", "vite.config.mts"];
+
+function scoped(configs, files) {
+    return configs.map(function(c) { return Object.assign({}, c, { files: files }); });
+}
 
 module.exports = [
     {
-        ignores: ["node_modules/**", "dist/**", ".e2e/**", "vendor/**", "test-results/**", "playwright-report/**"]
+        ignores: ["node_modules/**", "dist/**", "dist-vue/**", ".e2e/**", "vendor/**", "test-results/**", "playwright-report/**"]
     },
     js.configs.recommended,
     {
-        // the app: plain browser scripts concatenated into one bundle
-        files: ["src/**/*.js"],
+        // the app: plain browser scripts concatenated into one bundle; and the
+        // Vue app's unbundled config shim
+        files: ["src/**/*.js", "vue/public/**/*.js"],
         languageOptions: {
             ecmaVersion: 5,
             sourceType: "script",
@@ -54,6 +64,26 @@ module.exports = [
         files: ["test/unit/**/*.js"],
         languageOptions: {
             globals: globals.mocha
+        }
+    },
+    ...scoped(tseslint.configs.recommended, TS_FILES),
+    ...scoped(pluginVue.configs["flat/recommended"], ["vue/**/*.vue"]),
+    {
+        files: TS_FILES,
+        languageOptions: {
+            globals: globals.browser
+        }
+    },
+    {
+        files: ["vue/**/*.vue"],
+        languageOptions: {
+            // TypeScript in <script lang="ts">
+            parserOptions: { parser: tseslint.parser, extraFileExtensions: [".vue"] }
+        },
+        rules: {
+            "vue/html-indent": ["error", 4],
+            // templates keep an element's attributes on one line, like the partials
+            "vue/max-attributes-per-line": "off"
         }
     }
 ];

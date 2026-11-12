@@ -46,11 +46,18 @@ rebuilds and reloads the browser when files in `src` change.  It uses
 
 Use `--port` and `--host` to change where it listens.
 
+The UI is being rewritten in Vue 3 and TypeScript (in `vue/`).  Start its
+development server with `SIS_API_URL=http://localhost:3000 npm run dev:vue`
+(http://127.0.0.1:9001/) and build it with `npm run build:vue` (into
+`dist-vue`).  It reads the same `config.js` as the current UI.
+
 # Testing
 
-- `npm run lint` checks the code with eslint.
-- `npm test` runs the unit tests (mocha with jsdom), covering the services,
-  filters, directives, the query language and the build scripts.
+- `npm run lint` checks the code with eslint, and `npm run typecheck` the
+  TypeScript of the Vue rewrite.
+- `npm test` runs the unit tests: mocha with jsdom for the current UI
+  (services, filters, directives, the query language and the build scripts),
+  then Vitest for the Vue rewrite.
 - `npm run test:e2e` runs the end-to-end tests (Playwright).  They drive the
   built UI in Chromium against a real SIS API and MongoDB, which the test setup
   starts and seeds itself.  They need:
@@ -59,7 +66,7 @@ Use `--port` and `--host` to change where it listens.
     - a MongoDB server.  The tests drop and recreate the database given by
       `SIS_E2E_MONGO_URL` (default `mongodb://localhost:27017/sis-ui-e2e`)
     - Chromium for Playwright: `npx playwright install chromium`
-- `npm run test:all` runs all three.
+- `npm run test:all` runs all of these.
 
 Run one end-to-end file or test with `npx playwright test test/e2e/auth.spec.js`
 or `npx playwright test -g "survives a page reload"`.  Failed tests keep a

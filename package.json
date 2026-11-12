@@ -10,10 +10,14 @@
   "scripts": {
     "build": "node scripts/build.js",
     "serve": "node scripts/serve.js --watch",
-    "lint": "eslint .",
-    "test": "mocha 'test/unit/**/*.test.js'",
+    "dev:vue": "vite",
+    "build:vue": "vue-tsc --build && vite build",
+    "typecheck": "vue-tsc --build",
+    "lint": "eslint . --max-warnings 0",
+    "test": "mocha 'test/unit/**/*.test.js' && vitest run",
+    "test:vue": "vitest run",
     "test:e2e": "playwright test",
-    "test:all": "npm run lint && npm test && npm run test:e2e"
+    "test:all": "npm run lint && npm run typecheck && npm test && npm run test:e2e"
   },
   "dependencies": {
     "ace-builds": "github:ajaxorg/ace-builds#e3ccd2c654cf45ee41ffb09d0e7fa5b40cf91a8f",
@@ -25,13 +29,18 @@
     "jquery": "2.1.4",
     "jsondiffpatch": "0.1.43",
     "moment": "2.8.4",
-    "sis": "0.1.2"
+    "sis": "0.1.2",
+    "vue": "^3.5.45"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.65.0",
+    "@types/node": "^24.19.2",
+    "@vitejs/plugin-vue": "^6.0.10",
+    "@vue/tsconfig": "^0.9.1",
     "angular-mocks": "1.2.32",
     "eslint": "^10.14.0",
+    "eslint-plugin-vue": "^10.12.1",
     "globals": "^17.14.0",
     "highlight.js": "^11.12.0",
     "html-minifier-terser": "^7.2.0",
@@ -41,6 +50,14 @@
     "mongodb": "^7.8.0",
     "nunjucks": "^3.2.4",
     "peggy": "^5.1.1",
-    "terser": "^5.51.2"
+    "terser": "^5.51.2",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.2",
+    "vite": "^8.3.8",
+    "vitest": "^5.1.0",
+    "vue-tsc": "^3.3.14"
+  },
+  "overrides": {
+    "minimatch": "^11.0.8"
   }
 }
