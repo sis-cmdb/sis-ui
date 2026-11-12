@@ -88,7 +88,7 @@ test.describe("schema editor", function() {
     test("an error from the API is shown in a dialog and the form is kept", async function({ page, api, signIn, uniqueName, pageErrors }) {
         var name = uniqueName("taken");
         await api.createSchema({ name: name, definition: { a: "String" } });
-        pageErrors.allow(/the server responded with a status of/);
+        pageErrors.allow(/the server responded with a status of 409/);
         await signIn(page);
         await startNewSchema(page, name);
         await addField(page, "b", null, true);
@@ -96,7 +96,7 @@ test.describe("schema editor", function() {
 
         var dlg = pages.modal(page);
         await expect(dlg.getByRole("heading")).toHaveText("An error occurred");
-        await expect(dlg).toContainText("duplicate key");
+        await expect(dlg.locator(".modal-body")).toHaveText("Conflict: name \"" + name + "\" already exists");
         await dlg.getByRole("button", { name: "OK" }).click();
         await expect(dlg).toHaveCount(0);
         await expect(page).toHaveURL(/#\/schemas\/add$/);

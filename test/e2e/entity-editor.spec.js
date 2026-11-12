@@ -137,6 +137,26 @@ test.describe("entity editor", function() {
         expect(saved.disks).toEqual([expect.objectContaining({ dev: "sda", size: 512 })]);
     });
 
+    test("a taken unique value is reported in a dialog and the form is kept", async function({ page, api, signIn, uniqueName, pageErrors }) {
+        var s = await createSchemas(api, uniqueName);
+        await api.createEntity(s.host, { hostname: "taken" });
+        pageErrors.allow(/the server responded with a status of 409/);
+        await signIn(page);
+        await page.goto("/#/entities/" + s.host + "/add");
+
+        // right after the schema and the first entity were created
+        await pages.entityInput(page, "hostname").fill("taken");
+        await page.getByRole("button", { name: "Save" }).click();
+
+        var dlg = pages.modal(page);
+        await expect(dlg.locator(".modal-body")).toHaveText("Conflict: hostname \"taken\" already exists");
+        await dlg.getByRole("button", { name: "OK" }).click();
+        await expect(dlg).toHaveCount(0);
+        await expect(page).toHaveURL(new RegExp("#/entities/" + s.host + "/add$"));
+        await expect(pages.entityInput(page, "hostname")).toHaveValue("taken");
+        expect((await api.get("/entities/" + s.host)).length).toBe(1);
+    });
+
     test("toggle JSON shows the entity on the view page", async function({ page, api, signIn, uniqueName }) {
         var s = await createSchemas(api, uniqueName);
         var host = await api.createEntity(s.host, { hostname: "j", tags: ["x"] });
