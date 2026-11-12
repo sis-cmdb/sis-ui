@@ -50,8 +50,8 @@ a:focus:not(:focus-visible),
 
 /* inline forms size inputs to their content, which makes number inputs too
    narrow for their placeholder; give entity form inputs one width */
-sis-entity-input input[type=text].form-control,
-sis-entity-input input[type=number].form-control {
+.entity-input input[type=text].form-control,
+.entity-input input[type=number].form-control {
     width: 14em;
 }
 
@@ -73,7 +73,7 @@ sis-entity-input input[type=number].form-control {
 /* bootstrap tops checkboxes with a 4px margin, which puts them above the
    middle of their labels */
 .form-inline .schema-label ~ input[type=checkbox],
-.form-inline .entity-label ~ sis-entity-input input[type=checkbox] {
+.form-inline .entity-label ~ .entity-input input[type=checkbox] {
     margin-top: 0;
     vertical-align: middle;
 }

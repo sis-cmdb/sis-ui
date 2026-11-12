@@ -7,7 +7,9 @@ import AppLayout from "./pages/AppLayout.vue";
 import { session } from "./services";
 import { state } from "./state";
 
-const PendingPage = () => import("./pages/PendingPage.vue");
+const SchemaFormPage = () => import("./pages/SchemaFormPage.vue");
+const EntityFormPage = () => import("./pages/EntityFormPage.vue");
+const EntityViewPage = () => import("./pages/EntityViewPage.vue");
 
 const routes: RouteRecordRaw[] = [
     {
@@ -18,20 +20,20 @@ const routes: RouteRecordRaw[] = [
             { path: "login", name: "login", component: () => import("./pages/LoginPage.vue") },
             { path: "users", name: "users", component: () => import("./pages/UserListPage.vue") },
             { path: "schemas", name: "schemas", component: () => import("./pages/SchemaListPage.vue") },
-            { path: "schemas/add", name: "schema-add", component: PendingPage },
-            { path: "schemas/edit/:schema", name: "schema-edit", component: PendingPage },
+            { path: "schemas/add", name: "schema-add", component: SchemaFormPage },
+            { path: "schemas/edit/:schema", name: "schema-edit", component: SchemaFormPage },
             { path: "entities/:schema", name: "entities", component: () => import("./pages/EntityListPage.vue") },
-            { path: "entities/:schema/add", name: "entity-add", component: PendingPage },
-            { path: "entities/:schema/edit/:eid", name: "entity-edit", component: PendingPage },
-            { path: "entities/:schema/view/:eid", name: "entity-view", component: PendingPage },
+            { path: "entities/:schema/add", name: "entity-add", component: EntityFormPage },
+            { path: "entities/:schema/edit/:eid", name: "entity-edit", component: EntityFormPage },
+            { path: "entities/:schema/view/:eid", name: "entity-view", component: EntityViewPage },
             { path: "hooks", name: "hooks", component: () => import("./pages/HookListPage.vue") },
-            { path: "hooks/add", name: "hook-add", component: PendingPage },
-            { path: "hooks/edit/:id", name: "hook-edit", component: PendingPage },
-            { path: "hooks/view/:id", name: "hook-view", component: PendingPage },
+            { path: "hooks/add", name: "hook-add", component: EntityFormPage },
+            { path: "hooks/edit/:id", name: "hook-edit", component: EntityFormPage },
+            { path: "hooks/view/:id", name: "hook-view", component: EntityViewPage },
             { path: "scripts", name: "scripts", component: () => import("./pages/ScriptListPage.vue") },
-            { path: "scripts/add", name: "script-add", component: PendingPage },
-            { path: "scripts/edit/:id", name: "script-edit", component: PendingPage },
-            { path: "scripts/view/:id", name: "script-view", component: PendingPage },
+            { path: "scripts/add", name: "script-add", component: EntityFormPage },
+            { path: "scripts/edit/:id", name: "script-edit", component: EntityFormPage },
+            { path: "scripts/view/:id", name: "script-view", component: EntityViewPage },
             { path: "tokens", name: "tokens", component: () => import("./pages/TokenListPage.vue") },
             {
                 path: "commits/entities/:schema/:id",

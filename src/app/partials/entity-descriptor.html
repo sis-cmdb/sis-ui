@@ -62,7 +62,7 @@
                 <span class="glyphicon glyphicon-minus"></span>
             </a>
             <label style="width: {{ maxFieldNameLength(descriptor, isItem()) | labelWidth }}" class="entity-label left-border" for="{{ inputId }}">{{ fieldName }}</label>
-            <sis-entity-input ref-id="refId" field-descriptor="fieldDescriptor" path="innerFormField" input-id="inputId" ng-model="fieldValue" entity="entity" value-changed="valueChanged" action="action"></sis-entity-input>
+            <sis-entity-input class="entity-input" ref-id="refId" field-descriptor="fieldDescriptor" path="innerFormField" input-id="inputId" ng-model="fieldValue" entity="entity" value-changed="valueChanged" action="action"></sis-entity-input>
             <button style="margin-left: 4px;" ng-if="fieldDescriptor.ref && !isReadOnly()" class="btn btn-sm btn-info" ng-click="chooseEntity();">Choose</button>
             <a ng-if="refId" ui-sref="app.entities.view({ schema : fieldDescriptor.ref, eid : refId })">View</a>
             <div ng-if="!innerForm.innerFormField.$valid">

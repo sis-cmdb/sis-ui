@@ -33,6 +33,34 @@ angular.module('sisui')
         $scope.descriptors = descriptors;
         $scope.metaDescriptors = [metaDescriptor];
 
+        // references come from the API as the referenced entity and the form
+        // stores their _id; compare in that form, so an untouched entity is
+        // unchanged
+        var normalizeRefs = function(container, descs) {
+            if (!container || typeof container !== 'object') {
+                return;
+            }
+            descs.forEach(function(desc) {
+                var value = container[desc.name];
+                var isRef = function(d) { return d.type === 'ObjectId' && d.ref; };
+                if (isRef(desc) && value && typeof value === 'object') {
+                    container[desc.name] = value._id;
+                } else if (desc.type === 'Document' && desc.children) {
+                    normalizeRefs(value, desc.children);
+                } else if (desc.type === 'Array' && desc.children && value instanceof Array) {
+                    var item = desc.children[0];
+                    value.forEach(function(v, i) {
+                        if (isRef(item) && v && typeof v === 'object') {
+                            value[i] = v._id;
+                        } else if (item.type === 'Document') {
+                            normalizeRefs(v, item.children || []);
+                        }
+                    });
+                }
+            });
+        };
+        normalizeRefs(orig, descriptors);
+
         $scope.entity = angular.copy(orig);
         // for the valueChanged recursion
         $scope.fieldValue = $scope.entity;

@@ -58,6 +58,21 @@ test.describe("entity editor", function() {
         await expect(page.getByRole("heading", { name: "View entity r2 of type " + s.rack })).toBeVisible();
     });
 
+    test("an untouched entity with a reference cannot be saved", async function({ page, api, signIn, uniqueName }) {
+        var s = await createSchemas(api, uniqueName);
+        var r1 = await api.createEntity(s.rack, { name: "r1" });
+        // every field set, so the form adds no defaults
+        var host = await api.createEntity(s.host, { hostname: "h1", rack: r1._id, data: { a: 1 }, tags: ["t"], disks: [{ dev: "sda", size: 1 }] });
+        await signIn(page);
+        // opened directly: the API sends the reference as the whole rack
+        await page.goto("/#/entities/" + s.host + "/edit/" + host._id);
+
+        await expect(pages.entityInput(page, "rack")).toHaveValue("r1");
+        await expect(page.getByRole("button", { name: "Save" })).toBeDisabled();
+        await pages.entityInput(page, "hostname").fill("h2");
+        await expect(page.getByRole("button", { name: "Save" })).toBeEnabled();
+    });
+
     test("a reference can be cleared", async function({ page, api, signIn, uniqueName }) {
         var s = await createSchemas(api, uniqueName);
         var r1 = await api.createEntity(s.rack, { name: "r1" });

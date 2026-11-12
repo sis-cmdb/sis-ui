@@ -25,6 +25,7 @@
     "angular-smart-table": "github:lorenzofox3/Smart-Table#2d486024168b5568fbb9d3c1e81893b5989248d9",
     "angular-ui-router": "0.2.18",
     "bootswatch": "github:thomaspark/bootswatch#c6def2a07b63f0fdc7dab5dbc4f06cdbf5227cdc",
+    "ip-address": "^10.7.6",
     "ipv6": "3.1.1",
     "jquery": "2.1.4",
     "jsondiffpatch": "^0.7.7",

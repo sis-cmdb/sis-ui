@@ -23,6 +23,16 @@ declare module "virtual:sis-docs" {
     export function loadDoc(name: string): Promise<string | null>;
 }
 
+// the Ace editor (vue/src/lib/ace.ts loads it), as far as the UI uses it
+interface AceEditor {
+    setValue(value: string, cursor?: number): void;
+    getValue(): string;
+    setReadOnly(readOnly: boolean): void;
+    getSession(): { setMode(mode: string): void };
+    destroy(): void;
+}
+
 interface Window {
+    ace?: { edit(element: HTMLElement): AceEditor };
     SIS_CONFIG?: { API_URL?: string };
 }

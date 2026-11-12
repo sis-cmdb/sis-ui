@@ -61,7 +61,8 @@ function devConfig(): Plugin {
 
 // Files served as they are, at the same paths as in the AngularJS build: the
 // Bootswatch themes (switched at runtime by the Theme menu) with their fonts,
-// and the images.
+// the images and the Ace editor (loaded when the code editor opens; it loads
+// its modes from its own directory).
 const STATIC_DIRS: Array<{ url: string; dir: string; include: (file: string) => boolean }> = [
     ...legacyBuild.THEMES.map((theme) => ({
         url: "common/css/bootswatch/" + theme,
@@ -73,11 +74,16 @@ const STATIC_DIRS: Array<{ url: string; dir: string; include: (file: string) => 
         dir: path.join(ROOT, "node_modules/bootswatch/fonts"),
         include: (file: string) => file.startsWith("glyphicons")
     },
-    { url: "common/images", dir: path.join(ROOT, "src/common/images"), include: () => true }
+    { url: "common/images", dir: path.join(ROOT, "src/common/images"), include: () => true },
+    {
+        url: "app/js/vendor/ace",
+        dir: path.join(ROOT, "node_modules/ace-builds/src-min-noconflict"),
+        include: (file: string) => file.endsWith(".js")
+    }
 ];
 
 const MIME: Record<string, string> = {
-    ".css": "text/css", ".png": "image/png", ".ico": "image/x-icon", ".svg": "image/svg+xml",
+    ".css": "text/css", ".js": "text/javascript", ".png": "image/png", ".ico": "image/x-icon", ".svg": "image/svg+xml",
     ".eot": "application/vnd.ms-fontobject", ".ttf": "font/ttf", ".woff": "font/woff"
 };
 

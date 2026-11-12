@@ -16,15 +16,18 @@ const SUPPORTED_TYPES = ["schemas", "hooks", "scripts", "hiera"] as const;
 
 const route = useRoute();
 const router = useRouter();
-const id = String(route.params.id);
+// read once: loading continues after the user may have navigated away
+const params = { ...route.params };
+const routeName = route.name;
+const id = String(params.id);
 const title = ref("");
 const endpoint = shallowRef<Endpoint<Commit> | null>(null);
 
 const list = usePagedList<Commit>({ endpoint: () => endpoint.value, sort: () => "date_modified", url: false });
 
 async function setup(): Promise<void> {
-    if (route.name === "entity-commits") {
-        const schemaName = String(route.params.schema);
+    if (routeName === "entity-commits") {
+        const schemaName = String(params.schema);
         try {
             await api.schemas.get(schemaName);
         } catch {
@@ -35,7 +38,7 @@ async function setup(): Promise<void> {
         endpoint.value = api.entities(schemaName).commits(id);
         return;
     }
-    const type = String(route.params.type) as (typeof SUPPORTED_TYPES)[number];
+    const type = String(params.type) as (typeof SUPPORTED_TYPES)[number];
     if (!SUPPORTED_TYPES.includes(type)) {
         void router.replace("/schemas");
         return;
