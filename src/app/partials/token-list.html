@@ -17,12 +17,12 @@
         </thead>
         <tbody>
             <tr ng-repeat="token in temps">
-                <td>{{ token.name }}</td>
+                <td>{{ token.session ? 'Login session' : token.name }}</td>
                 <td>{{ token.expires | expireTime }}</td>
                 <td>
                     <span ng-if="isCurrent(token)" class="label label-primary">Current Token</span>
-                    <a ng-if="!isCurrent(token)" class="btn btn-xs btn-danger" ng-click="remove(token, true)">
-                        <span class="glyphicon glyphicon-trash">Remove</span>
+                    <a href="" ng-if="!isCurrent(token)" class="btn btn-xs btn-danger" ng-click="remove(token, true)">
+                        <span class="glyphicon glyphicon-trash"></span> Remove
                     </a>
                 </td>
             </tr>
@@ -47,8 +47,8 @@
     <table class="table table-bordered table-condensed table-striped">
         <thead>
             <tr>
-                <td>Name</td>
-                <td>Description</td>
+                <th>Name</th>
+                <th>Description</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -57,8 +57,8 @@
                 <td>{{ token.name }}</td>
                 <td>{{ token.desc }}</td>
                 <td>
-                    <a class="btn btn-xs btn-danger" ng-click="remove(token, false)">
-                        <span class="glyphicon glyphicon-trash">Remove</span>
+                    <a href="" class="btn btn-xs btn-danger" ng-click="remove(token, false)">
+                        <span class="glyphicon glyphicon-trash"></span> Remove
                     </a>
                 </td>
             </tr>

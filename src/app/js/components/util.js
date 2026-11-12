@@ -1,6 +1,6 @@
 // Utility methods - TODO refactor
 angular.module('sisui')
-.factory('SisUtil', function($window, $state, SisUser, $q) {
+.factory('SisUtil', function($window, $state, $rootScope, SisUser, $q) {
     "use strict";
 
     // add some utilities to the client
@@ -332,6 +332,9 @@ angular.module('sisui')
             return desc.enum[0];
         } else if (desc.type == "ObjectId") {
             return null;
+        } else if (desc.type == "Boolean") {
+            // matches the unchecked checkbox; the API rejects "" for booleans
+            return false;
         } else {
             return "";
         }
@@ -392,7 +395,7 @@ angular.module('sisui')
                 owner : _getAllRoles()
             },
             definition : {
-                name : { type : "String", required : true,  unique : true, match :  /^[a-z0-9_\-]+$/ },
+                name : { type : "String", required : true,  unique : true, match :  /^[a-z0-9_-]+$/ },
                 description : { type : "String" },
                 script_type : { type: "String", required : true, enum : ["application/javascript"] },
                 script : { type: "String", code : true, code_type_field : "script_type" }
@@ -423,12 +426,56 @@ angular.module('sisui')
         };
     };
 
+    // Returns to the previous page if the user got here from another page of
+    // the app (history.back() keeps that page's query, e.g. a filter), and
+    // goes to the given state otherwise (e.g. the page was opened from a link).
     var _goBack = function(state) {
-        if ($window.history.length) {
+        if ($rootScope.previousState) {
             $window.history.back();
         } else {
             $state.go(state);
         }
+    };
+
+    // message for the first failed validation of a form field
+    var _validationMessage = function(field, descriptor) {
+        descriptor = descriptor || {};
+        var errors = (field && field.$error) || {};
+        for (var k in errors) {
+            if (!errors[k]) {
+                continue;
+            }
+            switch (k) {
+                case "required": return "Required";
+                case "ip": return "Not a valid IP address";
+                case "number": return "Must be a number";
+                case "pattern":
+                case "match": return descriptor.match ? "Must match " + descriptor.match : "Invalid format";
+                case "min": return "Must be at least " + descriptor.min;
+                case "max": return "Must be at most " + descriptor.max;
+                default: return "Invalid (" + k + ")";
+            }
+        }
+        return "";
+    };
+
+    var _escapeHtml = function(text) {
+        return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+    };
+
+    // The jsondiffpatch html formatter escapes values but not object keys
+    // (GHSA-33vc-wfww-vjfv), so escape the keys of a delta before formatting it.
+    // Arrays in a delta are leaf changes holding plain values.
+    var _escapeDeltaKeys = function(delta) {
+        if (!delta || typeof delta !== 'object' || angular.isArray(delta)) {
+            return delta;
+        }
+        var result = { };
+        Object.keys(delta).forEach(function(k) {
+            result[_escapeHtml(k)] = _escapeDeltaKeys(delta[k]);
+        });
+        return result;
     };
 
     var _toRegex = function(str) {
@@ -451,6 +498,7 @@ angular.module('sisui')
             }
             return new RegExp(regex, flags);
         } catch(ex) {
+            // not a valid regex
         }
         return null;
     };
@@ -503,6 +551,9 @@ angular.module('sisui')
         getHookSchema : _getHookSchema,
         getScriptSchema : _getScriptSchema,
         goBack : _goBack,
+        escapeHtml : _escapeHtml,
+        escapeDeltaKeys : _escapeDeltaKeys,
+        validationMessage : _validationMessage,
         toRegex : _toRegex,
         getSisMetaDescriptor : _getSisMetaDescriptor,
         toStringArray : _toStringArray

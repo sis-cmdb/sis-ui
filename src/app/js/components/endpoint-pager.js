@@ -15,9 +15,9 @@ angular.module('sisui')
             result[op] = [left, right];
         } else {
             // at a leaf
-            if (!isNaN(right)) {
-                right = parseFloat(right);
-            }
+            var toValue = function(s) {
+                return isNaN(s) || s === "" ? s : parseFloat(s);
+            };
             var opMap = {
                 ">=" : "$gte",
                 "<=" : "$lte",
@@ -25,23 +25,22 @@ angular.module('sisui')
                 ">" : "$gt",
                 "!=" : "$ne"
             };
+            var cond = {};
             if (op in opMap) {
                 // { field : { op : val }}
-                var rightOp = {}; rightOp[opMap[op]] = right;
-                result[left] = rightOp;
+                cond[opMap[op]] = toValue(right);
+                result[left] = cond;
             } else if (op == "nin" || op == "in") {
-                right = right.split(",").map(function(s) {
-                    s = s.trim();
-                    if (!isNaN(s)) {
-                        s = parseFloat(s);
-                    }
-                    return s;
+                // { field : { $in : [vals] }}
+                cond['$' + op] = String(right).split(",").map(function(s) {
+                    return toValue(s.trim());
                 });
+                result[left] = cond;
             } else if (op == "like") {
                 result[left] = { $regex : right, $options : "i" };
             } else {
                 // equal
-                result[left] = right;
+                result[left] = toValue(right);
             }
         }
         return result;
@@ -60,7 +59,6 @@ angular.module('sisui')
         } catch (ex) {
             return null;
         }
-        return null;
     }
 
     function SmartTableSetup(scope, opts) {
@@ -78,13 +76,14 @@ angular.module('sisui')
         this.endpoint = null;
         var self = this;
 
-        var loading = false;
-
         // called from the parent scope to do page
         // loads
         this.loadPage = function(state, controller) {
             if (!this.stController) {
                 this._setStController(controller);
+            } else if (!this.endpoint) {
+                // not ready yet - setEndpoint() loads the first page
+                return;
             } else {
                 // table state change triggered
                 // after initialization
@@ -257,9 +256,8 @@ angular.module('sisui')
 
 
     return {
-        create : function(endpoint, scope, opts) {
-            return new EndpointPager(endpoint, scope, opts);
-        },
+        // filter box text -> SIS query object, or null if it does not parse
+        parseSearch : parseSearch,
         createStPager : function(scope, opts) {
             return new SmartTableSetup(scope, opts);
         }

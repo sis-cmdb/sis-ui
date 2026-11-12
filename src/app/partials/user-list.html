@@ -18,8 +18,8 @@
     <table class="table table-bordered table-condensed table-striped">
         <thead>
             <tr>
-                <td>Name</td>
-                <td>Roles</td>
+                <th>Name</th>
+                <th>Roles</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -39,8 +39,8 @@
                     <a ng-show="!canManage(user)" class="btn btn-xs btn-default" disabled="disabled">
                         <span class="glyphicon glyphicon-lock"></span>
                     </a>
-                    <a ng-show="canManage(user)" class="btn btn-xs btn-primary" ng-click="edit(user);">
-                        <span class="glyphicon glyphicon-edit">Edit</span>
+                    <a href="" ng-show="canManage(user)" class="btn btn-xs btn-primary" ng-click="edit(user);">
+                        <span class="glyphicon glyphicon-edit"></span> Edit
                     </a>
                 </td>
             </tr>

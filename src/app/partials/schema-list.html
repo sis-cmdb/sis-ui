@@ -20,8 +20,8 @@
     <table class="table table-bordered table-condensed table-striped">
         <thead>
             <tr>
-                <td>Name</td>
-                <td>Owners</td>
+                <th>Name</th>
+                <th>Owners</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -39,13 +39,13 @@
                         <span class="glyphicon glyphicon-lock"></span>
                     </a>
                     <a ng-show="canManage(schema)" class="btn btn-xs btn-primary" ng-click="cacheSchema(schema);" ui-sref="^.edit({ schema : schema.name })">
-                        <span class="glyphicon glyphicon-edit">Edit</span>
+                        <span class="glyphicon glyphicon-edit"></span> Edit
                     </a>
-                    <a ng-show="canRemove(schema)" class="btn btn-xs btn-danger" ng-click="remove(schema)">
-                        <span class="glyphicon glyphicon-trash">Remove</span>
+                    <a href="" ng-show="canRemove(schema)" class="btn btn-xs btn-danger" ng-click="remove(schema)">
+                        <span class="glyphicon glyphicon-trash"></span> Remove
                     </a>
                     <a type="buton" class="btn btn-info btn-xs" ui-sref="app.commits.sisobj({ type : 'schemas', id : schema.name })">
-                        <span class="glyphicon glyphicon-list">History</span>
+                        <span class="glyphicon glyphicon-list"></span> History
                     </a>
                 </td>
             </tr>

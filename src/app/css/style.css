@@ -41,6 +41,13 @@ ul {
     margin-right: 5px;
 }
 
+/* inline forms size inputs to their content, which makes number inputs too
+   narrow for their placeholder; give entity form inputs one width */
+sis-entity-input input[type=text].form-control,
+sis-entity-input input[type=number].form-control {
+    width: 14em;
+}
+
 .schema-label {
     width: 120px;
     text-align: right;

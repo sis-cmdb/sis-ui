@@ -4,11 +4,6 @@ angular.module('sisui')
                                            EndpointPager) {
     "use strict";
 
-    var query = {
-        sort : "name",
-        fields : "name,entity_type,_sis"
-    };
-
     var hookSchema = SisUtil.getHookSchema();
     var pager = null;
 

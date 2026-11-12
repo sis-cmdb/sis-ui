@@ -47,5 +47,5 @@ angular.module('sisui')
         });
     };
 
-    SisUser.verify().then(refresh());
+    SisUser.verify().then(refresh);
 });

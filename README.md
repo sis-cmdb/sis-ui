@@ -5,6 +5,8 @@ Table of Contents
 - [Requirements](#requirements)
 - [Building](#building)
 - [Configuration](#configuration)
+- [Running the server](#running-the-server)
+- [Testing](#testing)
 - [LICENSE](#license)
 
 # Description
@@ -16,17 +18,16 @@ rendering component.
 
 # Requirements
 
-[Grunt](http://gruntjs.com) is used to build the UI.  Ensure grunt is installed
-via `npm install -g grunt-cli`.  `sudo` might be required depending on your
-installation.
+Node.js 20 or newer (see `.nvmrc`).  Run `npm install` to install the build
+tools and the browser libraries.
 
 # Building
 
-Prior to building, run `npm install`.  If the git protocol (9418/tcp) access to
-github.com is blocked, run `git config --global url."https://".insteadOf git://`
-and re-run `npm install`.
+`npm run build` produces a UI distribution in the `dist` directory.  Add
+`-- --docpath ../sis-api/docs` to render the SIS API documentation into the UI.
 
-The default target produces a UI distribution in the `dist` directory.
+The build does not include `app/js/config.js`; deployments provide their own
+(see [Configuration](#configuration)).
 
 # Configuration
 
@@ -36,14 +37,34 @@ SIS backend URL.  See `src/app/js/config.js.sample` for an example.
 
 # Running the server
 
-A live reload server can be started via the `serve` target.  SIS API
-Documentation can be built into the UI by specifying the `--docpath` option.
-For example:
+`npm run serve` builds the UI, serves it on http://127.0.0.1:9000/ and
+rebuilds and reloads the browser when files in `src` change.  It uses
+`src/app/js/config.js`; pass `--api-url` to point at a SIS API instead, and
+`--docpath` to include the API documentation.  For example:
 
-`grunt serve --sisjspath=../sis-js/lib/sis-client.js --docpath=../sis-api/docs`
+`npm run serve -- --api-url http://localhost:3000 --docpath ../sis-api/docs`
 
-will start a live reload server on port 9000 that serves up the UI and renders
-the API documentation found in `../sis-api/docs`.
+Use `--port` and `--host` to change where it listens.
+
+# Testing
+
+- `npm run lint` checks the code with eslint.
+- `npm test` runs the unit tests (mocha with jsdom), covering the services,
+  filters, directives, the query language and the build scripts.
+- `npm run test:e2e` runs the end-to-end tests (Playwright).  They drive the
+  built UI in Chromium against a real SIS API and MongoDB, which the test setup
+  starts and seeds itself.  They need:
+    - a checkout of [sis-api](https://github.com/sis-cmdb/sis-api) with
+      `npm install` done, at `../sis-api` or in `SIS_API_DIR`
+    - a MongoDB server.  The tests drop and recreate the database given by
+      `SIS_E2E_MONGO_URL` (default `mongodb://localhost:27017/sis-ui-e2e`)
+    - Chromium for Playwright: `npx playwright install chromium`
+- `npm run test:all` runs all three.
+
+Run one end-to-end file or test with `npx playwright test test/e2e/auth.spec.js`
+or `npx playwright test -g "survives a page reload"`.  Failed tests keep a
+screenshot and a trace in `test-results`; open a trace with
+`npx playwright show-trace <path>`.
 
 # LICENSE
 

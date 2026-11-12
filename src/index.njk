@@ -20,7 +20,7 @@
           <ul class="nav navbar-nav">
             {% if docs.length %}
             <li class="dropdown" ng-class="{'active':$state.is('docs')}">
-                <a class="dropdown-toggle" data-toggle="dropdown">Docs <span class="caret"></span></a>
+                <a href="" class="dropdown-toggle" data-toggle="dropdown">Docs <span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
                     {%- for doc in docs -%}
                     <li><a ui-sref="docs({doc:'{{ doc[0] }}'})">{{ doc[2] }}</a></li>
@@ -28,10 +28,10 @@
                 </ul>
             {% endif %}
             <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown">Theme <span class="caret"></span></a>
+                <a href="" class="dropdown-toggle" data-toggle="dropdown">Theme <span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu" ng-controller="ThemeController" ng-init="setTheme('{{ themes[0] }}')">
                     {% for theme in themes %}
-                    <li><a ng-click="setTheme('{{theme}}')">{{ theme }}</a></li>
+                    <li><a href="" ng-click="setTheme('{{theme}}')">{{ theme }}</a></li>
                     {% endfor %}
                 </ul>
             </li>

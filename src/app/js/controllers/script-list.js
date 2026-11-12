@@ -4,11 +4,6 @@ angular.module('sisui')
                                              EndpointPager) {
     "use strict";
 
-    var query = {
-        sort : "name",
-        fields : "name,script_type,_sis,description"
-    };
-
     var scriptSchema = SisUtil.getScriptSchema();
     var pager = null;
 

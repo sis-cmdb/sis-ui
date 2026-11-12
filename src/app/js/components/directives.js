@@ -66,7 +66,7 @@ angular.module('sisui')
         if (elem == "select") {
             template += "</select>";
         } else if (isCode) {
-            template += "<a class='btn btn-sm btn-primary' ng-click='openEditor()'>Open Editor</a>";
+            template += "<a href='' class='btn btn-sm btn-primary' ng-click='openEditor()'>Open Editor</a>";
         }
         return template;
 
@@ -80,7 +80,6 @@ angular.module('sisui')
             return;
         }
         scope.$state = $state;
-        var elementOffset = element.offset().left;
 
         scope.openEditor = function() {
             var modalScope = scope.$new(true);
@@ -194,7 +193,6 @@ angular.module('sisui')
     };
     var linker = function(scope, element, attrs, formCtrl) {
         var field = scope.field;
-        var descriptor = scope.descriptor;
         var type = field.type;
         var name = field.name;
         scope.formCtrl = formCtrl;
@@ -303,7 +301,6 @@ angular.module('sisui')
                     });
                 });
             });
-            var content = toc.next("h1");
             ul.addClass('nav affix');
             ul.attr("role", "complementary");
             ul.children('li').children('ul').addClass('expand');

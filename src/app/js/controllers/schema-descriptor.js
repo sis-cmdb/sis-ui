@@ -418,13 +418,7 @@ angular.module('sisui')
     };
 
     $scope.getErrorMsg = function(field) {
-        if (!field) { return ""; }
-        for (var k in field.$error) {
-            if (field.$error[k]) {
-                return "Invalid : (" + k + ")";
-            }
-        }
-        return "";
+        return SisUtil.validationMessage(field, $scope.descriptor);
     };
 
     $scope.validDescriptorTypes = SisUtil.descriptorTypes;
@@ -462,25 +456,6 @@ angular.module('sisui')
                 $scope.descriptor.ref = schema;
                 break;
             }
-        }
-    }
-
-    if ($scope.descriptor.match &&
-        $scope.descriptorForm &&
-        $scope.descriptorForm.valueField) {
-        var regex = SisUtil.toRegex($scope.descriptor.match);
-        if (regex) {
-            $scope.descriptorForm.valueField.$parsers.push(function(viewValue) {
-                if (regex.test(viewValue)) {
-                  // it is valid
-                  ctrl.$setValidity('match', true);
-                  return viewValue;
-                } else {
-                  // it is invalid, return undefined (no model update)
-                  ctrl.$setValidity('match', false);
-                  return undefined;
-                }
-            });
         }
     }
 

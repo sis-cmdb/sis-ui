@@ -2,7 +2,7 @@
     <label class="schema-label" style="width: {{ maxFieldNameLength(descriptor) | labelWidth }}" ng-if="path === 'definition'" for="{{ path }}">{{ descriptor.name }}</label>
     <div ng-if="canModifyDescriptor()" >
         <div ng-class="{ 'input-error' : !nameForm.$valid }">
-            <a ng-disabled="!canDelete();" class="btn btn-xs btn-primary" ng-click="deleteDescriptor();" style="margin-right: 4px;">
+            <a href="" ng-disabled="!canDelete();" class="btn btn-xs btn-primary" ng-click="deleteDescriptor();" style="margin-right: 4px;">
                 <span class="glyphicon glyphicon-minus"></span>
             </a>
             <sis-schema-field-name name="'field_' + $index" read-only="!canModifyDescriptorName()" descriptor="descriptor" change="nameChanged"></sis-schema-field-name>
@@ -38,8 +38,8 @@
             <div ng-include="'app/partials/schema-descriptor.html'"></div>
         </li>
         <li ng-if="canAddChildren();">
-            <a class="btn btn-xs btn-primary" ng-click="addChildDescriptor();">
-                <span class="glyphicon glyphicon-plus">Add</span>
+            <a href="" class="btn btn-xs btn-primary" ng-click="addChildDescriptor();">
+                <span class="glyphicon glyphicon-plus"></span> Add
             </a>
         </li>
     </ul>

@@ -115,7 +115,6 @@ angular.module('sisui')
     };
 
     $scope.save = function() {
-        var schemaName = $scope.schema.name;
         var endpoint = SisApi.scripts;
         var func = endpoint.create;
         if ($scope.action == 'edit') {

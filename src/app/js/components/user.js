@@ -1,8 +1,35 @@
 // SIS User information.  Evolve into settings
 angular.module('sisui')
-.factory("SisUser", function(SisApi, $q, $rootScope) {
+.factory("SisUser", function(SisApi, $q, $rootScope, $window) {
     "use strict";
     var USER_KEY = "t";
+    // how long a UI login with a persistent (non expiring) token lasts
+    var PERSISTENT_TOKEN_SESSION_MS = 8 * 60 * 60 * 1000;
+
+    // Session tokens from POST /users/auth_token are JWTs (three dot separated
+    // parts). Persistent tokens are opaque strings stored by the API.
+    var isSessionToken = function(token) {
+        return typeof token === 'string' && token.split('.').length === 3;
+    };
+
+    // expiration of a session token in ms since the epoch, or null
+    var sessionExpiration = function(token) {
+        try {
+            var payload = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+            while (payload.length % 4) {
+                payload += '=';
+            }
+            var claims = angular.fromJson($window.atob(payload));
+            return typeof claims.exp === 'number' ? claims.exp * 1000 : null;
+        } catch (ex) {
+            return null;
+        }
+    };
+
+    // the API rejected the token itself (as opposed to being unreachable)
+    var isInvalidTokenError = function(err) {
+        return !!err && (err.status === 401 || err.status === 404);
+    };
 
     var isExpired = function(currentUser) {
         return !(currentUser &&
@@ -29,7 +56,44 @@ angular.module('sisui')
         localStorage.setItem(USER_KEY, angular.toJson(user));
     };
 
+    // Checks a token with the API and resolves with its expiration time.
+    var checkToken = function(username, token) {
+        SisApi.setAuthToken(token);
+        var tokens = SisApi.tokens(username);
+        if (isSessionToken(token)) {
+            // session tokens are not stored by the API, so make an authenticated
+            // request to validate it. The expiration is in the token itself.
+            return tokens.list({ limit : 1 }).then(function() {
+                return sessionExpiration(token) || Date.now() + PERSISTENT_TOKEN_SESSION_MS;
+            });
+        }
+        return tokens.get(token).then(function(result) {
+            if (!result) {
+                return $q.reject({ status : 404, error : "Token is invalid." });
+            }
+            // persistent tokens have no expiration
+            return Date.now() + (result.expires || PERSISTENT_TOKEN_SESSION_MS);
+        });
+    };
+
+    // Stores the logged in user and tells the rest of the app.
+    var storeUser = function(username, token, expirationTime) {
+        return SisApi.users.get(username).then(function(user) {
+            var data = {
+                username : user.name,
+                super_user : user.super_user,
+                roles : user.roles,
+                expirationTime : expirationTime,
+                token : token
+            };
+            setUser(data);
+            $rootScope.$broadcast("loggedIn", true);
+            return data;
+        });
+    };
+
     return {
+        isSessionToken : isSessionToken,
         isLoggedIn : function() {
             var currentUser = getUser();
             if (!currentUser) {
@@ -57,112 +121,65 @@ angular.module('sisui')
             }
             return null;
         },
+        // Resolves true once the user is logged out locally and, for session
+        // tokens, false if the API could not end the session.
         logout : function() {
-            var d = $q.defer();
             if (!this.isLoggedIn()) {
-                d.resolve(true);
-                return d.promise;
+                return $q.when(true);
             }
-            var username = this.getCurrentUser().username;
+            var token = SisApi.getAuthToken();
             cleanup();
-            SisApi.tokens(username).delete(SisApi.getAuthToken()).then(function() {
-                // ignore errors
-                d.resolve(true);
+            if (!isSessionToken(token)) {
+                // a persistent token belongs to whoever issued it (e.g. an app
+                // embedding the UI), so only forget it here
+                return $q.when(true);
+            }
+            return SisApi.endSession(token).then(function() {
+                return true;
             }, function() {
-                d.resolve(false);
+                return false;
             });
-            return d.promise;
         },
         login : function(username, password) {
-            var d = $q.defer();
-            this.logout().then(function() {
-                SisApi.authenticate(username, password).then(function(token) {
-                    if (!token) {
-                        return d.reject("Authentication failed.");
-                    }
-                    // get the user details
-                    return SisApi.users.get(username).then(function(user) {
-                        var data = {
-                            username : username,
-                            super_user : user.super_user,
-                            roles : user.roles,
-                            expirationTime : Date.now() + token.expires,
-                            token : token.name
-                        };
-                        setUser(data);
-                        d.resolve(data);
-                        $rootScope.$broadcast("loggedIn", true);
-                    });
-                }, function (err) {
-                    d.reject("An error occurred: " + err);
+            return this.logout().then(function() {
+                return SisApi.authenticate(username, password).catch(function(err) {
+                    return $q.reject("An error occurred: " + (err && err.error || err));
                 });
+            }).then(function(token) {
+                if (!token) {
+                    return $q.reject("Authentication failed.");
+                }
+                var expirationTime = sessionExpiration(token.name) || Date.now() + token.expires;
+                return storeUser(username, token.name, expirationTime);
             });
-            return d.promise;
         },
+        // Checks the stored login with the API. Resolves with the user, or null
+        // if nobody is logged in or the API rejected the token.
         verify : function() {
             var user = this.getCurrentUser();
-            var self = this;
-            var d = $q.defer();
-            if (user) {
-                SisApi.setAuthToken(user.token);
-                return SisApi.tokens(user.username).get(user.token).then(function(token) {
-                    // good to go
-                    // let's get the updated user too
-                    return SisApi.users.get(user.username).then(function(user) {
-                        var data = {
-                            username : user.name,
-                            super_user: user.super_user,
-                            roles: user.roles,
-                            expirationTime: Date.now() + token.expires,
-                            token: token.name
-                        };
-                        setUser(data);
-                        d.resolve(data);
-                    });
-                }, function(err) {
-                    // logout - something bad
-                    self.logout();
-                    d.resolve(null);
-                });
-            } else {
-                d.resolve(null);
+            if (!user) {
+                return $q.when(null);
             }
-            return d.promise;
+            return checkToken(user.username, user.token).then(function(expirationTime) {
+                return storeUser(user.username, user.token, expirationTime);
+            }, function(err) {
+                if (isInvalidTokenError(err)) {
+                    cleanup();
+                    return null;
+                }
+                // API unavailable - keep the login and try again next time
+                return user;
+            });
         },
         loginWithToken : function(username, token) {
-            var d = $q.defer();
-            this.logout().then(function() {
-                // ensure the token is valid
-                SisApi.setAuthToken(token);
-                SisApi.tokens(username).get(token).then(function(result) {
-                    if (!result) {
-                        SisApi.setAuthToken(null);
-                        return d.reject("Token is invalid.");
-                    }
-                    return SisApi.users.get(username).then(function(user) {
-                        // login
-                        if (!result.expires) {
-                            // persistent token
-                            // set it to 8 hours
-                            result.expires = (8 * 1000 * 60);
-                        }
-                        var data = {
-                            username : username,
-                            super_user : user.super_user,
-                            roles : user.roles,
-                            expirationTime : Date.now() + result.expires,
-                            token : token
-                        };
-                        setUser(data);
-                        d.resolve(data);
-                        $rootScope.$broadcast("loggedIn", true);
-                    });
-                }, function(err) {
-                    SisApi.setAuthToken(null);
-                    d.reject(err);
-                });
+            return this.logout().then(function() {
+                return checkToken(username, token);
+            }).then(function(expirationTime) {
+                return storeUser(username, token, expirationTime);
+            }).catch(function(err) {
+                SisApi.setAuthToken(null);
+                return $q.reject(err);
             });
-            return d.promise;
         }
     };
 });

@@ -179,15 +179,7 @@ angular.module('sisui')
     };
 
     $scope.getErrorMsg = function(field) {
-        for (var k in field.$error) {
-            if (field.$error[k]) {
-                if ($scope.descriptor[k]) {
-                    return "Invalid : (" + k + " - " + $scope.descriptor[k] + ")";
-                }
-                return "Invalid : (" + k + ")";
-            }
-        }
-        return "";
+        return SisUtil.validationMessage(field, $scope.fieldDescriptor);
     };
 
     // Dirty hack.  Better way would be to make binding fieldValue

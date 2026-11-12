@@ -1,0 +1,3 @@
+# Unit tests: services, filters and directives in jsdom, plus the build scripts.
+# The spec glob is in the npm test script so `npx mocha <file>` runs one file.
+timeout: 10000
